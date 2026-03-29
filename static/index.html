@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | AI Roleplay Agent</title>
+    <link rel="stylesheet" href="/static/shared.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#002859',
+                        'primary-container': '#003d82',
+                        secondary: '#b50062',
+                        'secondary-container': '#e2007c',
+                        'secondary-fixed': '#ffd9e2',
+                        'primary-fixed': '#d7e2ff',
+                        surface: '#f7fafd',
+                        'surface-container-low': '#f1f4f7',
+                        'surface-container-high': '#e5e8eb',
+                        'surface-container-lowest': '#ffffff',
+                        'on-surface': '#181c1e',
+                        'on-surface-variant': '#434751',
+                        outline: '#737782',
+                        'outline-variant': '#c3c6d2',
+                        tertiary: '#002f2c',
+                        'tertiary-fixed': '#72f7ed',
+                    },
+                    fontFamily: {
+                        manrope: ['Manrope', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafd;
+            color: #181c1e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            transform: translateX(4px);
+        }
+        .feature-card:hover .feature-icon {
+            background-color: #b50062 !important;
+            color: white !important;
+        }
+        .quick-link {
+            transition: all 0.2s ease;
+        }
+        .quick-link:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+        .stat-item {
+            position: relative;
+        }
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 40px;
+            width: 1px;
+            background-color: #c3c6d2;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
+        .animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
+        .animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
+        .db-warning-banner {
+            animation: slideDown 0.4s ease forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-100%); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-surface">
+
+    <!-- Background Accents -->
+    <div class="fixed top-20 right-20 w-[500px] h-[500px] rounded-full bg-secondary/5 blur-[120px] pointer-events-none"></div>
+    <div class="fixed bottom-20 left-80 w-[400px] h-[400px] rounded-full bg-primary/5 blur-[120px] pointer-events-none"></div>
+
+    <!-- Shared sidebar & header injected by shared.js -->
+    <script src="/static/shared.js"></script>
+
+    <!-- DB Warning Banner (hidden by default) -->
+    <div id="db-warning" class="hidden fixed top-16 left-0 lg:left-64 right-0 z-20 bg-amber-50 border-b border-amber-200 px-8 py-3">
+        <div class="max-w-[1200px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-amber-600">warning</span>
+                <span class="text-sm text-amber-800 font-medium">지식베이스가 아직 구축되지 않았습니다. 기능을 사용하려면 먼저 지식베이스를 구축해주세요.</span>
+            </div>
+            <button id="build-db-btn" onclick="buildDatabase()" class="px-4 py-1.5 bg-amber-600 text-white text-sm font-bold rounded-full hover:bg-amber-700 transition-colors flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-base">build</span>
+                지식베이스 구축
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="app-main p-8">
+        <div class="max-w-[1200px] mx-auto">
+
+            <!-- Hero Section -->
+            <section class="mb-8 animate-fade-in-up">
+                <div class="flex items-center gap-3 mb-3">
+                    <h2 class="text-4xl font-extrabold font-manrope text-on-surface">
+                        환영합니다, <span class="text-secondary">사업담당</span>님
+                    </h2>
+                    <span class="bg-secondary-fixed px-3 py-1 rounded-full text-sm font-bold text-secondary">Stage 1 MVP</span>
+                </div>
+                <p class="text-on-surface-variant text-lg">오늘도 AI 에이전트와 함께 실전 역량을 강화해볼까요?</p>
+            </section>
+
+            <!-- Progress Card -->
+            <section class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-outline-variant/20 mb-8 animate-fade-in-up animate-delay-1">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="material-symbols-outlined text-primary">trending_up</span>
+                    <h3 class="text-lg font-bold font-manrope text-on-surface">주간 학습 현황</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-0">
+                    <div class="stat-item text-center px-4">
+                        <p class="text-sm text-on-surface-variant mb-2">롤플레이 완료</p>
+                        <p class="text-2xl font-black text-primary font-manrope" id="stat-roleplay">0<span class="text-base font-bold">회</span></p>
+                    </div>
+                    <div class="stat-item text-center px-4">
+                        <p class="text-sm text-on-surface-variant mb-2">퀴즈 정답률</p>
+                        <p class="text-2xl font-black text-primary font-manrope" id="stat-quiz">0<span class="text-base font-bold">%</span></p>
+                    </div>
+                    <div class="stat-item text-center px-4">
+                        <p class="text-sm text-on-surface-variant mb-2">학습 용어</p>
+                        <p class="text-2xl font-black text-primary font-manrope" id="stat-terms">0<span class="text-base font-bold">개</span></p>
+                    </div>
+                    <div class="stat-item text-center px-4">
+                        <p class="text-sm text-on-surface-variant mb-2">연속 학습일</p>
+                        <p class="text-2xl font-black text-primary font-manrope" id="stat-streak">0<span class="text-base font-bold">일</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bento Grid -->
+            <section class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+                <!-- Card 1: Recommended Scenario (col-span-7) -->
+                <div class="md:col-span-7 bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/20 relative overflow-hidden animate-fade-in-up animate-delay-2">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-secondary bg-secondary-fixed px-2.5 py-1 rounded-full">Recommended</span>
+                    <div class="mt-4 mb-3 flex items-start gap-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-primary font-manrope mb-2">솔루션 시연 + 사업 효과 설명</h3>
+                            <p class="text-on-surface-variant text-sm italic leading-relaxed">고객사에 AICC 솔루션을 시연하고, 도입 시 기대되는 사업적 효과를 설득력 있게 전달하는 연습을 해봅니다.</p>
+                        </div>
+                        <span class="material-symbols-outlined text-primary text-4xl flex-shrink-0" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;">psychology</span>
+                    </div>
+                    <a href="/simulation" class="inline-flex items-center gap-1.5 mt-4 px-5 py-2.5 bg-primary text-white rounded-full text-sm font-bold hover:bg-primary-container transition-colors">
+                        시작하기
+                        <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    </a>
+                    <!-- Decorative icon -->
+                    <span class="material-symbols-outlined absolute -bottom-4 -right-4 text-[140px] text-primary/[0.03] pointer-events-none" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;">psychology</span>
+                </div>
+
+                <!-- Card 2: Quick Start (col-span-5) -->
+                <div class="md:col-span-5 bg-primary text-white rounded-2xl p-6 shadow-lg relative overflow-hidden animate-fade-in-up animate-delay-3">
+                    <div class="flex items-center gap-2 mb-5">
+                        <span class="material-symbols-outlined text-white/80">analytics</span>
+                        <h3 class="text-lg font-bold font-manrope">빠른 시작</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="/simulation" class="quick-link flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                            <span class="text-lg">🎭</span>
+                            <span class="text-sm font-medium">새 롤플레이</span>
+                            <span class="material-symbols-outlined text-white/50 ml-auto text-base">chevron_right</span>
+                        </a>
+                        <a href="/quiz" class="quick-link flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                            <span class="text-lg">🎯</span>
+                            <span class="text-sm font-medium">퀴즈 풀기</span>
+                            <span class="material-symbols-outlined text-white/50 ml-auto text-base">chevron_right</span>
+                        </a>
+                        <a href="/dictionary" class="quick-link flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                            <span class="text-lg">📖</span>
+                            <span class="text-sm font-medium">용어 검색</span>
+                            <span class="material-symbols-outlined text-white/50 ml-auto text-base">chevron_right</span>
+                        </a>
+                    </div>
+                    <!-- Decorative -->
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full"></div>
+                    <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full"></div>
+                </div>
+            </section>
+
+            <!-- Feature Cards Grid -->
+            <section class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up animate-delay-4">
+                <a href="/simulation" class="feature-card bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/20 hover:bg-secondary-fixed/30 transition-all group cursor-pointer">
+                    <div class="feature-icon w-12 h-12 rounded-full bg-primary/5 text-primary flex items-center justify-center mb-4 transition-all">
+                        <span class="material-symbols-outlined text-2xl">forum</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-on-surface">Simulation</h4>
+                    <p class="text-xs text-on-surface-variant mt-1">AI 고객과 실전 대화 연습</p>
+                </a>
+                <a href="/quiz" class="feature-card bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/20 hover:bg-secondary-fixed/30 transition-all group cursor-pointer">
+                    <div class="feature-icon w-12 h-12 rounded-full bg-primary/5 text-primary flex items-center justify-center mb-4 transition-all">
+                        <span class="material-symbols-outlined text-2xl">quiz</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-on-surface">Quiz</h4>
+                    <p class="text-xs text-on-surface-variant mt-1">지식 확인 퀴즈 풀기</p>
+                </a>
+                <a href="/dictionary" class="feature-card bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/20 hover:bg-secondary-fixed/30 transition-all group cursor-pointer">
+                    <div class="feature-icon w-12 h-12 rounded-full bg-primary/5 text-primary flex items-center justify-center mb-4 transition-all">
+                        <span class="material-symbols-outlined text-2xl">menu_book</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-on-surface">Dictionary</h4>
+                    <p class="text-xs text-on-surface-variant mt-1">AICC 용어 사전 검색</p>
+                </a>
+                <a href="/dictionary" class="feature-card bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/20 hover:bg-secondary-fixed/30 transition-all group cursor-pointer">
+                    <div class="feature-icon w-12 h-12 rounded-full bg-primary/5 text-primary flex items-center justify-center mb-4 transition-all">
+                        <span class="material-symbols-outlined text-2xl">account_tree</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-on-surface">Architecture</h4>
+                    <p class="text-xs text-on-surface-variant mt-1">시스템 아키텍처 이해</p>
+                </a>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Load stats from localStorage
+        function loadStats() {
+            const roleplayCount = localStorage.getItem('roleplay_count') || '0';
+            const quizAccuracy = localStorage.getItem('quiz_accuracy') || '0';
+            const termsLearned = localStorage.getItem('terms_learned') || '0';
+            const streakDays = localStorage.getItem('streak_days') || '0';
+
+            document.getElementById('stat-roleplay').innerHTML = `${roleplayCount}<span class="text-base font-bold">회</span>`;
+            document.getElementById('stat-quiz').innerHTML = `${quizAccuracy}<span class="text-base font-bold">%</span>`;
+            document.getElementById('stat-terms').innerHTML = `${termsLearned}<span class="text-base font-bold">개</span>`;
+            document.getElementById('stat-streak').innerHTML = `${streakDays}<span class="text-base font-bold">일</span>`;
+        }
+
+        // Check DB status
+        async function checkDbStatus() {
+            try {
+                const response = await fetch('/api/db-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (!data.ready) {
+                        document.getElementById('db-warning').classList.remove('hidden');
+                        document.getElementById('db-warning').classList.add('db-warning-banner');
+                    }
+                }
+            } catch (e) {
+                // API not available, silently ignore
+            }
+        }
+
+        // Build database
+        async function buildDatabase() {
+            const btn = document.getElementById('build-db-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> 구축 중...';
+
+            try {
+                const response = await fetch('/api/build-db', { method: 'POST' });
+                if (response.ok) {
+                    btn.innerHTML = '<span class="material-symbols-outlined text-base">check</span> 완료';
+                    btn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
+                    btn.classList.add('bg-green-600');
+                    setTimeout(() => {
+                        document.getElementById('db-warning').classList.add('hidden');
+                    }, 1500);
+                } else {
+                    btn.innerHTML = '<span class="material-symbols-outlined text-base">error</span> 실패 - 다시 시도';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                btn.innerHTML = '<span class="material-symbols-outlined text-base">error</span> 오류 발생';
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            checkDbStatus();
+        });
+    </script>
+</body>
+</html>

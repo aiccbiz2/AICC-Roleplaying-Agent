@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dictionary | AI Roleplay Agent</title>
+  <link rel="stylesheet" href="/static/shared.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#002859',
+            'primary-container': '#003d82',
+            secondary: '#b50062',
+            'secondary-fixed': '#ffd9e2',
+            'primary-fixed': '#d7e2ff',
+            surface: '#f7fafd',
+            'surface-container-low': '#f1f4f7',
+            'surface-container-high': '#e5e8eb',
+            'surface-container-lowest': '#ffffff',
+            'on-surface': '#181c1e',
+            'on-surface-variant': '#434751',
+            outline: '#737782',
+            'outline-variant': '#c3c6d2',
+            tertiary: '#002f2c',
+            'tertiary-fixed': '#72f7ed',
+            'tertiary-container': '#004743',
+            error: '#ba1a1a',
+          },
+          fontFamily: {
+            headline: ['Manrope', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Manrope', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-surface min-h-screen font-body text-on-surface">
+
+  <!-- Shared sidebar & header injected by shared.js -->
+  <script src="/static/shared.js"></script>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="app-main p-8 max-w-[1440px]">
+
+    <!-- Hero Search Section -->
+    <section class="bg-primary rounded-3xl p-12 mb-8">
+      <h2 class="font-headline font-extrabold text-white text-4xl mb-3">용어 사전 및 아키텍처 가이드</h2>
+      <p class="text-primary-fixed text-base mb-8 max-w-2xl">IPCC 전문 용어와 현장 표현의 매핑 정보를 검색하고, 시스템 아키텍처 구성을 학습하세요.</p>
+      <div class="relative max-w-2xl">
+        <div class="flex items-center bg-white/10 backdrop-blur rounded-2xl border border-white/20 overflow-hidden">
+          <span class="material-symbols-outlined text-white/60 pl-5 pr-2 text-[22px]">search</span>
+          <input
+            id="heroSearch"
+            type="text"
+            placeholder="용어, 약어, 현장 표현 검색..."
+            class="flex-1 bg-transparent border-none text-white placeholder-white/50 py-4 px-2 text-sm focus:ring-0 focus:outline-none"
+          />
+          <button onclick="applySearch()" class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2.5 rounded-xl text-sm font-semibold m-1.5 transition">검색</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Toggle -->
+    <div class="flex justify-center mb-8">
+      <div class="bg-surface-container-high rounded-full p-1 inline-flex">
+        <button id="tabDict" onclick="switchTab('dictionary')" class="px-6 py-2.5 rounded-full text-sm font-bold transition bg-white shadow-sm text-secondary">용어 사전</button>
+        <button id="tabArch" onclick="switchTab('architecture')" class="px-6 py-2.5 rounded-full text-sm font-medium transition text-on-surface-variant hover:text-on-surface">아키텍처 가이드</button>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 1: DICTIONARY ===== -->
+    <section id="sectionDictionary">
+
+      <!-- Category Filter Pills -->
+      <div id="categoryPills" class="flex gap-2 mb-6 overflow-x-auto hide-scrollbar pb-2">
+        <button onclick="filterCategory('all')" data-cat="all" class="cat-pill active shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition bg-primary text-white border-primary">전체</button>
+      </div>
+
+      <!-- Glossary Cards Grid -->
+      <div id="glossaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Cards injected by JS -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-16">
+        <span class="material-symbols-outlined text-outline text-6xl mb-4">search_off</span>
+        <p class="text-on-surface-variant text-lg">검색 결과가 없습니다</p>
+        <p class="text-outline text-sm mt-1">다른 검색어를 입력해 보세요</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: ARCHITECTURE ===== -->
+    <section id="sectionArchitecture" class="hidden">
+
+      <!-- Architecture Sub-Section Toggle -->
+      <div class="flex gap-2 mb-8 overflow-x-auto hide-scrollbar pb-2">
+        <button onclick="switchArch('structure')" data-arch="structure" class="arch-pill active shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold border transition bg-primary text-white border-primary">IPCC 전체 구조</button>
+        <button onclick="switchArch('callflow')" data-arch="callflow" class="arch-pill shrink-0 px-5 py-2.5 rounded-full text-sm font-medium border transition text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary">콜 플로우</button>
+        <button onclick="switchArch('aicc')" data-arch="aicc" class="arch-pill shrink-0 px-5 py-2.5 rounded-full text-sm font-medium border transition text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary">AICC 전환</button>
+        <button onclick="switchArch('vendor')" data-arch="vendor" class="arch-pill shrink-0 px-5 py-2.5 rounded-full text-sm font-medium border transition text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary">벤더 비교</button>
+      </div>
+
+      <!-- SUB 1: IPCC 전체 구조 -->
+      <div id="archStructure" class="arch-content">
+        <!-- Architecture Flow Diagram -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30 mb-8">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">IPCC 전체 아키텍처 다이어그램</h3>
+          <div class="overflow-x-auto hide-scrollbar">
+            <div class="flex items-center gap-3 min-w-[900px] py-4">
+              <!-- PSTN -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-primary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary text-3xl">call</span>
+                </div>
+                <span class="text-xs font-semibold text-primary">고객 전화</span>
+                <span class="text-[10px] text-outline">PSTN</span>
+              </div>
+              <span class="material-symbols-outlined text-outline-variant text-xl">arrow_forward</span>
+              <!-- Voice GW -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-primary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary text-3xl">router</span>
+                </div>
+                <span class="text-xs font-semibold text-primary">보이스 GW</span>
+                <span class="text-[10px] text-outline">E1/PRI</span>
+              </div>
+              <span class="material-symbols-outlined text-outline-variant text-xl">arrow_forward</span>
+              <!-- IP-PBX -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-tertiary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-tertiary text-3xl">device_hub</span>
+                </div>
+                <span class="text-xs font-semibold text-tertiary">IP-PBX</span>
+                <span class="text-[10px] text-outline">교환기</span>
+              </div>
+              <span class="material-symbols-outlined text-outline-variant text-xl">arrow_forward</span>
+              <!-- IVR -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-tertiary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-tertiary text-3xl">record_voice_over</span>
+                </div>
+                <span class="text-xs font-semibold text-tertiary">IVR</span>
+                <span class="text-[10px] text-outline">자동응답</span>
+              </div>
+              <span class="material-symbols-outlined text-outline-variant text-xl">arrow_forward</span>
+              <!-- CTI -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-secondary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-secondary text-3xl">hub</span>
+                </div>
+                <span class="text-xs font-semibold text-secondary">CTI</span>
+                <span class="text-[10px] text-outline">미들웨어</span>
+              </div>
+              <span class="material-symbols-outlined text-outline-variant text-xl">arrow_forward</span>
+              <!-- 상담원 -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-secondary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-secondary text-3xl">headset_mic</span>
+                </div>
+                <span class="text-xs font-semibold text-secondary">상담원</span>
+                <span class="text-[10px] text-outline">Softphone</span>
+              </div>
+              <span class="material-symbols-outlined text-outline-variant text-xl">arrow_forward</span>
+              <!-- CRM/녹취 -->
+              <div class="flex flex-col items-center gap-1.5">
+                <div class="w-20 h-20 rounded-2xl bg-primary-fixed flex items-center justify-center">
+                  <span class="material-symbols-outlined text-primary text-3xl">database</span>
+                </div>
+                <span class="text-xs font-semibold text-primary">CRM</span>
+                <span class="text-[10px] text-outline">기관계/녹취</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Components Table -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30 mb-8">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">핵심 구성요소</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b-2 border-primary/10">
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">구성요소</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">역할</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">핵심 포인트</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline-variant/30">
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">PBX</td>
+                  <td class="py-3 px-4 text-on-surface-variant">교환기 - 전화 통신 관리</td>
+                  <td class="py-3 px-4 text-on-surface-variant">대표번호, 회선번호, 내선번호, 스킬그룹 보유</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">CTI</td>
+                  <td class="py-3 px-4 text-on-surface-variant">미들웨어 - 교환기+컴퓨터 통합</td>
+                  <td class="py-3 px-4"><span class="bg-secondary-fixed text-secondary text-xs font-semibold px-2 py-0.5 rounded-full">"CTI 없으면 IPCC 아니다"</span></td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">IVR</td>
+                  <td class="py-3 px-4 text-on-surface-variant">자동응답 시스템</td>
+                  <td class="py-3 px-4 text-on-surface-variant">ARS(일방향) vs IVR(양방향) 구분 중요</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">녹취</td>
+                  <td class="py-3 px-4 text-on-surface-variant">통화 녹음/저장</td>
+                  <td class="py-3 px-4 text-on-surface-variant">스테레오 녹취 = AI의 전제조건 (화자분리)</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">상담AP</td>
+                  <td class="py-3 px-4 text-on-surface-variant">상담원 통합 업무 화면</td>
+                  <td class="py-3 px-4 text-on-surface-variant">소프트폰 + CRM + 기관계 연동</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- IPT vs IPCC -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">IPT vs IPCC 비교</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b-2 border-primary/10">
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">구분</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">IPT</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">IPCC</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline-variant/30">
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">구성</td>
+                  <td class="py-3 px-4 text-on-surface-variant">PBX + IVR</td>
+                  <td class="py-3 px-4 text-on-surface-variant">PBX + IVR + <strong>CTI</strong> + 녹취 + 상담AP</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">기능</td>
+                  <td class="py-3 px-4 text-on-surface-variant">단순 전화 연결</td>
+                  <td class="py-3 px-4 text-on-surface-variant">고객정보 연동, 라우팅, 통계</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">데이터</td>
+                  <td class="py-3 px-4 text-on-surface-variant">통신 데이터만</td>
+                  <td class="py-3 px-4 text-on-surface-variant">기관계 연동 고객 정보</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB 2: 콜 플로우 -->
+      <div id="archCallflow" class="arch-content hidden">
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30 mb-8">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">인바운드 콜 플로우</h3>
+          <div class="space-y-4">
+            <!-- Step 1 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-headline font-bold text-sm">1</div>
+                <div class="w-0.5 h-8 bg-primary/20 mt-1"></div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">고객 전화 인입</p>
+                <p class="text-sm text-on-surface-variant mt-1">고객 → PSTN → E1/PRI → 보이스 게이트웨이 (TDM→IP 변환)</p>
+              </div>
+            </div>
+            <!-- Step 2 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-headline font-bold text-sm">2</div>
+                <div class="w-0.5 h-8 bg-primary/20 mt-1"></div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">PBX 교환기</p>
+                <p class="text-sm text-on-surface-variant mt-1">대표번호로 인입, 호 처리 및 분배</p>
+              </div>
+            </div>
+            <!-- Step 3 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-headline font-bold text-sm">3</div>
+                <div class="w-0.5 h-8 bg-primary/20 mt-1"></div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">IVR 자동응답</p>
+                <p class="text-sm text-on-surface-variant mt-1">"1번 상담, 2번 조회..." 안내 및 고객 선택</p>
+              </div>
+            </div>
+            <!-- Step 4 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-headline font-bold text-sm">4</div>
+                <div class="w-0.5 h-8 bg-secondary/20 mt-1"></div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">CTI 라우팅</p>
+                <p class="text-sm text-on-surface-variant mt-1">고객 정보 조회 + 적합한 상담원 그룹으로 라우팅</p>
+              </div>
+            </div>
+            <!-- Step 5 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-headline font-bold text-sm">5</div>
+                <div class="w-0.5 h-8 bg-secondary/20 mt-1"></div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">상담원 연결</p>
+                <p class="text-sm text-on-surface-variant mt-1">상담원 소프트폰 울림 + 상담AP에 고객 정보 팝업</p>
+              </div>
+            </div>
+            <!-- Step 6 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-tertiary-container text-white flex items-center justify-center font-headline font-bold text-sm">6</div>
+                <div class="w-0.5 h-8 bg-tertiary/20 mt-1"></div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">통화 중 AI 지원</p>
+                <p class="text-sm text-on-surface-variant mt-1">녹취 시작 + STT(실시간) + 상담 어드바이저 지원</p>
+              </div>
+            </div>
+            <!-- Step 7 -->
+            <div class="flex items-start gap-4">
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-tertiary-container text-white flex items-center justify-center font-headline font-bold text-sm">7</div>
+              </div>
+              <div class="bg-surface rounded-xl p-4 flex-1 border border-outline-variant/20">
+                <p class="font-semibold text-on-surface">통화 종료 후처리</p>
+                <p class="text-sm text-on-surface-variant mt-1">TA(Text Analytics) → 상담 요약/분류 자동화</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACD Routing Methods -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">ACD 라우팅 방식</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-primary-fixed/40 rounded-xl p-5 border border-primary/10">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-primary">group</span>
+                <h4 class="font-headline font-bold text-primary">스킬 기반</h4>
+              </div>
+              <p class="text-sm text-on-surface-variant">상담 유형별 그룹 → 해당 스킬 보유 상담원에게 배분</p>
+            </div>
+            <div class="bg-primary-fixed/40 rounded-xl p-5 border border-primary/10">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-primary">priority_high</span>
+                <h4 class="font-headline font-bold text-primary">우선순위</h4>
+              </div>
+              <p class="text-sm text-on-surface-variant">대기 시간, 상담원 숙련도 등 기준으로 우선 배분</p>
+            </div>
+            <div class="bg-primary-fixed/40 rounded-xl p-5 border border-primary/10">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-primary">swap_horiz</span>
+                <h4 class="font-headline font-bold text-primary">오버플로우</h4>
+              </div>
+              <p class="text-sm text-on-surface-variant">특정 그룹 포화 시 → 다른 그룹으로 넘김</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB 3: AICC 전환 -->
+      <div id="archAicc" class="arch-content hidden">
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30 mb-8">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">AICC = IPCC + AI 기술</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b-2 border-primary/10">
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">AI 기능</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">설명</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">기반 기술</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline-variant/30">
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">실시간 STT</td>
+                  <td class="py-3 px-4 text-on-surface-variant">통화 내용 실시간 텍스트화</td>
+                  <td class="py-3 px-4"><span class="bg-tertiary-fixed text-tertiary text-xs font-semibold px-2 py-0.5 rounded-full">97% 인식률</span></td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">상담 어드바이저</td>
+                  <td class="py-3 px-4 text-on-surface-variant">상담 중 지식 추천/가이드</td>
+                  <td class="py-3 px-4 text-on-surface-variant">STT + RAG</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">AI 콜봇</td>
+                  <td class="py-3 px-4 text-on-surface-variant">음성 자동 응답</td>
+                  <td class="py-3 px-4 text-on-surface-variant">STT + LLM + TTS</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">AI 챗봇</td>
+                  <td class="py-3 px-4 text-on-surface-variant">텍스트 자동 응답</td>
+                  <td class="py-3 px-4 text-on-surface-variant">LLM + RAG</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">TA (Text Analytics)</td>
+                  <td class="py-3 px-4 text-on-surface-variant">상담 후 분석/요약</td>
+                  <td class="py-3 px-4 text-on-surface-variant">STT + NLP</td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">QA 자동화</td>
+                  <td class="py-3 px-4 text-on-surface-variant">상담 품질 자동 평가</td>
+                  <td class="py-3 px-4 text-on-surface-variant">STT + 규칙/AI</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Key Considerations -->
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">전환 시 핵심 고려사항</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-start gap-4 bg-surface rounded-xl p-5 border border-outline-variant/20">
+              <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-secondary text-xl">mic</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-on-surface mb-1">녹취 방식</h4>
+                <p class="text-sm text-on-surface-variant">모노 → <strong>스테레오</strong> 전환 필수 (화자분리 전제)</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 bg-surface rounded-xl p-5 border border-outline-variant/20">
+              <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-secondary text-xl">stream</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-on-surface mb-1">SBC/SIPREC</h4>
+                <p class="text-sm text-on-surface-variant">RTP 스트리밍으로 AI에 실시간 음성 전달</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 bg-surface rounded-xl p-5 border border-outline-variant/20">
+              <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-secondary text-xl">cloud</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-on-surface mb-1">온프레미스 vs 클라우드</h4>
+                <p class="text-sm text-on-surface-variant">금융권은 온프렘 선호, 하이브리드 구성 증가 추세</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 bg-surface rounded-xl p-5 border border-outline-variant/20">
+              <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-secondary text-xl">timer</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-on-surface mb-1">레이턴시</h4>
+                <p class="text-sm text-on-surface-variant">콜봇 응답 2.5초 → 고객 수용 가능 기준</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB 4: 벤더 비교 -->
+      <div id="archVendor" class="arch-content hidden">
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/30 mb-8">
+          <h3 class="font-headline font-bold text-primary text-xl mb-6">주요 IPCC/AICC 벤더 비교</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b-2 border-primary/10">
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">벤더</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">특징</th>
+                  <th class="text-left py-3 px-4 font-headline font-bold text-primary">점유율/대상</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-outline-variant/30">
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">어바이어 (Avaya)</td>
+                  <td class="py-3 px-4 text-on-surface-variant">글로벌 1위, 전용 장비(어플라이언스)</td>
+                  <td class="py-3 px-4"><span class="bg-primary-fixed text-primary text-xs font-semibold px-2 py-0.5 rounded-full">국내 대형 금융사 다수</span></td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">시스코 (Cisco)</td>
+                  <td class="py-3 px-4 text-on-surface-variant">네트워크 기반, 자체 VGW</td>
+                  <td class="py-3 px-4"><span class="bg-primary-fixed text-primary text-xs font-semibold px-2 py-0.5 rounded-full">대기업 선호</span></td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">제네시스 (Genesys)</td>
+                  <td class="py-3 px-4 text-on-surface-variant">클라우드 강점, PureCloud</td>
+                  <td class="py-3 px-4"><span class="bg-tertiary-fixed text-tertiary text-xs font-semibold px-2 py-0.5 rounded-full">클라우드 전환 시 선호</span></td>
+                </tr>
+                <tr class="hover:bg-surface transition">
+                  <td class="py-3 px-4 font-semibold">브리지텍/EICN</td>
+                  <td class="py-3 px-4 text-on-surface-variant">국산, 범용서버+SW 방식, SBC 사용</td>
+                  <td class="py-3 px-4"><span class="bg-secondary-fixed text-secondary text-xs font-semibold px-2 py-0.5 rounded-full">국내 중소형</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LG U+ Differentiators -->
+        <div class="bg-gradient-to-br from-primary to-primary-container rounded-2xl p-8 shadow-sm text-white">
+          <h3 class="font-headline font-bold text-xl mb-6">LG U+ AICC 솔루션 차별점</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white/10 backdrop-blur rounded-xl p-5 border border-white/10">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-tertiary-fixed text-xl">graphic_eq</span>
+                <h4 class="font-semibold">EC STT/TTS</h4>
+              </div>
+              <p class="text-sm text-primary-fixed">자체 음성엔진 (익시젠 기반)</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-5 border border-white/10">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-tertiary-fixed text-xl">cloud_sync</span>
+                <h4 class="font-semibold">하이브리드 구축</h4>
+              </div>
+              <p class="text-sm text-primary-fixed">구축형 + 클라우드 하이브리드로 금융권 온프렘 대응</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-5 border border-white/10">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-tertiary-fixed text-xl">smart_toy</span>
+                <h4 class="font-semibold">LLM 콜봇</h4>
+              </div>
+              <p class="text-sm text-primary-fixed">룰베이스 + LLM 하이브리드 아키텍처</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur rounded-xl p-5 border border-white/10">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-tertiary-fixed text-xl">bolt</span>
+                <h4 class="font-semibold">캐싱</h4>
+              </div>
+              <p class="text-sm text-primary-fixed">반복 질문 → LLM 미경유 → 즉시 답변</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ── State ──
+    let glossaryData = {};
+    let activeCategory = 'all';
+    let activeTab = 'dictionary';
+    let activeArch = 'structure';
+
+    // ── Category badge styles ──
+    const CATEGORY_STYLES = [
+      { bg: 'bg-primary-fixed', text: 'text-primary' },
+      { bg: 'bg-tertiary-fixed', text: 'text-tertiary' },
+      { bg: 'bg-secondary-fixed', text: 'text-secondary' },
+    ];
+
+    function getCategoryStyle(index) {
+      return CATEGORY_STYLES[index % CATEGORY_STYLES.length];
+    }
+
+    // ── Fetch glossary ──
+    async function loadGlossary() {
+      try {
+        const res = await fetch('/api/glossary');
+        glossaryData = await res.json();
+        buildCategoryPills();
+        renderCards();
+      } catch (err) {
+        console.error('Failed to load glossary:', err);
+        document.getElementById('glossaryGrid').innerHTML =
+          '<div class="col-span-3 text-center py-12 text-on-surface-variant">용어 데이터를 불러올 수 없습니다.</div>';
+      }
+    }
+
+    // ── Build category pills ──
+    function buildCategoryPills() {
+      const container = document.getElementById('categoryPills');
+      const cats = Object.keys(glossaryData);
+      let html = '<button onclick="filterCategory(\'all\')" data-cat="all" class="cat-pill active shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition bg-primary text-white border-primary">전체</button>';
+      cats.forEach((cat) => {
+        html += `<button onclick="filterCategory('${cat}')" data-cat="${cat}" class="cat-pill shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary">${cat}</button>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // ── Filter category ──
+    function filterCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach((btn) => {
+        if (btn.dataset.cat === cat) {
+          btn.className = 'cat-pill active shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition bg-primary text-white border-primary';
+        } else {
+          btn.className = 'cat-pill shrink-0 px-4 py-2 rounded-full text-xs font-semibold border transition text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary';
+        }
+      });
+      renderCards();
+    }
+
+    // ── Search ──
+    function applySearch() {
+      renderCards();
+    }
+
+    // ── Render glossary cards ──
+    function renderCards() {
+      const grid = document.getElementById('glossaryGrid');
+      const empty = document.getElementById('emptyState');
+      const query = document.getElementById('heroSearch').value.toLowerCase().trim();
+
+      let cards = [];
+      let catIndex = 0;
+
+      for (const [cat, terms] of Object.entries(glossaryData)) {
+        if (activeCategory !== 'all' && activeCategory !== cat) {
+          catIndex++;
+          continue;
+        }
+        const style = getCategoryStyle(catIndex);
+        for (const t of terms) {
+          // search filter
+          if (query) {
+            const haystack = `${t.term} ${t.abbr} ${t.definition} ${t.field_expression} ${t.note}`.toLowerCase();
+            if (!haystack.includes(query)) continue;
+          }
+          cards.push(buildCard(t, cat, style));
+        }
+        catIndex++;
+      }
+
+      if (cards.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+      } else {
+        empty.classList.add('hidden');
+        grid.innerHTML = cards.join('');
+      }
+    }
+
+    function buildCard(term, category, style) {
+      const noteHtml = term.note
+        ? `<div class="flex items-start gap-1.5 mt-3">
+             <span class="material-symbols-outlined text-outline text-[16px] mt-0.5">info</span>
+             <p class="text-xs text-outline">${escHtml(term.note)}</p>
+           </div>`
+        : '';
+
+      return `
+        <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-transparent hover:border-secondary-fixed transition group">
+          <div class="mb-3">
+            <span class="${style.bg} ${style.text} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">${escHtml(category)}</span>
+          </div>
+          <h4 class="text-xl font-bold text-primary font-headline mb-1">${escHtml(term.term)}</h4>
+          ${term.abbr ? `<p class="text-xs text-outline mb-3">${escHtml(term.abbr)}</p>` : '<div class="mb-3"></div>'}
+          <div class="bg-surface-container-low rounded-xl p-4">
+            <span class="inline-block bg-secondary-fixed text-secondary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider mb-2">FIELD EXPRESSION</span>
+            <p class="font-semibold text-on-surface text-sm mb-2">${escHtml(term.field_expression)}</p>
+            <p class="text-sm text-on-surface-variant leading-relaxed">${escHtml(term.definition)}</p>
+          </div>
+          ${noteHtml}
+        </div>
+      `;
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ── Tab toggle ──
+    function switchTab(tab) {
+      activeTab = tab;
+      const dictSection = document.getElementById('sectionDictionary');
+      const archSection = document.getElementById('sectionArchitecture');
+      const tabDict = document.getElementById('tabDict');
+      const tabArch = document.getElementById('tabArch');
+
+      if (tab === 'dictionary') {
+        dictSection.classList.remove('hidden');
+        archSection.classList.add('hidden');
+        tabDict.className = 'px-6 py-2.5 rounded-full text-sm font-bold transition bg-white shadow-sm text-secondary';
+        tabArch.className = 'px-6 py-2.5 rounded-full text-sm font-medium transition text-on-surface-variant hover:text-on-surface';
+      } else {
+        dictSection.classList.add('hidden');
+        archSection.classList.remove('hidden');
+        tabArch.className = 'px-6 py-2.5 rounded-full text-sm font-bold transition bg-white shadow-sm text-secondary';
+        tabDict.className = 'px-6 py-2.5 rounded-full text-sm font-medium transition text-on-surface-variant hover:text-on-surface';
+      }
+    }
+
+    // ── Architecture sub-section toggle ──
+    function switchArch(section) {
+      activeArch = section;
+      document.querySelectorAll('.arch-content').forEach((el) => el.classList.add('hidden'));
+      document.querySelectorAll('.arch-pill').forEach((btn) => {
+        if (btn.dataset.arch === section) {
+          btn.className = 'arch-pill active shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold border transition bg-primary text-white border-primary';
+        } else {
+          btn.className = 'arch-pill shrink-0 px-5 py-2.5 rounded-full text-sm font-medium border transition text-on-surface-variant border-outline-variant hover:border-primary hover:text-primary';
+        }
+      });
+
+      const map = {
+        structure: 'archStructure',
+        callflow: 'archCallflow',
+        aicc: 'archAicc',
+        vendor: 'archVendor',
+      };
+      document.getElementById(map[section]).classList.remove('hidden');
+    }
+
+    // ── Search on Enter ──
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('heroSearch');
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          applySearch();
+        }
+      });
+      input.addEventListener('input', () => {
+        // Real-time filtering as user types
+        renderCards();
+      });
+      loadGlossary();
+    });
+  </script>
+
+</body>
+</html>

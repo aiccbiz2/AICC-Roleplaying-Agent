@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation | AI Roleplay Agent</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="/static/shared.css" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Material Symbols -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#002859',
+            'primary-container': '#003d82',
+            secondary: '#b50062',
+            'secondary-fixed': '#ffd9e2',
+            surface: '#f7fafd',
+            'surface-container-low': '#f1f4f7',
+            'surface-container-high': '#e5e8eb',
+            'surface-container-lowest': '#ffffff',
+            'on-surface': '#181c1e',
+            'on-surface-variant': '#434751',
+            outline: '#737782',
+            'outline-variant': '#c3c6d2',
+            tertiary: '#002f2c',
+            'tertiary-fixed': '#72f7ed',
+            error: '#ba1a1a',
+          },
+          fontFamily: {
+            headline: ['Manrope', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Manrope', sans-serif; }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    /* Custom scrollbar */
+    .chat-area::-webkit-scrollbar { width: 6px; }
+    .chat-area::-webkit-scrollbar-track { background: transparent; }
+    .chat-area::-webkit-scrollbar-thumb { background: #c3c6d2; border-radius: 3px; }
+    .chat-area::-webkit-scrollbar-thumb:hover { background: #737782; }
+
+    /* Glass effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    /* Gradient button */
+    .btn-gradient {
+      background: linear-gradient(135deg, #002859, #003d82);
+      transition: all 0.2s ease;
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(135deg, #003d82, #004ea8);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0, 40, 89, 0.3);
+    }
+    .btn-gradient:active { transform: translateY(0); }
+
+    /* Scenario card hover */
+    .scenario-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .scenario-card:hover {
+      border-color: #ffd9e2;
+      box-shadow: 0 4px 16px rgba(181, 0, 98, 0.08);
+    }
+    .scenario-card.selected {
+      border-color: #b50062;
+      box-shadow: 0 0 0 2px rgba(181, 0, 98, 0.15);
+      background: linear-gradient(135deg, #fff, #fff5f8);
+    }
+
+    /* Persona card */
+    .persona-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .persona-card:hover {
+      border-color: #ffd9e2;
+    }
+    .persona-card.selected {
+      border-color: #b50062;
+      background: linear-gradient(135deg, #fff, #fff5f8);
+      box-shadow: 0 0 0 2px rgba(181, 0, 98, 0.15);
+    }
+
+    /* Nav items */
+    .nav-item {
+      transition: all 0.2s ease;
+    }
+    .nav-item:hover {
+      transform: translateX(4px);
+    }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2.5px solid #c3c6d2;
+      border-top-color: #002859;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    /* Typing indicator */
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+    .typing-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #737782;
+      margin: 0 2px;
+    }
+    .typing-dot:nth-child(1) { animation: bounce 1.4s infinite ease-in-out 0s; }
+    .typing-dot:nth-child(2) { animation: bounce 1.4s infinite ease-in-out 0.2s; }
+    .typing-dot:nth-child(3) { animation: bounce 1.4s infinite ease-in-out 0.4s; }
+
+    /* Fade in */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.35s ease-out;
+    }
+
+    /* Grade badge colors */
+    .grade-A { background: #dcfce7; color: #166534; }
+    .grade-B { background: #dbeafe; color: #1e40af; }
+    .grade-C { background: #fef3c7; color: #92400e; }
+    .grade-D { background: #fecaca; color: #991b1b; }
+  </style>
+</head>
+
+<body class="bg-surface min-h-screen font-body text-on-surface">
+
+  <!-- Shared sidebar & header injected by shared.js -->
+  <script src="/static/shared.js"></script>
+
+  <!-- ============================================== -->
+  <!-- MAIN CONTENT -->
+  <!-- ============================================== -->
+  <main class="app-main min-h-[calc(100vh-4rem)]">
+
+    <!-- ========== PHASE 1: SETUP ========== -->
+    <section id="phase-setup" class="p-8 max-w-5xl mx-auto">
+      <!-- Section Header -->
+      <div class="mb-8">
+        <p class="text-secondary text-xs font-semibold tracking-widest uppercase mb-2">Customer Meeting Simulation</p>
+        <h2 class="font-headline font-extrabold text-3xl text-primary mb-2">고객 미팅 롤플레이</h2>
+        <p class="text-on-surface-variant text-sm">당신 = LG U+ AI사업2팀 사업담당 | AI = AICC 도입 검토 고객</p>
+      </div>
+
+      <!-- Loading indicator -->
+      <div id="setup-loading" class="flex items-center justify-center py-20">
+        <div class="text-center">
+          <div class="spinner mx-auto mb-4" style="width:32px;height:32px;border-width:3px;"></div>
+          <p class="text-on-surface-variant text-sm">시나리오를 불러오는 중...</p>
+        </div>
+      </div>
+
+      <!-- Scenario Selection -->
+      <div id="setup-content" class="hidden">
+        <div class="mb-8">
+          <h3 class="font-headline font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">1</span>
+            영업 단계 선택
+          </h3>
+
+          <!-- Stage Tabs -->
+          <div id="stage-tabs" class="flex flex-wrap gap-2 mb-4">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Industry Filter -->
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-xs text-on-surface-variant font-semibold">업종 필터:</span>
+            <div id="industry-filters" class="flex flex-wrap gap-1.5">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Scenario Cards -->
+          <div id="scenario-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Populated by JS -->
+          </div>
+          <p id="no-scenarios-msg" class="hidden text-center text-on-surface-variant text-sm py-8">해당 조건에 맞는 시나리오가 없습니다.</p>
+        </div>
+
+        <!-- Persona Selection -->
+        <div class="mb-8">
+          <h3 class="font-headline font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">2</span>
+            고객 난이도
+          </h3>
+          <div id="persona-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Start Button -->
+        <button id="btn-start" onclick="startRoleplay()" disabled
+          class="w-full btn-gradient text-white font-bold py-4 rounded-full text-base flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
+          <span class="material-symbols-outlined" style="font-size:22px;">play_arrow</span>
+          롤플레이 시작
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== PHASE 2: PLAYING (CHAT) ========== -->
+    <section id="phase-playing" class="hidden flex flex-col" style="height: calc(100vh - 4rem);">
+
+      <!-- Top Info Bar -->
+      <div class="glass border-b border-outline-variant/20 px-6 py-3 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-4">
+          <div>
+            <p id="play-scenario-title" class="font-headline font-bold text-sm text-on-surface"></p>
+            <p class="text-xs text-on-surface-variant">
+              <span id="play-customer-role"></span>
+              <span class="mx-1 text-outline-variant">|</span>
+              <span id="play-persona-level"></span>
+              <span class="mx-1 text-outline-variant">|</span>
+              대화 <span id="play-turn-count" class="font-semibold text-primary">0</span>턴
+            </p>
+          </div>
+        </div>
+        <button onclick="endRoleplay()" class="bg-secondary/10 hover:bg-secondary/20 text-secondary font-semibold text-sm px-5 py-2 rounded-full transition flex items-center gap-1.5">
+          <span class="material-symbols-outlined" style="font-size:18px;">stop_circle</span>
+          종료 &amp; 피드백
+        </button>
+      </div>
+
+      <!-- Hint Expander -->
+      <div class="px-6 pt-3 flex-shrink-0">
+        <button onclick="toggleHints()" id="btn-hints" class="text-xs text-on-surface-variant hover:text-primary transition flex items-center gap-1">
+          <span class="material-symbols-outlined" style="font-size:16px;">lightbulb</span>
+          <span>막히면 눌러보세요 -- 예상 질문 힌트</span>
+          <span class="material-symbols-outlined transition" id="hint-chevron" style="font-size:16px;">expand_more</span>
+        </button>
+        <div id="hint-panel" class="hidden mt-2 p-4 rounded-2xl bg-tertiary-fixed/10 border border-tertiary-fixed/30 text-sm text-on-surface-variant">
+          <ul id="hint-list" class="space-y-1.5">
+            <!-- Populated by JS -->
+          </ul>
+          <p class="mt-2 text-xs text-outline">위 질문들이 나올 수 있습니다. 미리 답변을 준비해보세요.</p>
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div id="chat-area" class="flex-1 overflow-y-auto px-6 py-4 space-y-6 chat-area">
+        <!-- Messages populated by JS -->
+      </div>
+
+      <!-- Ending info banner -->
+      <div id="ending-banner" class="hidden px-6 pb-2 flex-shrink-0">
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-3 flex items-center gap-3 text-sm text-blue-800 fade-in-up">
+          <span class="material-symbols-outlined" style="font-size:20px;">info</span>
+          고객이 미팅 마무리를 시사했습니다. '종료 &amp; 피드백' 버튼을 눌러주세요.
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="px-6 pb-5 pt-2 flex-shrink-0">
+        <form onsubmit="sendMessage(event)" class="flex items-end gap-3">
+          <div class="flex-1 relative">
+            <textarea id="chat-input" placeholder="사업담당자로서 응답하세요..."
+              rows="1"
+              class="w-full px-5 py-3.5 rounded-2xl border border-outline-variant/50 bg-white text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition pr-12 resize-none overflow-hidden leading-relaxed"
+              style="max-height: 150px;"
+              autocomplete="off"></textarea>
+            <span class="absolute right-4 bottom-2 text-[10px] text-outline pointer-events-none select-none">Shift+Enter: 줄바꿈</span>
+          </div>
+          <button type="submit" id="btn-send"
+            class="w-12 h-12 btn-gradient rounded-full flex items-center justify-center text-white flex-shrink-0 disabled:opacity-40 mb-0.5"
+            disabled>
+            <span class="material-symbols-outlined" style="font-size:22px;">send</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== PHASE 3: FEEDBACK ========== -->
+    <section id="phase-feedback" class="hidden p-8 max-w-5xl mx-auto">
+
+      <!-- Loading -->
+      <div id="feedback-loading" class="flex items-center justify-center py-20">
+        <div class="text-center">
+          <div class="spinner mx-auto mb-4" style="width:32px;height:32px;border-width:3px;"></div>
+          <p class="text-on-surface-variant text-sm">대화를 분석하고 피드백을 생성 중입니다...</p>
+          <p class="text-outline text-xs mt-1">약 10-20초 소요됩니다</p>
+        </div>
+      </div>
+
+      <!-- Feedback Content -->
+      <div id="feedback-content" class="hidden">
+
+        <!-- Header -->
+        <div class="mb-8">
+          <p class="text-secondary text-xs font-semibold tracking-widest uppercase mb-2">Roleplay Feedback</p>
+          <h2 class="font-headline font-extrabold text-3xl text-primary mb-1">롤플레이 피드백</h2>
+          <p id="feedback-meta" class="text-on-surface-variant text-sm"></p>
+        </div>
+
+        <!-- Overall Grade -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20 mb-6 flex items-center gap-6">
+          <div id="feedback-grade-badge" class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-headline font-extrabold">
+            <!-- Grade letter -->
+          </div>
+          <div>
+            <p class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Overall Grade</p>
+            <p class="font-headline font-bold text-xl text-on-surface" id="feedback-grade-label"></p>
+          </div>
+        </div>
+
+        <!-- Strengths / Improvements -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Strengths -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
+            <h3 class="font-headline font-bold text-base mb-4 flex items-center gap-2 text-green-700">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#16a34a;">check_circle</span>
+              잘한 점
+            </h3>
+            <ul id="feedback-strengths" class="space-y-2 text-sm text-on-surface-variant">
+              <!-- Populated by JS -->
+            </ul>
+          </div>
+          <!-- Improvements -->
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
+            <h3 class="font-headline font-bold text-base mb-4 flex items-center gap-2 text-amber-700">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#d97706;">trending_up</span>
+              개선할 점
+            </h3>
+            <ul id="feedback-improvements" class="space-y-2 text-sm text-on-surface-variant">
+              <!-- Populated by JS -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Terminology Check -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20 mb-6">
+          <h3 class="font-headline font-bold text-base mb-4 flex items-center gap-2 text-on-surface">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#002859;">spellcheck</span>
+            도메인 용어 사용 분석
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <p class="text-xs text-green-700 font-semibold uppercase tracking-wider mb-2">정확히 사용한 용어</p>
+              <div id="feedback-terms-correct" class="flex flex-wrap gap-1.5">
+                <!-- Tags -->
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-amber-700 font-semibold uppercase tracking-wider mb-2">놓쳤거나 부정확한 용어</p>
+              <div id="feedback-terms-missed" class="flex flex-wrap gap-1.5">
+                <!-- Tags -->
+              </div>
+            </div>
+          </div>
+          <div id="feedback-term-tip" class="bg-blue-50 rounded-xl px-4 py-2.5 text-sm text-blue-800 flex items-start gap-2 hidden">
+            <span class="material-symbols-outlined flex-shrink-0 mt-0.5" style="font-size:16px;">lightbulb</span>
+            <span id="feedback-term-tip-text"></span>
+          </div>
+        </div>
+
+        <!-- Best / Worst Moments -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
+            <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-primary">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#002859;">star</span>
+              베스트 모먼트
+            </h3>
+            <p id="feedback-best" class="text-sm text-on-surface-variant leading-relaxed"></p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
+            <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#737782;">sentiment_dissatisfied</span>
+              아쉬운 모먼트
+            </h3>
+            <p id="feedback-worst" class="text-sm text-on-surface-variant leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- Expert Answer -->
+        <div id="feedback-expert-section" class="bg-gradient-to-br from-primary/5 to-primary-container/5 rounded-2xl p-6 border border-primary/10 mb-6 hidden">
+          <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined" style="font-size:20px;">school</span>
+            전문가 모범 답변
+          </h3>
+          <p id="feedback-expert" class="text-sm text-on-surface leading-relaxed"></p>
+        </div>
+
+        <!-- Next Focus -->
+        <div id="feedback-focus-section" class="bg-amber-50 rounded-2xl p-6 border border-amber-200 mb-8 hidden">
+          <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-amber-800">
+            <span class="material-symbols-outlined" style="font-size:20px;">flag</span>
+            다음 연습 집중 포인트
+          </h3>
+          <p id="feedback-focus" class="text-sm text-amber-900 leading-relaxed"></p>
+        </div>
+
+        <!-- Conversation History (expandable) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-outline-variant/20 mb-8 overflow-hidden">
+          <button onclick="toggleConversationHistory()" class="w-full px-6 py-4 flex items-center justify-between hover:bg-surface-container-low transition">
+            <h3 class="font-headline font-bold text-base flex items-center gap-2 text-on-surface">
+              <span class="material-symbols-outlined" style="font-size:20px;">history</span>
+              전체 대화 기록
+            </h3>
+            <span class="material-symbols-outlined transition text-on-surface-variant" id="history-chevron" style="font-size:20px;">expand_more</span>
+          </button>
+          <div id="conversation-history" class="hidden px-6 pb-6 space-y-4 border-t border-outline-variant/20 pt-4">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button onclick="retrySameScenario()" class="bg-white border-2 border-primary text-primary font-bold py-4 rounded-full text-sm hover:bg-primary/5 transition flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined" style="font-size:20px;">refresh</span>
+            같은 시나리오 다시
+          </button>
+          <button onclick="resetToSetup()" class="btn-gradient text-white font-bold py-4 rounded-full text-sm flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined" style="font-size:20px;">add</span>
+            새 시나리오
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT -->
+  <!-- ============================================== -->
+  <script>
+    // ── State ──
+    let phase = 'setup';        // setup | playing | feedback
+    let scenarios = {};
+    let personas = {};
+    let stages = {};
+    let industries = [];
+    let selectedStage = null;    // 'A', 'B', ... or null (전체)
+    let selectedIndustry = null; // industry string or null (전체)
+    let selectedScenario = null;
+    let selectedPersona = null;
+    let systemPrompt = '';
+    let chatHistory = [];       // [{role, content}, ...]
+    let feedback = null;
+    let isWaitingForAI = false;
+
+    // ── DOM References ──
+    const $phaseSetup    = document.getElementById('phase-setup');
+    const $phasePlaying  = document.getElementById('phase-playing');
+    const $phaseFeedback = document.getElementById('phase-feedback');
+
+    // ── Phase Transition ──
+    function showPhase(newPhase) {
+      phase = newPhase;
+      $phaseSetup.classList.toggle('hidden', phase !== 'setup');
+      $phasePlaying.classList.toggle('hidden', phase !== 'playing');
+      $phasePlaying.style.display = phase === 'playing' ? 'flex' : 'none';
+      $phaseFeedback.classList.toggle('hidden', phase !== 'feedback');
+    }
+
+    // ── Init: Load data ──
+    async function init() {
+      showPhase('setup');
+      try {
+        const [scenRes, persRes, stageRes, indRes] = await Promise.all([
+          fetch('/api/scenarios'),
+          fetch('/api/personas'),
+          fetch('/api/stages'),
+          fetch('/api/industries'),
+        ]);
+        scenarios  = await scenRes.json();
+        personas   = await persRes.json();
+        stages     = await stageRes.json();
+        industries = await indRes.json();
+        renderSetup();
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        document.getElementById('setup-loading').innerHTML = `
+          <div class="text-center">
+            <span class="material-symbols-outlined text-error mb-2" style="font-size:40px;">error</span>
+            <p class="text-error text-sm font-semibold">데이터를 불러올 수 없습니다.</p>
+            <p class="text-outline text-xs mt-1">서버가 실행 중인지 확인해주세요.</p>
+            <button onclick="init()" class="mt-4 text-primary text-sm font-semibold hover:underline">다시 시도</button>
+          </div>`;
+      }
+    }
+
+    // ── Render Setup ──
+    function renderSetup() {
+      document.getElementById('setup-loading').classList.add('hidden');
+      document.getElementById('setup-content').classList.remove('hidden');
+
+      // Stage tabs
+      renderStageTabs();
+      // Industry filters
+      renderIndustryFilters();
+      // Scenario cards (filtered)
+      renderScenarioCards();
+
+      // Persona cards
+      const personaGrid = document.getElementById('persona-grid');
+      personaGrid.innerHTML = '';
+
+      const personaIcons = { '초급': 'sentiment_satisfied', '중급': 'psychology', '고급': 'local_fire_department' };
+      const personaStars = { '초급': 1, '중급': 3, '고급': 5 };
+      const personaDesc  = {
+        '초급': '기본 질문 위주, 긍정적 반응. 편안한 분위기에서 연습하기 좋습니다.',
+        '중급': '구체적 수치와 경쟁사 비교. 꼼꼼한 실무자를 상대해보세요.',
+        '고급': 'ROI 집요 추궁, 가격 압박. 임원급 의사결정자 대응 연습.',
+      };
+
+      for (const [key, pers] of Object.entries(personas)) {
+        const stars = personaStars[key] || 3;
+        const icon  = personaIcons[key] || 'person';
+        const desc  = personaDesc[key]  || '';
+        const starsStr = '<span class="text-amber-400 text-xs">' + '&#9733;'.repeat(stars) + '</span>' + '<span class="text-outline-variant/40 text-xs">' + '&#9733;'.repeat(5 - stars) + '</span>';
+
+        const card = document.createElement('div');
+        card.className = 'persona-card bg-white rounded-2xl p-5 border border-outline-variant/30 text-center';
+        card.dataset.key = key;
+        card.innerHTML = `
+          <span class="material-symbols-outlined text-primary mb-2" style="font-size:32px;">${icon}</span>
+          <h4 class="font-headline font-bold text-sm text-on-surface mb-1">${pers.label}</h4>
+          <div class="mb-2">${starsStr}</div>
+          <p class="text-xs text-on-surface-variant leading-relaxed">${desc}</p>
+        `;
+        card.addEventListener('click', () => selectPersona(key));
+        personaGrid.appendChild(card);
+      }
+
+      updateStartButton();
+    }
+
+    // ── Stage Tabs ──
+    function renderStageTabs() {
+      const container = document.getElementById('stage-tabs');
+      container.innerHTML = '';
+
+      // "전체" button
+      const allBtn = document.createElement('button');
+      allBtn.className = `px-4 py-2 rounded-full text-xs font-semibold transition ${
+        selectedStage === null
+          ? 'bg-primary text-white shadow-sm'
+          : 'bg-white text-on-surface-variant border border-outline-variant/40 hover:border-primary/40'
+      }`;
+      allBtn.textContent = '전체';
+      allBtn.addEventListener('click', () => selectStage(null));
+      container.appendChild(allBtn);
+
+      for (const [code, label] of Object.entries(stages)) {
+        const count = Object.values(scenarios).filter(s => s.stage === code).length;
+        const btn = document.createElement('button');
+        btn.className = `px-4 py-2 rounded-full text-xs font-semibold transition ${
+          selectedStage === code
+            ? 'bg-primary text-white shadow-sm'
+            : 'bg-white text-on-surface-variant border border-outline-variant/40 hover:border-primary/40'
+        }`;
+        btn.innerHTML = `${code}. ${label} <span class="ml-1 opacity-60">${count}</span>`;
+        btn.addEventListener('click', () => selectStage(code));
+        container.appendChild(btn);
+      }
+    }
+
+    // ── Industry Filters ──
+    function renderIndustryFilters() {
+      const container = document.getElementById('industry-filters');
+      container.innerHTML = '';
+
+      // "전체" pill
+      const allPill = document.createElement('button');
+      allPill.className = `px-3 py-1.5 rounded-full text-[11px] font-medium transition ${
+        selectedIndustry === null
+          ? 'bg-secondary text-white'
+          : 'bg-white text-on-surface-variant border border-outline-variant/30 hover:border-secondary/40'
+      }`;
+      allPill.textContent = '전체';
+      allPill.addEventListener('click', () => selectIndustry(null));
+      container.appendChild(allPill);
+
+      for (const ind of industries) {
+        const pill = document.createElement('button');
+        pill.className = `px-3 py-1.5 rounded-full text-[11px] font-medium transition ${
+          selectedIndustry === ind
+            ? 'bg-secondary text-white'
+            : 'bg-white text-on-surface-variant border border-outline-variant/30 hover:border-secondary/40'
+        }`;
+        pill.textContent = ind;
+        pill.addEventListener('click', () => selectIndustry(ind));
+        container.appendChild(pill);
+      }
+    }
+
+    // ── Scenario Cards (filtered) ──
+    function renderScenarioCards() {
+      const grid = document.getElementById('scenario-grid');
+      const noMsg = document.getElementById('no-scenarios-msg');
+      grid.innerHTML = '';
+
+      // Stage difficulty mapping
+      const stageDifficulty = { A: 2, B: 3, C: 4, D: 4, E: 3, F: 4, G: 3, H: 5 };
+
+      let filtered = Object.entries(scenarios);
+      if (selectedStage) {
+        filtered = filtered.filter(([, s]) => s.stage === selectedStage);
+      }
+      if (selectedIndustry) {
+        filtered = filtered.filter(([, s]) => s.industry === selectedIndustry);
+      }
+
+      if (filtered.length === 0) {
+        noMsg.classList.remove('hidden');
+        return;
+      }
+      noMsg.classList.add('hidden');
+
+      for (const [key, scen] of filtered) {
+        const stars = stageDifficulty[scen.stage] || 3;
+        const starsStr = '<span class="text-amber-400">' + '&#9733;'.repeat(stars) + '</span>' +
+                         '<span class="text-outline-variant/40">' + '&#9733;'.repeat(5 - stars) + '</span>';
+        const questionsPreview = (scen.key_questions || []).slice(0, 2).map(q =>
+          `<li class="text-xs text-on-surface-variant truncate">"${q}"</li>`
+        ).join('');
+        const stageLabel = stages[scen.stage] || scen.stage;
+
+        const card = document.createElement('div');
+        card.className = `scenario-card bg-white rounded-2xl p-6 border border-outline-variant/30 ${selectedScenario === key ? 'selected' : ''}`;
+        card.dataset.key = key;
+        card.innerHTML = `
+          <div class="flex items-start justify-between mb-3">
+            <h4 class="font-headline font-bold text-sm text-on-surface leading-snug">${scen.title}</h4>
+            <span class="text-xs flex-shrink-0 ml-2">${starsStr}</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 mb-3">
+            <span class="inline-block text-[10px] font-semibold text-white bg-primary px-2 py-0.5 rounded-full">${scen.stage}. ${stageLabel}</span>
+            <span class="inline-block text-[10px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">${scen.industry}</span>
+            <span class="inline-block text-[10px] font-semibold text-primary bg-primary/8 px-2 py-0.5 rounded-full">${scen.source}</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed mb-3 line-clamp-2">${scen.situation}</p>
+          <p class="text-[10px] text-outline mb-2">
+            <span class="material-symbols-outlined align-middle" style="font-size:13px;">person</span>
+            ${scen.customer_role}
+          </p>
+          <ul class="space-y-1">${questionsPreview}</ul>
+        `;
+        card.addEventListener('click', () => selectScenario(key));
+        grid.appendChild(card);
+      }
+    }
+
+    // ── Stage / Industry selection ──
+    function selectStage(code) {
+      selectedStage = code;
+      selectedScenario = null; // reset scenario selection on filter change
+      renderStageTabs();
+      renderScenarioCards();
+      updateStartButton();
+    }
+
+    function selectIndustry(ind) {
+      selectedIndustry = ind;
+      selectedScenario = null;
+      renderIndustryFilters();
+      renderScenarioCards();
+      updateStartButton();
+    }
+
+    // ── Selection handlers ──
+    function selectScenario(key) {
+      selectedScenario = key;
+      document.querySelectorAll('.scenario-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.key === key);
+      });
+      updateStartButton();
+    }
+
+    function selectPersona(key) {
+      selectedPersona = key;
+      document.querySelectorAll('.persona-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.key === key);
+      });
+      updateStartButton();
+    }
+
+    function updateStartButton() {
+      const btn = document.getElementById('btn-start');
+      btn.disabled = !(selectedScenario && selectedPersona);
+    }
+
+    // ── Start Roleplay ──
+    async function startRoleplay() {
+      if (!selectedScenario || !selectedPersona) return;
+
+      const btn = document.getElementById('btn-start');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span><span>AI 고객을 준비하고 있습니다...</span>';
+
+      try {
+        const res = await fetch('/api/roleplay/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario: selectedScenario, persona: selectedPersona }),
+        });
+        const data = await res.json();
+        systemPrompt = data.system_prompt;
+        chatHistory = [{ role: 'assistant', content: data.opening }];
+
+        // Setup playing phase UI
+        const scen = scenarios[selectedScenario];
+        const pers = personas[selectedPersona];
+        document.getElementById('play-scenario-title').textContent = scen.title;
+        document.getElementById('play-customer-role').textContent = scen.customer_role;
+        document.getElementById('play-persona-level').textContent = pers.label;
+        document.getElementById('play-turn-count').textContent = '0';
+
+        // Hints
+        const hintList = document.getElementById('hint-list');
+        hintList.innerHTML = (scen.key_questions || []).map(q =>
+          `<li class="flex items-start gap-2"><span class="text-tertiary-fixed flex-shrink-0 mt-0.5">&#8226;</span>${q}</li>`
+        ).join('');
+
+        // Hide ending banner
+        document.getElementById('ending-banner').classList.add('hidden');
+        // Close hints
+        document.getElementById('hint-panel').classList.add('hidden');
+        document.getElementById('hint-chevron').style.transform = '';
+
+        renderChat();
+        showPhase('playing');
+        document.getElementById('chat-input').focus();
+      } catch (err) {
+        console.error('Start failed:', err);
+        alert('롤플레이 시작에 실패했습니다. 서버 상태를 확인해주세요.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:22px;">play_arrow</span>롤플레이 시작';
+      }
+    }
+
+    // ── Render Chat ──
+    function renderChat() {
+      const chatArea = document.getElementById('chat-area');
+      chatArea.innerHTML = '';
+
+      const scen = scenarios[selectedScenario];
+      let userTurnCount = 0;
+
+      for (const msg of chatHistory) {
+        if (msg.role === 'user') userTurnCount++;
+        const bubble = createChatBubble(msg, scen);
+        chatArea.appendChild(bubble);
+      }
+
+      document.getElementById('play-turn-count').textContent = userTurnCount;
+      scrollChatToBottom();
+    }
+
+    function createChatBubble(msg, scen) {
+      const isAI = msg.role === 'assistant';
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex gap-3 fade-in-up ${isAI ? '' : 'flex-row-reverse'}`;
+
+      // Avatar
+      const avatar = document.createElement('div');
+      if (isAI) {
+        avatar.className = 'w-10 h-10 rounded-full bg-white shadow-sm border border-outline-variant/30 flex items-center justify-center flex-shrink-0';
+        avatar.innerHTML = '<span class="material-symbols-outlined text-primary" style="font-size:20px;">person</span>';
+      } else {
+        avatar.className = 'w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold';
+        avatar.textContent = 'ME';
+      }
+
+      // Content
+      const content = document.createElement('div');
+      content.className = `max-w-[70%] ${isAI ? '' : 'flex flex-col items-end'}`;
+
+      // Name
+      const name = document.createElement('p');
+      name.className = `text-[10px] font-semibold uppercase tracking-wider mb-1 ${isAI ? 'text-outline' : 'text-primary'}`;
+      name.textContent = isAI ? (scen ? scen.customer_role : 'AI Customer') : 'ME';
+
+      // Bubble
+      const bubble = document.createElement('div');
+      if (isAI) {
+        bubble.className = 'glass rounded-2xl rounded-tl-none px-5 py-3.5 text-sm text-on-surface leading-relaxed border border-outline-variant/15';
+      } else {
+        bubble.className = 'bg-primary text-white rounded-2xl rounded-tr-none px-5 py-3.5 text-sm leading-relaxed';
+      }
+      bubble.textContent = msg.content;
+      bubble.style.whiteSpace = 'pre-wrap';
+
+      content.appendChild(name);
+      content.appendChild(bubble);
+
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(content);
+      return wrapper;
+    }
+
+    function scrollChatToBottom() {
+      const chatArea = document.getElementById('chat-area');
+      requestAnimationFrame(() => {
+        chatArea.scrollTop = chatArea.scrollHeight;
+      });
+    }
+
+    // ── Send Message ──
+    async function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text || isWaitingForAI) return;
+
+      // Add user message
+      chatHistory.push({ role: 'user', content: text });
+      input.value = '';
+      input.style.height = 'auto';
+      renderChat();
+
+      // Disable input
+      isWaitingForAI = true;
+      input.disabled = true;
+      document.getElementById('btn-send').disabled = true;
+
+      // Show typing indicator
+      const chatArea = document.getElementById('chat-area');
+      const typingEl = document.createElement('div');
+      typingEl.id = 'typing-indicator';
+      typingEl.className = 'flex gap-3 fade-in-up';
+      const scen = scenarios[selectedScenario];
+      typingEl.innerHTML = `
+        <div class="w-10 h-10 rounded-full bg-white shadow-sm border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary" style="font-size:20px;">person</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-semibold uppercase tracking-wider mb-1 text-outline">${scen ? scen.customer_role : 'AI'}</p>
+          <div class="glass rounded-2xl rounded-tl-none px-5 py-4 border border-outline-variant/15">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(typingEl);
+      scrollChatToBottom();
+
+      try {
+        const res = await fetch('/api/roleplay/respond', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ system_prompt: systemPrompt, history: chatHistory }),
+        });
+        const data = await res.json();
+        chatHistory.push({ role: 'assistant', content: data.response });
+
+        // Check for ending phrases
+        const endings = ['내부적으로 검토', '다시 연락', '오늘은 여기까지', '감사합니다. 검토', '검토해보고', '다시 연락드리겠습니다'];
+        if (endings.some(e => data.response.includes(e))) {
+          document.getElementById('ending-banner').classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Response failed:', err);
+        chatHistory.push({ role: 'assistant', content: '(응답을 생성하지 못했습니다. 다시 시도해주세요.)' });
+      } finally {
+        // Remove typing indicator
+        const ti = document.getElementById('typing-indicator');
+        if (ti) ti.remove();
+
+        isWaitingForAI = false;
+        input.disabled = false;
+        document.getElementById('btn-send').disabled = false;
+        input.focus();
+        renderChat();
+      }
+    }
+
+    // ── Input validation + Shift+Enter handling ──
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('chat-input');
+      const btnSend = document.getElementById('btn-send');
+
+      // Auto-resize textarea
+      function autoResize() {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+        input.style.overflowY = input.scrollHeight > 150 ? 'auto' : 'hidden';
+      }
+
+      input.addEventListener('input', () => {
+        btnSend.disabled = !input.value.trim() || isWaitingForAI;
+        autoResize();
+      });
+
+      // Enter = submit, Shift+Enter = newline
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (input.value.trim() && !isWaitingForAI) {
+            input.closest('form').dispatchEvent(new Event('submit', { cancelable: true }));
+          }
+        }
+      });
+    });
+
+    // ── Toggle Hints ──
+    function toggleHints() {
+      const panel = document.getElementById('hint-panel');
+      const chevron = document.getElementById('hint-chevron');
+      const isHidden = panel.classList.contains('hidden');
+      panel.classList.toggle('hidden');
+      chevron.style.transform = isHidden ? 'rotate(180deg)' : '';
+    }
+
+    // ── End Roleplay ──
+    async function endRoleplay() {
+      const userTurns = chatHistory.filter(m => m.role === 'user').length;
+      if (userTurns < 1) {
+        alert('최소 1턴 이상 대화 후 종료하세요.');
+        return;
+      }
+
+      showPhase('feedback');
+      document.getElementById('feedback-loading').classList.remove('hidden');
+      document.getElementById('feedback-content').classList.add('hidden');
+
+      const scen = scenarios[selectedScenario];
+      const pers = personas[selectedPersona];
+
+      try {
+        const res = await fetch('/api/roleplay/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            history: chatHistory,
+            scenario_title: scen.title,
+            persona_level: selectedPersona,
+          }),
+        });
+        feedback = await res.json();
+        renderFeedback(scen, pers);
+      } catch (err) {
+        console.error('Feedback failed:', err);
+        document.getElementById('feedback-loading').innerHTML = `
+          <div class="text-center">
+            <span class="material-symbols-outlined text-error mb-2" style="font-size:40px;">error</span>
+            <p class="text-error text-sm font-semibold">피드백 생성에 실패했습니다.</p>
+            <button onclick="endRoleplay()" class="mt-4 text-primary text-sm font-semibold hover:underline">다시 시도</button>
+          </div>`;
+      }
+    }
+
+    // ── Render Feedback ──
+    function renderFeedback(scen, pers) {
+      document.getElementById('feedback-loading').classList.add('hidden');
+      document.getElementById('feedback-content').classList.remove('hidden');
+
+      // Meta
+      document.getElementById('feedback-meta').textContent = `${scen.title} | ${pers.label} | ${chatHistory.filter(m => m.role === 'user').length}턴 대화`;
+
+      // Error case
+      if (feedback.error) {
+        document.getElementById('feedback-grade-badge').className = 'w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-headline font-extrabold grade-D';
+        document.getElementById('feedback-grade-badge').textContent = '?';
+        document.getElementById('feedback-grade-label').textContent = feedback.error;
+        return;
+      }
+
+      // Grade
+      const grade = feedback.overall_score || '?';
+      const gradeBadge = document.getElementById('feedback-grade-badge');
+      gradeBadge.className = `w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-headline font-extrabold grade-${grade}`;
+      gradeBadge.textContent = grade;
+
+      const gradeLabels = { A: '우수 - 훌륭한 대응이었습니다!', B: '양호 - 좋은 수준이에요.', C: '보통 - 개선할 부분이 있어요.', D: '미흡 - 더 연습이 필요해요.' };
+      document.getElementById('feedback-grade-label').textContent = gradeLabels[grade] || '';
+
+      // Strengths
+      const strengthsList = document.getElementById('feedback-strengths');
+      strengthsList.innerHTML = (feedback.strengths || []).map(s =>
+        `<li class="flex items-start gap-2"><span class="text-green-500 flex-shrink-0 mt-0.5">&#10003;</span><span>${s}</span></li>`
+      ).join('') || '<li class="text-outline">-</li>';
+
+      // Improvements
+      const improvementsList = document.getElementById('feedback-improvements');
+      improvementsList.innerHTML = (feedback.improvements || []).map(s =>
+        `<li class="flex items-start gap-2"><span class="text-amber-500 flex-shrink-0 mt-0.5">&#9679;</span><span>${s}</span></li>`
+      ).join('') || '<li class="text-outline">-</li>';
+
+      // Terminology
+      const termCheck = feedback.terminology_check || {};
+      const termsCorrect = document.getElementById('feedback-terms-correct');
+      termsCorrect.innerHTML = (termCheck.correctly_used || []).map(t =>
+        `<span class="inline-block text-xs font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full">${t}</span>`
+      ).join('') || '<span class="text-xs text-outline">-</span>';
+
+      const termsMissed = document.getElementById('feedback-terms-missed');
+      termsMissed.innerHTML = (termCheck.missed_or_wrong || []).map(t =>
+        `<span class="inline-block text-xs font-medium bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">${t}</span>`
+      ).join('') || '<span class="text-xs text-outline">-</span>';
+
+      const tipEl = document.getElementById('feedback-term-tip');
+      const tipTextEl = document.getElementById('feedback-term-tip-text');
+      if (termCheck.tip) {
+        tipEl.classList.remove('hidden');
+        tipTextEl.textContent = termCheck.tip;
+      } else {
+        tipEl.classList.add('hidden');
+      }
+
+      // Best / Worst moments
+      document.getElementById('feedback-best').textContent = feedback.best_moment || '-';
+      document.getElementById('feedback-worst').textContent = feedback.worst_moment || '-';
+
+      // Expert answer
+      const expertSection = document.getElementById('feedback-expert-section');
+      if (feedback.expert_answer) {
+        expertSection.classList.remove('hidden');
+        document.getElementById('feedback-expert').textContent = feedback.expert_answer;
+      } else {
+        expertSection.classList.add('hidden');
+      }
+
+      // Next focus
+      const focusSection = document.getElementById('feedback-focus-section');
+      if (feedback.next_focus) {
+        focusSection.classList.remove('hidden');
+        document.getElementById('feedback-focus').textContent = feedback.next_focus;
+      } else {
+        focusSection.classList.add('hidden');
+      }
+
+      // Conversation history
+      const historyEl = document.getElementById('conversation-history');
+      historyEl.innerHTML = chatHistory.map(msg => {
+        const isAI = msg.role === 'assistant';
+        return `
+          <div class="flex items-start gap-3 ${isAI ? '' : 'flex-row-reverse'}">
+            <div class="w-7 h-7 rounded-full ${isAI ? 'bg-surface-container-high' : 'bg-primary'} flex items-center justify-center flex-shrink-0">
+              ${isAI
+                ? '<span class="material-symbols-outlined text-on-surface-variant" style="font-size:14px;">person</span>'
+                : '<span class="text-white text-[9px] font-bold">ME</span>'}
+            </div>
+            <div class="max-w-[80%] ${isAI ? '' : 'text-right'}">
+              <p class="text-[10px] font-semibold text-outline mb-1">${isAI ? (scen ? scen.customer_role : 'AI') : '나 (사업담당)'}</p>
+              <p class="text-sm text-on-surface-variant leading-relaxed">${msg.content}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── Toggle Conversation History ──
+    function toggleConversationHistory() {
+      const el = document.getElementById('conversation-history');
+      const chevron = document.getElementById('history-chevron');
+      const isHidden = el.classList.contains('hidden');
+      el.classList.toggle('hidden');
+      chevron.style.transform = isHidden ? 'rotate(180deg)' : '';
+    }
+
+    // ── Retry Same Scenario ──
+    async function retrySameScenario() {
+      chatHistory = [];
+      feedback = null;
+
+      showPhase('playing');
+      document.getElementById('ending-banner').classList.add('hidden');
+      document.getElementById('hint-panel').classList.add('hidden');
+      document.getElementById('hint-chevron').style.transform = '';
+
+      // Show loading in chat
+      const chatArea = document.getElementById('chat-area');
+      chatArea.innerHTML = `
+        <div class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <div class="spinner mx-auto mb-3"></div>
+            <p class="text-on-surface-variant text-sm">AI 고객을 준비하고 있습니다...</p>
+          </div>
+        </div>
+      `;
+
+      try {
+        const res = await fetch('/api/roleplay/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario: selectedScenario, persona: selectedPersona }),
+        });
+        const data = await res.json();
+        systemPrompt = data.system_prompt;
+        chatHistory = [{ role: 'assistant', content: data.opening }];
+
+        document.getElementById('play-turn-count').textContent = '0';
+        renderChat();
+        document.getElementById('chat-input').focus();
+      } catch (err) {
+        console.error('Retry failed:', err);
+        alert('재시작에 실패했습니다.');
+        showPhase('feedback');
+      }
+    }
+
+    // ── Reset to Setup ──
+    function resetToSetup() {
+      chatHistory = [];
+      feedback = null;
+      systemPrompt = '';
+      selectedScenario = null;
+      selectedPersona = null;
+      selectedStage = null;
+      selectedIndustry = null;
+      isWaitingForAI = false;
+
+      // Re-render setup with reset filters
+      renderStageTabs();
+      renderIndustryFilters();
+      renderScenarioCards();
+      document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
+      updateStartButton();
+
+      showPhase('setup');
+    }
+
+    // ── Boot ──
+    init();
+  </script>
+</body>
+</html>

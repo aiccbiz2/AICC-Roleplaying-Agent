@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz | AI Roleplay Agent</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="/static/shared.css" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#002859',
+            'primary-container': '#003d82',
+            secondary: '#b50062',
+            'secondary-fixed': '#ffd9e2',
+            surface: '#f7fafd',
+            'surface-container-low': '#f1f4f7',
+            'surface-container-high': '#e5e8eb',
+            'surface-container-lowest': '#ffffff',
+            'on-surface': '#181c1e',
+            'on-surface-variant': '#434751',
+            outline: '#737782',
+            'outline-variant': '#c3c6d2',
+            tertiary: '#002f2c',
+            'tertiary-fixed': '#72f7ed',
+            error: '#ba1a1a',
+            'error-container': '#ffdad6',
+          },
+          fontFamily: {
+            headline: ['Manrope', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Material Symbols -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+  />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f7fafd;
+    }
+    .font-headline {
+      font-family: 'Manrope', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-header {
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c3c6d2; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #737782; }
+    /* Transition for option buttons */
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+    .option-btn:hover:not(.answered) {
+      background-color: #ffd9e2;
+    }
+    .option-btn.selected:not(.answered) {
+      border-color: #b50062;
+      background-color: #ffd9e2;
+    }
+    .option-btn.selected:not(.answered) .letter-badge {
+      background-color: #b50062;
+      color: #ffffff;
+    }
+    /* Progress bar */
+    .progress-dot {
+      transition: all 0.3s ease;
+    }
+    .progress-dot.correct {
+      background-color: #002f2c;
+      border-color: #002f2c;
+    }
+    .progress-dot.wrong {
+      background-color: #ba1a1a;
+      border-color: #ba1a1a;
+    }
+    .progress-dot.current {
+      border-color: #b50062;
+      box-shadow: 0 0 0 3px rgba(181, 0, 98, 0.2);
+    }
+    /* Result card animation */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-card {
+      animation: slideUp 0.4s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+
+  <!-- Shared sidebar & header injected by shared.js -->
+  <script src="/static/shared.js"></script>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main class="app-main min-h-[calc(100vh-4rem)]">
+    <div class="max-w-4xl mx-auto px-6 py-8">
+
+      <!-- ====== SCREEN 1: INITIAL (Category/Difficulty Selection) ====== -->
+      <div id="setupScreen">
+        <!-- Empty State / Start -->
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <div class="w-20 h-20 rounded-3xl bg-secondary-fixed/50 flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-secondary text-4xl">quiz</span>
+          </div>
+          <h2 class="font-headline font-bold text-2xl text-on-surface mb-2">AICC 도메인 퀴즈</h2>
+          <p class="text-on-surface-variant text-sm max-w-md mb-10">
+            카테고리와 난이도를 선택하고 퀴즈를 시작하세요.<br />10문제가 출제되며, 끝나면 결과를 확인할 수 있습니다.
+          </p>
+
+          <!-- Selection Controls -->
+          <div class="w-full max-w-lg space-y-4 mb-8">
+            <!-- Category Dropdown -->
+            <div class="text-left">
+              <label for="categorySelect" class="block text-xs font-medium text-on-surface-variant mb-1.5">
+                카테고리
+              </label>
+              <select
+                id="categorySelect"
+                class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary"
+              >
+                <option value="">전체 (랜덤 출제)</option>
+              </select>
+            </div>
+
+            <!-- Difficulty Dropdown -->
+            <div class="text-left">
+              <label for="difficultySelect" class="block text-xs font-medium text-on-surface-variant mb-1.5">
+                난이도
+              </label>
+              <select
+                id="difficultySelect"
+                class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary"
+              >
+                <option value="초급">초급</option>
+                <option value="중급" selected>중급</option>
+                <option value="고급">고급</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Start Button -->
+          <button
+            id="startQuizBtn"
+            onclick="startQuizSet()"
+            class="flex items-center gap-3 px-10 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-base font-bold shadow-lg hover:shadow-xl transition-all"
+          >
+            <span class="material-symbols-outlined text-xl">play_arrow</span>
+            퀴즈 시작 (10문제)
+          </button>
+        </div>
+      </div>
+
+      <!-- ====== SCREEN 2: QUIZ IN PROGRESS ====== -->
+      <div id="quizScreen" class="hidden">
+
+        <!-- Top Bar: Progress + Score -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+          <!-- Progress indicator -->
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-sm font-semibold text-on-surface" id="progressLabel">문제 1 / 10</span>
+            </div>
+            <div class="flex items-center gap-1.5" id="progressDots"></div>
+          </div>
+
+          <!-- Score -->
+          <div class="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm">
+            <span class="material-symbols-outlined text-primary text-xl">scoreboard</span>
+            <span id="scoreText" class="text-sm font-semibold text-on-surface">0 / 0</span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden flex flex-col items-center justify-center py-24">
+          <div class="animate-spin w-10 h-10 border-4 border-outline-variant border-t-primary rounded-full mb-4"></div>
+          <p class="text-on-surface-variant text-sm">문제를 불러오는 중...</p>
+        </div>
+
+        <!-- Quiz Card -->
+        <div id="quizCard" class="hidden">
+          <div class="relative bg-surface-container-lowest rounded-3xl p-8 md:p-12 shadow-sm overflow-hidden">
+            <!-- Decorative blur -->
+            <div class="absolute -top-20 -right-20 w-60 h-60 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Category & Difficulty badge -->
+            <div class="flex items-center gap-2 mb-6">
+              <span
+                id="quizCategoryBadge"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-low text-xs font-medium text-on-surface-variant"
+              ></span>
+              <span
+                id="quizDifficultyBadge"
+                class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary"
+              ></span>
+            </div>
+
+            <!-- Question -->
+            <div class="flex items-start gap-4 mb-8">
+              <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center">
+                <span class="material-symbols-outlined text-secondary text-xl">help</span>
+              </div>
+              <h2 id="questionText" class="font-headline font-bold text-xl md:text-2xl text-on-surface leading-relaxed"></h2>
+            </div>
+
+            <!-- Options -->
+            <div id="optionsContainer" class="flex flex-col gap-3 mb-8"></div>
+
+            <!-- Submit Button -->
+            <div id="submitArea" class="flex justify-center">
+              <button
+                id="submitBtn"
+                onclick="checkAnswer()"
+                disabled
+                class="px-10 py-4 bg-primary text-white rounded-full font-bold text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                정답 확인
+              </button>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedbackArea" class="hidden mt-8"></div>
+
+            <!-- Next Question Button (shown after answering) -->
+            <div id="nextArea" class="hidden flex justify-center mt-6">
+              <button
+                id="nextBtn"
+                onclick="showNextQuestion()"
+                class="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+              >
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                <span id="nextBtnText">다음 문제</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SCREEN 3: RESULTS ====== -->
+      <div id="resultScreen" class="hidden">
+        <div class="flex flex-col items-center justify-center py-8">
+          <!-- Result Header -->
+          <div class="result-card w-full max-w-2xl bg-surface-container-lowest rounded-3xl p-8 md:p-12 shadow-sm mb-6">
+            <div class="text-center mb-8">
+              <div id="resultIcon" class="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto"></div>
+              <h2 id="resultTitle" class="font-headline font-bold text-2xl text-on-surface mb-2"></h2>
+              <p id="resultSubtitle" class="text-on-surface-variant text-sm"></p>
+            </div>
+
+            <!-- Score Summary -->
+            <div class="grid grid-cols-3 gap-4 mb-8">
+              <div class="text-center p-4 rounded-2xl bg-tertiary/5">
+                <div id="resultCorrect" class="font-headline font-bold text-3xl text-tertiary mb-1"></div>
+                <div class="text-xs text-on-surface-variant">정답</div>
+              </div>
+              <div class="text-center p-4 rounded-2xl bg-error-container/30">
+                <div id="resultWrong" class="font-headline font-bold text-3xl text-error mb-1"></div>
+                <div class="text-xs text-on-surface-variant">오답</div>
+              </div>
+              <div class="text-center p-4 rounded-2xl bg-primary/5">
+                <div id="resultPercent" class="font-headline font-bold text-3xl text-primary mb-1"></div>
+                <div class="text-xs text-on-surface-variant">정답률</div>
+              </div>
+            </div>
+
+            <!-- Per-question review -->
+            <div class="mb-8">
+              <h3 class="font-headline font-bold text-base text-on-surface mb-4">문제별 결과</h3>
+              <div id="resultDetails" class="space-y-3"></div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <button
+              onclick="goToSetup()"
+              class="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+            >
+              <span class="material-symbols-outlined text-lg">refresh</span>
+              새 퀴즈 시작
+            </button>
+            <button
+              onclick="reviewWrongAnswers()"
+              id="reviewWrongBtn"
+              class="flex items-center gap-2 px-6 py-3.5 rounded-full border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-low transition-colors"
+            >
+              <span class="material-symbols-outlined text-lg">visibility</span>
+              오답 다시 보기
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SCREEN 4: Wrong Answer Review ====== -->
+      <div id="reviewScreen" class="hidden">
+        <div class="max-w-2xl mx-auto py-8">
+          <div class="flex items-center gap-3 mb-6">
+            <button onclick="showResults()" class="p-2 rounded-xl hover:bg-surface-container-low transition-colors">
+              <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+            </button>
+            <h2 class="font-headline font-bold text-xl text-on-surface">오답 복습</h2>
+          </div>
+          <div id="reviewList" class="space-y-6"></div>
+          <div class="flex justify-center mt-8">
+            <button
+              onclick="goToSetup()"
+              class="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
+            >
+              <span class="material-symbols-outlined text-lg">refresh</span>
+              새 퀴즈 시작
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ====== JAVASCRIPT ====== -->
+  <script>
+    // ── Constants ──
+    const SET_SIZE = 10;
+
+    // ── State ──
+    let quizSet = [];           // Array of 10 quiz objects
+    let currentIndex = 0;       // 0-based index of current question
+    let answered = false;
+    let selectedOption = null;
+    let results = [];           // Array of { quiz, selectedAnswer, isCorrect }
+
+    // ── DOM Refs ──
+    const categorySelect = document.getElementById('categorySelect');
+    const difficultySelect = document.getElementById('difficultySelect');
+
+    const setupScreen = document.getElementById('setupScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const reviewScreen = document.getElementById('reviewScreen');
+
+    const loadingState = document.getElementById('loadingState');
+    const quizCard = document.getElementById('quizCard');
+    const progressLabel = document.getElementById('progressLabel');
+    const progressDots = document.getElementById('progressDots');
+    const scoreText = document.getElementById('scoreText');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitArea = document.getElementById('submitArea');
+    const feedbackArea = document.getElementById('feedbackArea');
+    const nextArea = document.getElementById('nextArea');
+    const nextBtnText = document.getElementById('nextBtnText');
+    const quizCategoryBadge = document.getElementById('quizCategoryBadge');
+    const quizDifficultyBadge = document.getElementById('quizDifficultyBadge');
+
+    // ── Screen Management ──
+    function showScreen(screenId) {
+      [setupScreen, quizScreen, resultScreen, reviewScreen].forEach(s => s.classList.add('hidden'));
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    // ── Load Categories on Page Load ──
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/quiz/categories');
+        const categories = await res.json();
+        categories.forEach((cat) => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          categorySelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+      }
+    }
+
+    // ── Start Quiz Set ──
+    async function startQuizSet() {
+      // Reset state
+      quizSet = [];
+      currentIndex = 0;
+      results = [];
+      answered = false;
+      selectedOption = null;
+
+      // Switch to quiz screen
+      showScreen('quizScreen');
+      quizCard.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+
+      // Build progress dots
+      renderProgressDots();
+      updateScoreDisplay();
+
+      try {
+        const category = categorySelect.value || '';
+        const difficulty = difficultySelect.value;
+        const params = new URLSearchParams();
+        if (category) params.set('category', category);
+        params.set('difficulty', difficulty);
+        params.set('count', SET_SIZE);
+
+        const res = await fetch(`/api/quiz/set?${params.toString()}`);
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        quizSet = data.quizzes || [];
+
+        if (quizSet.length === 0) {
+          alert('선택한 조건에 맞는 퀴즈가 없습니다. 다른 조건을 선택해주세요.');
+          showScreen('setupScreen');
+          return;
+        }
+
+        showCurrentQuestion();
+      } catch (err) {
+        console.error('Failed to fetch quiz set:', err);
+        alert('퀴즈 로딩에 실패했습니다.');
+        showScreen('setupScreen');
+      }
+    }
+
+    // ── Render Progress Dots ──
+    function renderProgressDots() {
+      progressDots.innerHTML = '';
+      const total = quizSet.length || SET_SIZE;
+      for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center text-xs font-bold text-on-surface-variant';
+        dot.textContent = i + 1;
+        if (i === currentIndex) dot.classList.add('current');
+        progressDots.appendChild(dot);
+      }
+    }
+
+    // ── Update Progress Dots State ──
+    function updateProgressDots() {
+      const dots = progressDots.querySelectorAll('.progress-dot');
+      dots.forEach((dot, i) => {
+        dot.classList.remove('current', 'correct', 'wrong');
+        if (i < results.length) {
+          dot.classList.add(results[i].isCorrect ? 'correct' : 'wrong');
+          dot.style.color = '#ffffff';
+        }
+        if (i === currentIndex && i >= results.length) {
+          dot.classList.add('current');
+        }
+      });
+    }
+
+    // ── Update Score Display ──
+    function updateScoreDisplay() {
+      const correct = results.filter(r => r.isCorrect).length;
+      const total = results.length;
+      scoreText.textContent = `${correct} / ${total}`;
+    }
+
+    // ── Show Current Question ──
+    function showCurrentQuestion() {
+      loadingState.classList.add('hidden');
+      quizCard.classList.remove('hidden');
+      feedbackArea.classList.add('hidden');
+      feedbackArea.innerHTML = '';
+      nextArea.classList.add('hidden');
+      submitArea.classList.remove('hidden');
+      submitBtn.disabled = true;
+      answered = false;
+      selectedOption = null;
+
+      const quiz = quizSet[currentIndex];
+
+      // Update progress
+      progressLabel.textContent = `문제 ${currentIndex + 1} / ${quizSet.length}`;
+      updateProgressDots();
+
+      // Badges
+      quizCategoryBadge.textContent = quiz.category || '랜덤';
+      quizDifficultyBadge.textContent = quiz.difficulty || '중급';
+
+      // Question
+      questionText.textContent = quiz.question;
+
+      // Options
+      optionsContainer.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      quiz.options.forEach((optText, idx) => {
+        const letter = letters[idx];
+        const displayText = optText.replace(/^[A-D]\.\s*/, '');
+
+        const btn = document.createElement('button');
+        btn.className =
+          'option-btn flex items-center gap-4 p-5 rounded-2xl border-2 border-transparent bg-surface-container-low text-left w-full';
+        btn.setAttribute('data-index', idx);
+        btn.innerHTML = `
+          <div class="letter-badge flex-shrink-0 w-10 h-10 rounded-xl bg-white text-secondary font-bold shadow-sm flex items-center justify-center text-sm">
+            ${letter}
+          </div>
+          <span class="text-on-surface text-sm md:text-base font-medium leading-relaxed">${displayText}</span>
+        `;
+
+        btn.addEventListener('click', () => selectOption(idx, btn));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // ── Select Option ──
+    function selectOption(idx, btn) {
+      if (answered) return;
+
+      selectedOption = idx;
+
+      // Clear all selections
+      document.querySelectorAll('.option-btn').forEach((b) => {
+        b.classList.remove('selected');
+        const badge = b.querySelector('.letter-badge');
+        badge.classList.remove('bg-secondary', 'text-white');
+        badge.classList.add('bg-white', 'text-secondary');
+        const checkIcon = b.querySelector('.check-icon');
+        if (checkIcon) checkIcon.remove();
+      });
+
+      // Highlight selected
+      btn.classList.add('selected');
+      const badge = btn.querySelector('.letter-badge');
+      badge.classList.remove('bg-white', 'text-secondary');
+      badge.classList.add('bg-secondary', 'text-white');
+
+      // Add check icon
+      const checkSpan = document.createElement('span');
+      checkSpan.className = 'material-symbols-outlined text-secondary text-xl ml-auto check-icon';
+      checkSpan.textContent = 'check_circle';
+      btn.appendChild(checkSpan);
+
+      // Enable submit
+      submitBtn.disabled = false;
+    }
+
+    // ── Check Answer ──
+    function checkAnswer() {
+      if (answered || selectedOption === null) return;
+      answered = true;
+
+      const quiz = quizSet[currentIndex];
+      const correctLetter = quiz.answer.trim().charAt(0).toUpperCase();
+      const letters = ['A', 'B', 'C', 'D'];
+      const selectedLetter = letters[selectedOption];
+      const isCorrect = selectedLetter === correctLetter;
+
+      // Record result
+      results.push({ quiz, selectedAnswer: selectedLetter, isCorrect });
+      updateScoreDisplay();
+      updateProgressDots();
+
+      // Mark options as answered
+      document.querySelectorAll('.option-btn').forEach((b) => {
+        b.classList.add('answered');
+      });
+
+      // Hide submit, show feedback
+      submitArea.classList.add('hidden');
+      feedbackArea.classList.remove('hidden');
+
+      if (isCorrect) {
+        feedbackArea.innerHTML = `
+          <div class="bg-tertiary/5 rounded-3xl p-6 border-l-8 border-tertiary">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="material-symbols-outlined text-tertiary text-2xl">verified_user</span>
+              <span class="font-headline font-bold text-lg text-tertiary">정답입니다!</span>
+            </div>
+            <p class="text-on-surface-variant text-sm leading-relaxed">${quiz.explanation || ''}</p>
+          </div>
+        `;
+      } else {
+        const correctIdx = letters.indexOf(correctLetter);
+        const correctOptionText = correctIdx >= 0 && quiz.options[correctIdx]
+          ? quiz.options[correctIdx].replace(/^[A-D]\.\s*/, '')
+          : correctLetter;
+
+        feedbackArea.innerHTML = `
+          <div class="bg-error-container/30 rounded-3xl p-6 border-l-8 border-error">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="material-symbols-outlined text-error text-2xl">cancel</span>
+              <span class="font-headline font-bold text-lg text-error">오답입니다. 정답: ${correctLetter}</span>
+            </div>
+            <p class="text-on-surface-variant text-sm leading-relaxed mb-3">
+              <span class="font-semibold text-on-surface">${correctOptionText}</span>
+            </p>
+            <p class="text-on-surface-variant text-sm leading-relaxed">${quiz.explanation || ''}</p>
+          </div>
+        `;
+
+        // Highlight correct option
+        const correctBtn = optionsContainer.children[correctIdx];
+        if (correctBtn) {
+          correctBtn.classList.remove('bg-surface-container-low', 'border-transparent');
+          correctBtn.classList.add('border-tertiary', 'bg-tertiary/5');
+          const correctBadge = correctBtn.querySelector('.letter-badge');
+          correctBadge.classList.remove('bg-white', 'text-secondary', 'bg-secondary');
+          correctBadge.classList.add('bg-tertiary', 'text-white');
+        }
+
+        // Highlight wrong selected option
+        const wrongBtn = optionsContainer.children[selectedOption];
+        if (wrongBtn) {
+          wrongBtn.classList.remove('bg-surface-container-low', 'border-transparent');
+          wrongBtn.classList.add('border-error', 'bg-error-container/20');
+        }
+      }
+
+      // Show next button
+      nextArea.classList.remove('hidden');
+      const isLast = currentIndex >= quizSet.length - 1;
+      nextBtnText.textContent = isLast ? '결과 확인' : '다음 문제';
+    }
+
+    // ── Show Next Question ──
+    function showNextQuestion() {
+      currentIndex++;
+      if (currentIndex >= quizSet.length) {
+        showResults();
+      } else {
+        showCurrentQuestion();
+      }
+    }
+
+    // ── Show Results ──
+    function showResults() {
+      showScreen('resultScreen');
+
+      const correct = results.filter(r => r.isCorrect).length;
+      const wrong = results.length - correct;
+      const pct = results.length > 0 ? Math.round((correct / results.length) * 100) : 0;
+
+      // Result icon & title
+      const resultIcon = document.getElementById('resultIcon');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultSubtitle = document.getElementById('resultSubtitle');
+
+      if (pct >= 80) {
+        resultIcon.className = 'w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto bg-tertiary/10';
+        resultIcon.innerHTML = '<span class="material-symbols-outlined text-tertiary text-4xl">emoji_events</span>';
+        resultTitle.textContent = '훌륭합니다!';
+        resultSubtitle.textContent = 'AICC 도메인 전문가 수준입니다.';
+      } else if (pct >= 50) {
+        resultIcon.className = 'w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto bg-primary/10';
+        resultIcon.innerHTML = '<span class="material-symbols-outlined text-primary text-4xl">thumb_up</span>';
+        resultTitle.textContent = '좋은 성적입니다!';
+        resultSubtitle.textContent = '조금만 더 공부하면 전문가가 될 수 있습니다.';
+      } else {
+        resultIcon.className = 'w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto bg-secondary-fixed/50';
+        resultIcon.innerHTML = '<span class="material-symbols-outlined text-secondary text-4xl">school</span>';
+        resultTitle.textContent = '더 공부해봐요!';
+        resultSubtitle.textContent = '오답을 복습하고 다시 도전해보세요.';
+      }
+
+      // Score numbers
+      document.getElementById('resultCorrect').textContent = correct;
+      document.getElementById('resultWrong').textContent = wrong;
+      document.getElementById('resultPercent').textContent = `${pct}%`;
+
+      // Per-question details
+      const detailsEl = document.getElementById('resultDetails');
+      detailsEl.innerHTML = '';
+      results.forEach((r, i) => {
+        const icon = r.isCorrect ? 'check_circle' : 'cancel';
+        const iconColor = r.isCorrect ? 'text-tertiary' : 'text-error';
+        const bgColor = r.isCorrect ? 'bg-tertiary/5' : 'bg-error-container/20';
+
+        const row = document.createElement('div');
+        row.className = `flex items-start gap-3 p-4 rounded-2xl ${bgColor}`;
+        row.innerHTML = `
+          <span class="material-symbols-outlined ${iconColor} text-xl mt-0.5">${icon}</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-on-surface mb-1 truncate">Q${i + 1}. ${r.quiz.question}</div>
+            <div class="text-xs text-on-surface-variant">
+              내 답: ${r.selectedAnswer} ${r.isCorrect ? '' : ' / 정답: ' + r.quiz.answer.trim().charAt(0).toUpperCase()}
+            </div>
+          </div>
+        `;
+        detailsEl.appendChild(row);
+      });
+
+      // Hide review button if no wrong answers
+      document.getElementById('reviewWrongBtn').classList.toggle('hidden', wrong === 0);
+    }
+
+    // ── Review Wrong Answers ──
+    function reviewWrongAnswers() {
+      showScreen('reviewScreen');
+      const reviewList = document.getElementById('reviewList');
+      reviewList.innerHTML = '';
+
+      const wrongResults = results.filter(r => !r.isCorrect);
+      wrongResults.forEach((r, i) => {
+        const quiz = r.quiz;
+        const letters = ['A', 'B', 'C', 'D'];
+        const correctLetter = quiz.answer.trim().charAt(0).toUpperCase();
+        const correctIdx = letters.indexOf(correctLetter);
+        const correctOptionText = correctIdx >= 0 && quiz.options[correctIdx]
+          ? quiz.options[correctIdx].replace(/^[A-D]\.\s*/, '')
+          : correctLetter;
+
+        const card = document.createElement('div');
+        card.className = 'bg-surface-container-lowest rounded-2xl p-6 shadow-sm';
+        card.innerHTML = `
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-low text-xs font-medium text-on-surface-variant">${quiz.category || ''}</span>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-error-container/30 text-xs font-semibold text-error">오답</span>
+          </div>
+          <h3 class="font-headline font-bold text-base text-on-surface mb-3">${quiz.question}</h3>
+          <div class="space-y-2 mb-4">
+            ${quiz.options.map((opt, idx) => {
+              const letter = letters[idx];
+              const display = opt.replace(/^[A-D]\.\s*/, '');
+              const isCorrect = letter === correctLetter;
+              const isSelected = letter === r.selectedAnswer;
+              let cls = 'p-3 rounded-xl text-sm';
+              if (isCorrect) cls += ' bg-tertiary/10 border border-tertiary/30 font-semibold text-tertiary';
+              else if (isSelected) cls += ' bg-error-container/20 border border-error/30 text-error line-through';
+              else cls += ' bg-surface-container-low text-on-surface-variant';
+              return `<div class="${cls}">${letter}. ${display}</div>`;
+            }).join('')}
+          </div>
+          <div class="bg-tertiary/5 rounded-xl p-4 border-l-4 border-tertiary">
+            <p class="text-sm text-on-surface-variant leading-relaxed">
+              <span class="font-semibold text-tertiary">정답: ${correctLetter}.</span> ${correctOptionText}<br/>
+              ${quiz.explanation || ''}
+            </p>
+          </div>
+        `;
+        reviewList.appendChild(card);
+      });
+    }
+
+    // ── Go to Setup Screen ──
+    function goToSetup() {
+      showScreen('setupScreen');
+    }
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCategories();
+    });
+  </script>
+</body>
+</html>

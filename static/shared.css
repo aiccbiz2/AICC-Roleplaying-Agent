@@ -1,0 +1,122 @@
+/* ── Shared Sidebar & Responsive Layout ── */
+
+/* Sidebar base */
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16rem; /* w-64 */
+  height: 100vh;
+  background-color: #f1f4f7;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+/* Header base */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 16rem;
+  right: 0;
+  height: 4rem;
+  background: rgba(247, 250, 253, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(195, 198, 210, 0.3);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+/* Main content offset */
+.app-main {
+  margin-left: 16rem;
+  margin-top: 4rem;
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 45;
+}
+
+/* Hamburger button (hidden on desktop) */
+.hamburger-btn {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #434751;
+  transition: background 0.2s;
+}
+.hamburger-btn:hover {
+  background: #e5e8eb;
+}
+
+/* Nav item styles */
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  margin-right: 1rem;
+  border-radius: 0 9999px 9999px 0;
+  font-size: 0.875rem;
+  color: #44474a;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.sidebar-nav-item:hover {
+  background: #e5e8eb;
+  transform: translateX(4px);
+}
+.sidebar-nav-item.active {
+  background: white;
+  color: #b50062;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 1023px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+  }
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.open {
+    display: block;
+  }
+  .app-header {
+    left: 0;
+  }
+  .app-main {
+    margin-left: 0;
+  }
+  .hamburger-btn {
+    display: flex;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 1rem;
+  }
+  .app-main {
+    padding: 1rem !important;
+  }
+}
