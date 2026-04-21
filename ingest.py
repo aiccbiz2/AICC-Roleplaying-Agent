@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
@@ -13,19 +13,39 @@ from config import (
 
 
 def load_documents() -> list:
-    """docs/ 하위의 모든 .md, .txt 파일을 로드"""
+    """Ground Truth + 핵심 루트 파일만 로드 (rawdata 제외)"""
     docs = []
-    for ext in ("*.md", "*.txt"):
-        for path in DOCS_DIR.rglob(ext):
-            try:
-                loader = TextLoader(str(path), encoding="utf-8")
-                loaded = loader.load()
-                for doc in loaded:
-                    doc.metadata["source"] = str(path.relative_to(DOCS_DIR))
-                    doc.metadata["category"] = _categorize(path)
-                docs.extend(loaded)
-            except Exception as e:
-                print(f"[WARN] {path.name} 로드 실패: {e}")
+
+    # 1) Ground Truth 폴더 전체
+    gt_dir = DOCS_DIR / "Ground Truth"
+    # 2) 핵심 루트 파일 (정제된 참조 자료)
+    root_files = [
+        DOCS_DIR / "도메인_용어사전.md",
+        DOCS_DIR / "고객질문_패턴DB.md",
+        DOCS_DIR / "AICC_롤플레이_정답참고서_통합.md",
+        DOCS_DIR / "롤플레이_시나리오.md",
+    ]
+
+    targets: list[Path] = []
+
+    # Ground Truth 하위 모든 .md, .txt
+    if gt_dir.exists():
+        for ext in ("*.md", "*.txt"):
+            targets.extend(gt_dir.rglob(ext))
+
+    # 핵심 루트 파일
+    targets.extend(f for f in root_files if f.exists())
+
+    for path in targets:
+        try:
+            loader = TextLoader(str(path), encoding="utf-8")
+            loaded = loader.load()
+            for doc in loaded:
+                doc.metadata["source"] = str(path.relative_to(DOCS_DIR))
+                doc.metadata["category"] = _categorize(path)
+            docs.extend(loaded)
+        except Exception as e:
+            print(f"[WARN] {path.name} 로드 실패: {e}")
     return docs
 
 
@@ -55,12 +75,18 @@ def split_documents(docs: list) -> list:
     return splitter.split_documents(docs)
 
 
+_embeddings_instance = None
+
+
 def get_embeddings():
-    """로컬 임베딩 모델 (API 불필요)"""
-    return HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL,
-        model_kwargs={"device": "cpu"},
-    )
+    """로컬 임베딩 모델 (API 불필요) — 싱글톤으로 재사용"""
+    global _embeddings_instance
+    if _embeddings_instance is None:
+        _embeddings_instance = HuggingFaceEmbeddings(
+            model_name=EMBEDDING_MODEL,
+            model_kwargs={"device": "cpu"},
+        )
+    return _embeddings_instance
 
 
 def create_vectorstore(chunks: list) -> Chroma:

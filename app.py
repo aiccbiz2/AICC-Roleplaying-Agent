@@ -3,14 +3,14 @@ import streamlit as st
 
 st.set_page_config(
     page_title="AICC 롤플레이 시뮬레이터",
-    page_icon="🎭",
+    page_icon=""
     layout="wide",
 )
 
 
 # ── 사이드바 ──────────────────────────────────────────────
 with st.sidebar:
-    st.title("🎭 AICC 롤플레이 시뮬레이터")
+    st.title(" AICC Role Play Simulator")
     st.caption("AI사업2팀 자기학습 도구 — Stage 1 MVP")
     st.divider()
 
@@ -72,9 +72,9 @@ with tab_roleplay:
 
     # ── Phase 1: 시나리오 선택 ──
     if st.session_state.rp_phase == "setup":
-        st.header("🎭 고객 미팅 롤플레이")
+        st.header("고객 미팅 롤플레이")
         st.markdown("**실제 고객 미팅을 기반으로 AI 고객과 사업 대응을 연습하세요.**")
-        st.caption("당신 = LG U+ AI사업2팀 사업담당 | AI = AICC 도입 검토 고객")
+        st.caption("당신 =AI사업2팀 사업담당자 | AI = 고객")
 
         st.divider()
 
@@ -155,11 +155,20 @@ with tab_roleplay:
 
         st.divider()
 
-        # 힌트 버튼
-        with st.expander("💡 막히면 눌러보세요 — 예상 질문 힌트"):
-            for q in scenario["key_questions"]:
-                st.markdown(f"- {q}")
-            st.caption("위 질문들이 나올 수 있습니다. 미리 답변을 준비해보세요.")
+        # 힌트 버튼 (show_hints가 True인 경우에만 표시)
+        if persona.get("show_hints", False):
+            user_turn_count = len([m for m in st.session_state.rp_history if m["role"] == "user"])
+            questions = scenario["key_questions"]
+            with st.expander("💡 막히면 눌러보세요 — 예상 질문 힌트"):
+                for i, q in enumerate(questions):
+                    if i < user_turn_count:
+                        st.markdown(f"- ~~{q}~~ ✅")
+                    elif i == user_turn_count:
+                        st.markdown(f"- **👉 {q}**")
+                    else:
+                        st.markdown(f"- {q}")
+                remaining = max(0, len(questions) - user_turn_count)
+                st.caption(f"남은 예상 질문: {remaining}개 — 다음 질문에 대한 답변을 준비하세요.")
 
         # 대화 표시
         for msg in st.session_state.rp_history:
@@ -308,6 +317,9 @@ with tab_roleplay:
                 st.session_state.rp_phase = "setup"
                 st.session_state.rp_history = []
                 st.session_state.rp_feedback = None
+                st.session_state.rp_persona = ""
+                st.session_state.rp_scenario = ""
+                st.session_state.rp_system_prompt = ""
                 st.rerun()
 
 
@@ -349,8 +361,9 @@ with tab_quiz:
             st.session_state.quiz_answered = False
         else:
             with st.spinner("퀴즈 풀이 없어서 실시간 생성 중..."):
+                import asyncio
                 from quiz import generate_quiz
-                st.session_state.quiz_data = generate_quiz(category=cat, difficulty=quiz_diff)
+                st.session_state.quiz_data = asyncio.run(generate_quiz(category=cat, difficulty=quiz_diff))
                 st.session_state.quiz_answered = False
 
     quiz = st.session_state.quiz_data

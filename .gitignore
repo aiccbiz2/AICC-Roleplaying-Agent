@@ -21,3 +21,20 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Runtime data / databases
+data/app.db
+data/app.db-shm
+data/app.db-wal
+data/gemini_usage.json
+data/runtime_config.json
+
+# Logs & perf results
+logs/
+results/
+
+# Large media
+static/videos/
+
+# Claude local config
+.claude/

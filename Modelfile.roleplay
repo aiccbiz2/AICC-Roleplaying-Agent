@@ -1,0 +1,22 @@
+FROM gemma3:12b
+
+# 컨텍스트 크기 (시스템 프롬프트 + 8~10턴 대화를 수용)
+PARAMETER num_ctx 4096
+
+# 온도 — 자연스럽고 다양한 표현을 위해 약간 높게
+PARAMETER temperature 0.8
+
+# 반복 억제 — 같은 말 반복 방지 (너무 높으면 부자연스러움)
+PARAMETER repeat_penalty 1.15
+PARAMETER repeat_last_n 64
+
+# 응답 길이 제한 — 간결한 응답 (2-3문장)
+PARAMETER num_predict 256
+
+# Top-P — 다양성 조절
+PARAMETER top_p 0.9
+
+# GPU 레이어 — 가능한 많이 GPU에 올리기
+PARAMETER num_gpu 999
+
+SYSTEM """당신은 고객 역할을 하는 AI입니다. 한국어로 자연스럽게 대화하세요. 응답은 2~3문장 이내로 간결하게 하세요. 상대방의 말을 반복하지 마세요."""

@@ -8,11 +8,6 @@
   <!-- Shared CSS -->
   <link rel="stylesheet" href="/static/shared.css" />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
   <!-- Material Symbols -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
@@ -23,25 +18,25 @@
       theme: {
         extend: {
           colors: {
-            primary: '#002859',
-            'primary-container': '#003d82',
-            secondary: '#b50062',
-            'secondary-fixed': '#ffd9e2',
-            surface: '#f7fafd',
-            'surface-container-low': '#f1f4f7',
-            'surface-container-high': '#e5e8eb',
+            primary: '#0071e3',
+            'primary-container': '#0077ed',
+            secondary: '#0071e3',
+            'secondary-fixed': '#e8f0fe',
+            surface: '#fbfbfd',
+            'surface-container-low': '#f5f5f7',
+            'surface-container-high': '#e5e5ea',
             'surface-container-lowest': '#ffffff',
-            'on-surface': '#181c1e',
-            'on-surface-variant': '#434751',
-            outline: '#737782',
-            'outline-variant': '#c3c6d2',
-            tertiary: '#002f2c',
-            'tertiary-fixed': '#72f7ed',
-            error: '#ba1a1a',
+            'on-surface': '#1d1d1f',
+            'on-surface-variant': '#6e6e73',
+            outline: '#86868b',
+            'outline-variant': '#d2d2d7',
+            tertiary: '#1d1d1f',
+            'tertiary-fixed': '#0071e3',
+            error: '#ff3b30',
           },
           fontFamily: {
-            headline: ['Manrope', 'sans-serif'],
-            body: ['Inter', 'sans-serif'],
+            headline: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'sans-serif'],
+            body: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Helvetica Neue', 'sans-serif'],
           },
         },
       },
@@ -50,8 +45,8 @@
 
   <style>
     * { box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; }
-    h1, h2, h3, h4, h5, h6 { font-family: 'Manrope', sans-serif; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    h1, h2, h3, h4, h5, h6 { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
     .material-symbols-outlined {
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -73,29 +68,144 @@
 
     /* Gradient button */
     .btn-gradient {
-      background: linear-gradient(135deg, #002859, #003d82);
+      background: linear-gradient(135deg, #0071e3, #0077ed);
       transition: all 0.2s ease;
     }
     .btn-gradient:hover {
-      background: linear-gradient(135deg, #003d82, #004ea8);
+      background: linear-gradient(135deg, #0077ed, #005bb5);
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(0, 40, 89, 0.3);
+      box-shadow: 0 4px 16px rgba(0, 113, 227, 0.3);
     }
     .btn-gradient:active { transform: translateY(0); }
 
-    /* Scenario card hover */
+    /* ── Apple Store-style Carousel ── */
+    .stage-row { margin-bottom: 40px; }
+    .stage-row__title {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: #1d1d1f;
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+      padding-left: 4px;
+    }
+    .carousel-track {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      /* scroll-snap 제거: 카드 선택 시 자동 스크롤 방지 */
+      -webkit-overflow-scrolling: touch;
+      padding: 8px 8px 20px 12px;
+      cursor: grab;
+    }
+    .carousel-track:active { cursor: grabbing; }
+    .carousel-track::-webkit-scrollbar { height: 6px; }
+    .carousel-track::-webkit-scrollbar-track { background: transparent; }
+    .carousel-track::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+    .carousel-track::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
     .scenario-card {
-      transition: all 0.2s ease;
+      flex: 0 0 400px;
+      height: 420px;
+      border-radius: 20px;
+      /* scroll-snap-align 제거 */
       cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f7;
+      user-select: none;
     }
     .scenario-card:hover {
-      border-color: #ffd9e2;
-      box-shadow: 0 4px 16px rgba(181, 0, 98, 0.08);
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
     }
     .scenario-card.selected {
-      border-color: #b50062;
-      box-shadow: 0 0 0 2px rgba(181, 0, 98, 0.15);
-      background: linear-gradient(135deg, #fff, #fff5f8);
+      outline: 3px solid #0071e3;
+      outline-offset: 2px;
+      box-shadow: 0 8px 30px rgba(0,113,227,0.2);
+    }
+    .scenario-card.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.7);
+    }
+    .scenario-card.disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    .scenario-card.disabled::after {
+      content: attr(data-disabled-reason);
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+    .scenario-card__content {
+      padding: 28px 28px 16px;
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .scenario-card__label {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 4px;
+    }
+    .scenario-card__title {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #1d1d1f;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .scenario-card__desc {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #6e6e73;
+      margin-bottom: 6px;
+    }
+    .scenario-card__sub {
+      font-size: 13px;
+      color: #86868b;
+    }
+    .scenario-card__image-area {
+      flex: 1 1 50%;
+      min-height: 0;
+      overflow: hidden;
+      border-radius: 0 0 16px 16px;
+    }
+    .scenario-card__image-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .scenario-card__image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scenario-card__image-placeholder .material-symbols-outlined {
+      font-size: 80px;
+      color: #d1d1d6;
     }
 
     /* Persona card */
@@ -104,12 +214,12 @@
       cursor: pointer;
     }
     .persona-card:hover {
-      border-color: #ffd9e2;
+      border-color: #e8f0fe;
     }
     .persona-card.selected {
-      border-color: #b50062;
-      background: linear-gradient(135deg, #fff, #fff5f8);
-      box-shadow: 0 0 0 2px rgba(181, 0, 98, 0.15);
+      border-color: #0071e3;
+      background: linear-gradient(135deg, #fff, #e8f0fe);
+      box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
     }
 
     /* Nav items */
@@ -126,7 +236,7 @@
       display: inline-block;
       width: 20px; height: 20px;
       border: 2.5px solid #c3c6d2;
-      border-top-color: #002859;
+      border-top-color: #0071e3;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
     }
@@ -156,11 +266,198 @@
       animation: fadeInUp 0.35s ease-out;
     }
 
-    /* Grade badge colors */
+    /* ── Feedback — Apple Design Language ── */
+    .fb-hero {
+      background: #000;
+      border-radius: 28px;
+      padding: clamp(48px, 8vw, 80px) 32px;
+      text-align: center;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fb-hero__eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #86868b;
+      margin-bottom: 28px;
+    }
+    .fb-hero__ring { margin: 0 auto 20px; display: block; }
+    .fb-hero__ring .ring-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 5; }
+    .fb-hero__ring .ring-fill {
+      fill: none; stroke-width: 5; stroke-linecap: round;
+      transform: rotate(-90deg); transform-origin: center;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .fb-hero__ring .ring-text {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-weight: 700; fill: #f5f5f7;
+    }
+    .fb-hero__label {
+      font-size: clamp(19px, 2.5vw, 24px);
+      font-weight: 600;
+      color: #f5f5f7;
+      margin-bottom: 8px;
+      letter-spacing: -0.015em;
+    }
+    .fb-hero__meta { font-size: 14px; color: #86868b; }
+
+    /* Cards */
+    .fb-card {
+      background: #f5f5f7;
+      border-radius: 18px;
+      padding: clamp(24px, 4vw, 40px);
+      margin-bottom: 12px;
+    }
+    .fb-card--dark { background: #1d1d1f; }
+    .fb-card__title {
+      font-size: clamp(19px, 2vw, 24px);
+      font-weight: 600;
+      color: #1d1d1f;
+      letter-spacing: -0.015em;
+      margin-bottom: 20px;
+    }
+    .fb-card--dark .fb-card__title { color: #f5f5f7; }
+
+    /* Feedback list items — left-border accent */
+    .fb-item {
+      padding: 12px 0 12px 20px;
+      border-left: 3px solid #d2d2d7;
+      margin-bottom: 10px;
+      font-size: 15px;
+      line-height: 1.65;
+      color: #1d1d1f;
+    }
+    .fb-item:last-child { margin-bottom: 0; }
+    .fb-item--green { border-left-color: #30d158; }
+    .fb-item--blue  { border-left-color: #0071e3; }
+    .fb-item--amber { border-left-color: #ff9f0a; }
+    .fb-item--red   { border-left-color: #ff3b30; }
+
+    /* Term bar visualization */
+    .fb-term-stats { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .fb-term-stats span { font-size: 14px; color: #86868b; }
+    .fb-term-stats strong { font-weight: 600; color: #1d1d1f; }
+    .fb-term-bar {
+      height: 8px; border-radius: 4px;
+      background: rgba(0,0,0,0.06);
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .fb-term-bar__fill {
+      height: 100%; border-radius: 4px;
+      background: #0071e3;
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Tags */
+    .fb-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fb-tag {
+      display: inline-block;
+      font-size: 14px; font-weight: 500;
+      padding: 6px 16px; border-radius: 980px;
+      background: rgba(0,0,0,0.05); color: #1d1d1f;
+    }
+    .fb-tag--missed {
+      background: rgba(0,0,0,0.03); color: #86868b;
+      text-decoration: line-through;
+      text-decoration-color: rgba(0,0,0,0.2);
+    }
+
+    /* Moment blocks */
+    .fb-moment { position: relative; padding-top: 16px; }
+    .fb-moment::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 40px; height: 3px; border-radius: 2px;
+    }
+    .fb-moment--best::before  { background: #30d158; }
+    .fb-moment--worst::before { background: #86868b; }
+    .fb-moment__label {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .fb-moment--best  .fb-moment__label { color: #30d158; }
+    .fb-moment--worst .fb-moment__label { color: #86868b; }
+    .fb-moment__text { font-size: 15px; line-height: 1.65; color: #1d1d1f; }
+
+    /* Expert (dark) */
+    .fb-card--dark .fb-expert-text {
+      font-size: 16px; line-height: 1.7; color: #f5f5f7;
+    }
+
+    /* Focus callout */
+    .fb-focus { display: flex; gap: 16px; align-items: flex-start; }
+    .fb-focus__badge {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: #0071e3; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; color: #fff;
+    }
+    .fb-focus__text { font-size: 15px; line-height: 1.65; color: #1d1d1f; }
+
+    /* Tip */
+    .fb-tip {
+      margin-top: 16px; padding: 14px 18px;
+      background: rgba(0,113,227,0.06); border-radius: 12px;
+      font-size: 14px; line-height: 1.5; color: #1d1d1f;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+
+    /* Accordion */
+    .fb-accordion {
+      background: #f5f5f7; border-radius: 18px;
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .fb-accordion__trigger {
+      width: 100%; padding: 20px clamp(24px, 4vw, 40px);
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; background: transparent; border: none;
+      font-size: 17px; font-weight: 600; color: #1d1d1f;
+      letter-spacing: -0.01em;
+    }
+    .fb-accordion__trigger:hover { background: rgba(0,0,0,0.02); }
+    .fb-accordion__body {
+      padding: 0 clamp(24px, 4vw, 40px) clamp(24px, 4vw, 40px);
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    /* Action buttons — Apple pill */
+    .fb-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .fb-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; height: 50px; padding: 0 24px; border-radius: 980px;
+      font-size: 17px; font-weight: 400; letter-spacing: -0.01em;
+      cursor: pointer; transition: all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .fb-btn--fill { background: #0071e3; color: #fff; border: none; }
+    .fb-btn--fill:hover { background: #0077ed; }
+    .fb-btn--outline { background: transparent; color: #0071e3; border: 1.5px solid #0071e3; }
+    .fb-btn--outline:hover { background: rgba(0,113,227,0.04); }
+
+    /* Wrong answers (multiple choice) */
+    .fb-wrong {
+      padding: 14px 20px; background: rgba(255,59,48,0.04);
+      border-radius: 14px; margin-bottom: 10px;
+      border-left: 3px solid #ff3b30;
+    }
+    .fb-wrong:last-child { margin-bottom: 0; }
+    .fb-wrong__q { font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 6px; }
+    .fb-wrong__selected { font-size: 14px; color: #ff3b30; }
+    .fb-wrong__correct { font-size: 14px; font-weight: 600; color: #30d158; }
+    .fb-wrong__explain { font-size: 14px; color: #6e6e73; margin-top: 6px; }
+
+    .fb-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 640px) { .fb-grid-2, .fb-actions { grid-template-columns: 1fr; } }
+
     .grade-A { background: #dcfce7; color: #166534; }
     .grade-B { background: #dbeafe; color: #1e40af; }
     .grade-C { background: #fef3c7; color: #92400e; }
     .grade-D { background: #fecaca; color: #991b1b; }
+
+    @media (max-width: 1023px) {
+      #phase-playing { left: 0 !important; }
+    }
   </style>
 </head>
 
@@ -175,11 +472,11 @@
   <main class="app-main min-h-[calc(100vh-4rem)]">
 
     <!-- ========== PHASE 1: SETUP ========== -->
-    <section id="phase-setup" class="p-8 max-w-5xl mx-auto">
+    <section id="phase-setup" class="p-8">
       <!-- Section Header -->
       <div class="mb-8">
-        <p class="text-secondary text-xs font-semibold tracking-widest uppercase mb-2">Customer Meeting Simulation</p>
-        <h2 class="font-headline font-extrabold text-3xl text-primary mb-2">고객 미팅 롤플레이</h2>
+        <p class="text-[#86868b] text-xs font-semibold tracking-widest uppercase mb-2">Customer Meeting Simulation</p>
+        <h2 class="font-headline font-extrabold text-3xl text-[#1d1d1f] mb-2">고객 미팅 롤플레이</h2>
         <p class="text-on-surface-variant text-sm">당신 = LG U+ AI사업2팀 사업담당 | AI = AICC 도입 검토 고객</p>
       </div>
 
@@ -194,35 +491,22 @@
       <!-- Scenario Selection -->
       <div id="setup-content" class="hidden">
         <div class="mb-8">
-          <h3 class="font-headline font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
-            <span class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">1</span>
-            영업 단계 선택
+          <h3 class="font-headline font-bold text-on-surface mb-6 flex items-center gap-3" style="font-size:28px;letter-spacing:-0.02em;">
+            <span class="rounded-full bg-primary text-white flex items-center justify-center font-bold" style="width:36px;height:36px;font-size:16px;">1</span>
+            시나리오 선택
           </h3>
 
-          <!-- Stage Tabs -->
-          <div id="stage-tabs" class="flex flex-wrap gap-2 mb-4">
-            <!-- Populated by JS -->
+          <!-- Scenario Carousel (stage-grouped rows) -->
+          <div id="scenario-carousel">
+            <!-- Populated by JS: each stage gets a row with horizontal scrolling cards -->
           </div>
 
-          <!-- Industry Filter -->
-          <div class="flex items-center gap-2 mb-4">
-            <span class="text-xs text-on-surface-variant font-semibold">업종 필터:</span>
-            <div id="industry-filters" class="flex flex-wrap gap-1.5">
-              <!-- Populated by JS -->
-            </div>
-          </div>
-
-          <!-- Scenario Cards -->
-          <div id="scenario-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Populated by JS -->
-          </div>
-          <p id="no-scenarios-msg" class="hidden text-center text-on-surface-variant text-sm py-8">해당 조건에 맞는 시나리오가 없습니다.</p>
         </div>
 
         <!-- Persona Selection -->
         <div class="mb-8">
-          <h3 class="font-headline font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
-            <span class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">2</span>
+          <h3 class="font-headline font-bold text-on-surface mb-4 flex items-center gap-3" style="font-size:28px;letter-spacing:-0.02em;">
+            <span class="rounded-full bg-primary text-white flex items-center justify-center font-bold" style="width:36px;height:36px;font-size:16px;">2</span>
             고객 난이도
           </h3>
           <div id="persona-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -240,10 +524,10 @@
     </section>
 
     <!-- ========== PHASE 2: PLAYING (CHAT) ========== -->
-    <section id="phase-playing" class="hidden flex flex-col" style="height: calc(100vh - 4rem);">
+    <section id="phase-playing" class="hidden flex flex-col" style="position: fixed; top: 4rem; left: 16rem; right: 0; bottom: 0; overflow: hidden; z-index: 5;">
 
-      <!-- Top Info Bar -->
-      <div class="glass border-b border-outline-variant/20 px-6 py-3 flex items-center justify-between flex-shrink-0">
+      <!-- Top Info Bar (항상 상단 고정) -->
+      <div class="z-10 bg-white border-b border-outline-variant/20 px-6 py-3 flex items-center justify-between" style="flex: 0 0 auto;">
         <div class="flex items-center gap-4">
           <div>
             <p id="play-scenario-title" class="font-headline font-bold text-sm text-on-surface"></p>
@@ -256,30 +540,79 @@
             </p>
           </div>
         </div>
-        <button onclick="endRoleplay()" class="bg-secondary/10 hover:bg-secondary/20 text-secondary font-semibold text-sm px-5 py-2 rounded-full transition flex items-center gap-1.5">
-          <span class="material-symbols-outlined" style="font-size:18px;">stop_circle</span>
-          종료 &amp; 피드백
-        </button>
-      </div>
-
-      <!-- Hint Expander -->
-      <div class="px-6 pt-3 flex-shrink-0">
-        <button onclick="toggleHints()" id="btn-hints" class="text-xs text-on-surface-variant hover:text-primary transition flex items-center gap-1">
-          <span class="material-symbols-outlined" style="font-size:16px;">lightbulb</span>
-          <span>막히면 눌러보세요 -- 예상 질문 힌트</span>
-          <span class="material-symbols-outlined transition" id="hint-chevron" style="font-size:16px;">expand_more</span>
-        </button>
-        <div id="hint-panel" class="hidden mt-2 p-4 rounded-2xl bg-tertiary-fixed/10 border border-tertiary-fixed/30 text-sm text-on-surface-variant">
-          <ul id="hint-list" class="space-y-1.5">
-            <!-- Populated by JS -->
-          </ul>
-          <p class="mt-2 text-xs text-outline">위 질문들이 나올 수 있습니다. 미리 답변을 준비해보세요.</p>
+        <div class="flex items-center gap-2">
+          <button onclick="saveSession()" id="btn-save"
+            class="bg-primary hover:bg-primary-container text-white font-bold text-sm px-5 py-2.5 rounded-full transition shadow-sm hover:shadow-md flex items-center gap-2">
+            <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+            저장
+          </button>
+          <button onclick="endRoleplay()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-6 py-2.5 rounded-full transition shadow-md hover:shadow-lg flex items-center gap-2 animate-pulse hover:animate-none">
+            <span class="material-symbols-outlined" style="font-size:20px;">stop_circle</span>
+            종료 &amp; 피드백
+          </button>
         </div>
       </div>
 
       <!-- Chat Area -->
-      <div id="chat-area" class="flex-1 overflow-y-auto px-6 py-4 space-y-6 chat-area">
-        <!-- Messages populated by JS -->
+      <div id="chat-area" class="flex-1 overflow-y-auto px-6 py-4 space-y-6 chat-area" style="min-height: 0;">
+        <!-- Briefing card + Messages populated by JS -->
+      </div>
+
+      <!-- Briefing Overlay (시작 전 상황 브리핑) -->
+      <div id="briefing-overlay" class="hidden" style="position:absolute;inset:0;z-index:20;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:2rem;">
+        <div class="w-full max-w-xl">
+          <div class="bg-white rounded-2xl shadow-lg border border-outline-variant/30 overflow-hidden">
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-outline-variant/20" style="background:linear-gradient(135deg,#f0f4ff,#e8f0fe);">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-primary" style="font-size:28px;">assignment</span>
+                <h3 class="font-headline font-extrabold text-lg text-on-surface">미팅 브리핑</h3>
+              </div>
+              <p class="text-xs text-on-surface-variant">롤플레이 시작 전 상황을 확인하세요</p>
+            </div>
+            <!-- Body -->
+            <div class="px-6 py-5 space-y-4">
+              <!-- 당신의 역할 -->
+              <div class="flex items-start gap-3">
+                <span class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background-color:#007AFF;">ME</span>
+                <div>
+                  <p class="text-[10px] font-semibold text-outline uppercase tracking-wider mb-0.5">당신의 역할</p>
+                  <p class="text-sm font-semibold text-on-surface">LG유플러스 AI사업2팀 사업담당자</p>
+                </div>
+              </div>
+              <!-- 상대방 -->
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                  <span class="material-symbols-outlined text-gray-500" style="font-size:16px;">person</span>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-outline uppercase tracking-wider mb-0.5">상대방 (AI)</p>
+                  <p id="briefing-customer-role" class="text-sm font-semibold text-on-surface"></p>
+                </div>
+              </div>
+              <!-- 미팅 상황 -->
+              <div class="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100">
+                <p class="text-[10px] font-semibold text-blue-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <span class="material-symbols-outlined" style="font-size:14px;">info</span>
+                  미팅 상황
+                </p>
+                <p id="briefing-situation" class="text-sm text-blue-900 leading-relaxed"></p>
+              </div>
+              <!-- 출처 -->
+              <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+                <span class="material-symbols-outlined" style="font-size:14px;">source</span>
+                <span id="briefing-source"></span>
+              </div>
+            </div>
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface">
+              <button id="btn-start-chat" onclick="dismissBriefing()" class="w-full btn-gradient text-white font-bold py-3.5 rounded-full text-sm flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined" style="font-size:20px;">chat</span>
+                대화 시작
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Ending info banner -->
@@ -290,7 +623,17 @@
         </div>
       </div>
 
-      <!-- Input Area -->
+      <!-- Dynamic Hint Bar (중급 mode) - 입력창 바로 위 -->
+      <div id="hint-bar" class="hidden px-6 py-3 flex-shrink-0 border-t border-outline-variant/10 bg-amber-50/60">
+        <div class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-size:18px;">lightbulb</span>
+          <div id="hint-content" class="text-xs text-on-surface-variant leading-relaxed">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area (서술형 모드) -->
       <div class="px-6 pb-5 pt-2 flex-shrink-0">
         <form onsubmit="sendMessage(event)" class="flex items-end gap-3">
           <div class="flex-1 relative">
@@ -308,151 +651,137 @@
           </button>
         </form>
       </div>
+
+      <!-- Choices Area (객관식 모드) -->
+      <div id="choices-area" class="hidden px-6 pb-3 pt-1 overflow-y-auto" style="flex: 0 1 auto; max-height: 50vh;">
+        <p class="text-[11px] text-on-surface-variant mb-1.5 flex items-center gap-1">
+          <span class="material-symbols-outlined" style="font-size:14px;">touch_app</span>
+          아래 선택지 중 하나를 골라 제출하세요
+        </p>
+        <div id="choices-buttons" class="space-y-1">
+          <!-- Populated by renderChoices() -->
+        </div>
+        <!-- 정답/오답 피드백 영역 -->
+        <div id="answer-feedback" class="hidden mt-2 p-3 rounded-xl text-xs"></div>
+        <!-- 제출 / 다음 버튼 -->
+        <div id="choices-action-bar" class="mt-2 flex gap-2">
+          <button id="btn-submit-choice" onclick="submitChoice()" disabled
+            class="flex-1 py-2 rounded-full font-bold text-sm text-white transition shadow-md disabled:opacity-40"
+            style="background-color:#007AFF;">
+            <span class="material-symbols-outlined align-middle" style="font-size:16px;">check_circle</span>
+            제출
+          </button>
+          <button id="btn-next-turn" onclick="proceedToNextTurn()" class="hidden flex-1 py-2 rounded-full font-bold text-sm text-white transition shadow-md"
+            style="background-color:#34C759;">
+            <span class="material-symbols-outlined align-middle" style="font-size:16px;">arrow_forward</span>
+            다음
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- ========== PHASE 3: FEEDBACK ========== -->
-    <section id="phase-feedback" class="hidden p-8 max-w-5xl mx-auto">
+    <section id="phase-feedback" class="hidden" style="padding:clamp(24px,4vw,48px) 20px;">
 
-      <!-- Loading -->
       <div id="feedback-loading" class="flex items-center justify-center py-20">
         <div class="text-center">
           <div class="spinner mx-auto mb-4" style="width:32px;height:32px;border-width:3px;"></div>
-          <p class="text-on-surface-variant text-sm">대화를 분석하고 피드백을 생성 중입니다...</p>
-          <p class="text-outline text-xs mt-1">약 10-20초 소요됩니다</p>
+          <p style="font-size:17px;color:#6e6e73;">대화를 분석하고 피드백을 생성 중입니다...</p>
+          <p style="font-size:14px;color:#86868b;margin-top:6px;">약 1~2분 소요됩니다</p>
         </div>
       </div>
 
-      <!-- Feedback Content -->
-      <div id="feedback-content" class="hidden">
+      <div id="feedback-content" class="hidden" style="max-width:900px;margin:0 auto;">
 
-        <!-- Header -->
-        <div class="mb-8">
-          <p class="text-secondary text-xs font-semibold tracking-widest uppercase mb-2">Roleplay Feedback</p>
-          <h2 class="font-headline font-extrabold text-3xl text-primary mb-1">롤플레이 피드백</h2>
-          <p id="feedback-meta" class="text-on-surface-variant text-sm"></p>
+        <!-- Grade Hero -->
+        <div class="fb-hero" id="feedback-hero">
+          <p class="fb-hero__eyebrow">Roleplay Feedback</p>
+          <svg class="fb-hero__ring" id="feedback-ring" width="140" height="140" viewBox="0 0 140 140">
+            <circle class="ring-track" cx="70" cy="70" r="58"/>
+            <circle class="ring-fill" id="ring-fill" cx="70" cy="70" r="58"
+              stroke="#0071e3" stroke-dasharray="364.42" stroke-dashoffset="364.42"/>
+            <text class="ring-text" id="ring-grade" x="70" y="72" text-anchor="middle" dominant-baseline="central" font-size="52"></text>
+          </svg>
+          <p class="fb-hero__label" id="feedback-grade-label"></p>
+          <p class="fb-hero__meta" id="feedback-meta"></p>
         </div>
 
-        <!-- Overall Grade -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20 mb-6 flex items-center gap-6">
-          <div id="feedback-grade-badge" class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-headline font-extrabold">
-            <!-- Grade letter -->
-          </div>
-          <div>
-            <p class="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">Overall Grade</p>
-            <p class="font-headline font-bold text-xl text-on-surface" id="feedback-grade-label"></p>
-          </div>
+        <!-- Strengths -->
+        <div class="fb-card">
+          <h3 class="fb-card__title">잘한 점</h3>
+          <div id="feedback-strengths"></div>
         </div>
 
-        <!-- Strengths / Improvements -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <!-- Strengths -->
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
-            <h3 class="font-headline font-bold text-base mb-4 flex items-center gap-2 text-green-700">
-              <span class="material-symbols-outlined" style="font-size:20px;color:#16a34a;">check_circle</span>
-              잘한 점
-            </h3>
-            <ul id="feedback-strengths" class="space-y-2 text-sm text-on-surface-variant">
-              <!-- Populated by JS -->
-            </ul>
-          </div>
-          <!-- Improvements -->
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
-            <h3 class="font-headline font-bold text-base mb-4 flex items-center gap-2 text-amber-700">
-              <span class="material-symbols-outlined" style="font-size:20px;color:#d97706;">trending_up</span>
-              개선할 점
-            </h3>
-            <ul id="feedback-improvements" class="space-y-2 text-sm text-on-surface-variant">
-              <!-- Populated by JS -->
-            </ul>
-          </div>
+        <!-- Improvements -->
+        <div class="fb-card">
+          <h3 class="fb-card__title">개선할 점</h3>
+          <div id="feedback-improvements"></div>
         </div>
 
-        <!-- Terminology Check -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20 mb-6">
-          <h3 class="font-headline font-bold text-base mb-4 flex items-center gap-2 text-on-surface">
-            <span class="material-symbols-outlined" style="font-size:20px;color:#002859;">spellcheck</span>
-            도메인 용어 사용 분석
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-            <div>
-              <p class="text-xs text-green-700 font-semibold uppercase tracking-wider mb-2">정확히 사용한 용어</p>
-              <div id="feedback-terms-correct" class="flex flex-wrap gap-1.5">
-                <!-- Tags -->
-              </div>
-            </div>
-            <div>
-              <p class="text-xs text-amber-700 font-semibold uppercase tracking-wider mb-2">놓쳤거나 부정확한 용어</p>
-              <div id="feedback-terms-missed" class="flex flex-wrap gap-1.5">
-                <!-- Tags -->
-              </div>
-            </div>
+        <!-- Terminology -->
+        <div class="fb-card" id="feedback-terms-card">
+          <h3 class="fb-card__title">도메인 용어 분석</h3>
+          <div class="fb-term-stats">
+            <span>정확히 사용 <strong id="term-correct-count">0</strong>개</span>
+            <span>놓침 <strong id="term-missed-count">0</strong>개</span>
           </div>
-          <div id="feedback-term-tip" class="bg-blue-50 rounded-xl px-4 py-2.5 text-sm text-blue-800 flex items-start gap-2 hidden">
-            <span class="material-symbols-outlined flex-shrink-0 mt-0.5" style="font-size:16px;">lightbulb</span>
+          <div class="fb-term-bar"><div class="fb-term-bar__fill" id="term-bar-fill" style="width:0%"></div></div>
+          <div id="feedback-terms-correct" class="fb-tags"></div>
+          <div id="feedback-terms-missed" class="fb-tags" style="margin-top:10px;"></div>
+          <div id="feedback-term-tip" class="fb-tip hidden">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#0071e3;flex-shrink:0;">lightbulb</span>
             <span id="feedback-term-tip-text"></span>
           </div>
         </div>
 
         <!-- Best / Worst Moments -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
-            <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-primary">
-              <span class="material-symbols-outlined" style="font-size:20px;color:#002859;">star</span>
-              베스트 모먼트
-            </h3>
-            <p id="feedback-best" class="text-sm text-on-surface-variant leading-relaxed"></p>
+        <div class="fb-grid-2" id="feedback-moments-grid">
+          <div class="fb-card" style="margin-bottom:0;">
+            <div class="fb-moment fb-moment--best">
+              <p class="fb-moment__label">Best Moment</p>
+              <p class="fb-moment__text" id="feedback-best"></p>
+            </div>
           </div>
-          <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/20">
-            <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-on-surface-variant">
-              <span class="material-symbols-outlined" style="font-size:20px;color:#737782;">sentiment_dissatisfied</span>
-              아쉬운 모먼트
-            </h3>
-            <p id="feedback-worst" class="text-sm text-on-surface-variant leading-relaxed"></p>
+          <div class="fb-card" style="margin-bottom:0;">
+            <div class="fb-moment fb-moment--worst">
+              <p class="fb-moment__label">Room for Growth</p>
+              <p class="fb-moment__text" id="feedback-worst"></p>
+            </div>
           </div>
         </div>
 
         <!-- Expert Answer -->
-        <div id="feedback-expert-section" class="bg-gradient-to-br from-primary/5 to-primary-container/5 rounded-2xl p-6 border border-primary/10 mb-6 hidden">
-          <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-primary">
-            <span class="material-symbols-outlined" style="font-size:20px;">school</span>
-            전문가 모범 답변
-          </h3>
-          <p id="feedback-expert" class="text-sm text-on-surface leading-relaxed"></p>
+        <div id="feedback-expert-section" class="fb-card fb-card--dark hidden">
+          <h3 class="fb-card__title">전문가 모범 답변</h3>
+          <p class="fb-expert-text" id="feedback-expert"></p>
         </div>
 
         <!-- Next Focus -->
-        <div id="feedback-focus-section" class="bg-amber-50 rounded-2xl p-6 border border-amber-200 mb-8 hidden">
-          <h3 class="font-headline font-bold text-base mb-3 flex items-center gap-2 text-amber-800">
-            <span class="material-symbols-outlined" style="font-size:20px;">flag</span>
-            다음 연습 집중 포인트
-          </h3>
-          <p id="feedback-focus" class="text-sm text-amber-900 leading-relaxed"></p>
-        </div>
-
-        <!-- Conversation History (expandable) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-outline-variant/20 mb-8 overflow-hidden">
-          <button onclick="toggleConversationHistory()" class="w-full px-6 py-4 flex items-center justify-between hover:bg-surface-container-low transition">
-            <h3 class="font-headline font-bold text-base flex items-center gap-2 text-on-surface">
-              <span class="material-symbols-outlined" style="font-size:20px;">history</span>
-              전체 대화 기록
-            </h3>
-            <span class="material-symbols-outlined transition text-on-surface-variant" id="history-chevron" style="font-size:20px;">expand_more</span>
-          </button>
-          <div id="conversation-history" class="hidden px-6 pb-6 space-y-4 border-t border-outline-variant/20 pt-4">
-            <!-- Populated by JS -->
+        <div id="feedback-focus-section" class="fb-card hidden">
+          <div class="fb-focus">
+            <div class="fb-focus__badge">
+              <span class="material-symbols-outlined" style="font-size:20px;">flag</span>
+            </div>
+            <div>
+              <p style="font-size:17px;font-weight:600;color:#1d1d1f;margin-bottom:6px;">다음 연습 집중 포인트</p>
+              <p class="fb-focus__text" id="feedback-focus"></p>
+            </div>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button onclick="retrySameScenario()" class="bg-white border-2 border-primary text-primary font-bold py-4 rounded-full text-sm hover:bg-primary/5 transition flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined" style="font-size:20px;">refresh</span>
-            같은 시나리오 다시
+        <!-- Conversation History -->
+        <div class="fb-accordion">
+          <button class="fb-accordion__trigger" onclick="toggleConversationHistory()">
+            <span>전체 대화 기록</span>
+            <span class="material-symbols-outlined" id="history-chevron" style="font-size:20px;color:#86868b;transition:transform 0.2s;">expand_more</span>
           </button>
-          <button onclick="resetToSetup()" class="btn-gradient text-white font-bold py-4 rounded-full text-sm flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined" style="font-size:20px;">add</span>
-            새 시나리오
-          </button>
+          <div id="conversation-history" class="fb-accordion__body hidden"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="fb-actions">
+          <button onclick="retrySameScenario()" class="fb-btn fb-btn--outline">같은 시나리오 다시</button>
+          <button onclick="resetToSetup()" class="fb-btn fb-btn--fill">새 시나리오</button>
         </div>
       </div>
     </section>
@@ -463,6 +792,31 @@
   <!-- JAVASCRIPT -->
   <!-- ============================================== -->
   <script>
+    // ── AI 응답 정제: raw JSON이 말풍선에 노출되지 않도록 ──
+    function cleanAiResponse(text) {
+      if (!text) return '(응답을 생성하지 못했습니다.)';
+      const trimmed = text.trim();
+      // JSON처럼 보이면 response 필드 추출 시도
+      if (trimmed.startsWith('{') || trimmed.startsWith('```')) {
+        try {
+          let jsonStr = trimmed;
+          if (jsonStr.startsWith('```')) {
+            const nl = jsonStr.indexOf('\n');
+            if (nl > 0) jsonStr = jsonStr.substring(nl + 1);
+            if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
+            jsonStr = jsonStr.trim();
+          }
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.response) return parsed.response;
+        } catch (e) {
+          // 불완전 JSON에서 response 추출
+          const m = trimmed.match(/"response"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+          if (m) return m[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+        }
+      }
+      return text;
+    }
+
     // ── State ──
     let phase = 'setup';        // setup | playing | feedback
     let scenarios = {};
@@ -477,6 +831,17 @@
     let chatHistory = [];       // [{role, content}, ...]
     let feedback = null;
     let isWaitingForAI = false;
+    let roleplayStartedAt = null;
+    let currentMode = 'free_text';  // 'free_text' | 'multiple_choice'
+    let currentChoices = [];        // 객관식 선택지
+    let isRoleplayEnded = false;    // 종료 감지 플래그
+    let currentCorrectIndex = 0;   // 정답 인덱스
+    let currentExplanation = '';   // 정답 해설
+    let selectedChoiceIndex = -1;  // 사용자가 선택한 인덱스
+    let answerHistory = [];        // [{turn, question, selected, correct, isCorrect}, ...]
+    let showHints = false;          // 힌트 표시 여부
+    let savedSessionId = null;      // DB 세션 ID (저장 후)
+    let autoSaveInterval = null;    // 자동 저장 인터벌
 
     // ── DOM References ──
     const $phaseSetup    = document.getElementById('phase-setup');
@@ -497,10 +862,10 @@
       showPhase('setup');
       try {
         const [scenRes, persRes, stageRes, indRes] = await Promise.all([
-          fetch('/api/scenarios'),
-          fetch('/api/personas'),
-          fetch('/api/stages'),
-          fetch('/api/industries'),
+          authFetch('/api/scenarios'),
+          authFetch('/api/personas'),
+          authFetch('/api/stages'),
+          authFetch('/api/industries'),
         ]);
         scenarios  = await scenRes.json();
         personas   = await persRes.json();
@@ -524,28 +889,24 @@
       document.getElementById('setup-loading').classList.add('hidden');
       document.getElementById('setup-content').classList.remove('hidden');
 
-      // Stage tabs
-      renderStageTabs();
-      // Industry filters
-      renderIndustryFilters();
-      // Scenario cards (filtered)
+      // Scenario carousel (stage-grouped horizontal rows)
       renderScenarioCards();
 
       // Persona cards
       const personaGrid = document.getElementById('persona-grid');
       personaGrid.innerHTML = '';
 
-      const personaIcons = { '초급': 'sentiment_satisfied', '중급': 'psychology', '고급': 'local_fire_department' };
+      const personaEnglish = { '초급': 'Beginner', '중급': 'Intermediate', '고급': 'Advanced' };
       const personaStars = { '초급': 1, '중급': 3, '고급': 5 };
       const personaDesc  = {
-        '초급': '기본 질문 위주, 긍정적 반응. 편안한 분위기에서 연습하기 좋습니다.',
-        '중급': '구체적 수치와 경쟁사 비교. 꼼꼼한 실무자를 상대해보세요.',
-        '고급': 'ROI 집요 추궁, 가격 압박. 임원급 의사결정자 대응 연습.',
+        '초급': '객관식 — 선택지에서 골라 답변. 처음 시작하기 좋습니다.',
+        '중급': '서술형 — 힌트와 함께 자유 응답. 키워드를 참고해 연습하세요.',
+        '고급': '서술형 — 힌트 없이 실전처럼 도전. 꼼꼼한 실무자를 상대합니다.',
       };
 
       for (const [key, pers] of Object.entries(personas)) {
         const stars = personaStars[key] || 3;
-        const icon  = personaIcons[key] || 'person';
+        const engName = personaEnglish[key] || key;
         const desc  = personaDesc[key]  || '';
         const starsStr = '<span class="text-amber-400 text-xs">' + '&#9733;'.repeat(stars) + '</span>' + '<span class="text-outline-variant/40 text-xs">' + '&#9733;'.repeat(5 - stars) + '</span>';
 
@@ -553,8 +914,8 @@
         card.className = 'persona-card bg-white rounded-2xl p-5 border border-outline-variant/30 text-center';
         card.dataset.key = key;
         card.innerHTML = `
-          <span class="material-symbols-outlined text-primary mb-2" style="font-size:32px;">${icon}</span>
-          <h4 class="font-headline font-bold text-sm text-on-surface mb-1">${pers.label}</h4>
+          <div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.02em; color:#1d1d1f; margin-bottom:4px;">${engName}</div>
+          <h4 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif; font-size:13px; font-weight:500; color:#6e6e73; margin-bottom:6px;">${pers.label}</h4>
           <div class="mb-2">${starsStr}</div>
           <p class="text-xs text-on-surface-variant leading-relaxed">${desc}</p>
         `;
@@ -565,141 +926,123 @@
       updateStartButton();
     }
 
-    // ── Stage Tabs ──
-    function renderStageTabs() {
-      const container = document.getElementById('stage-tabs');
-      container.innerHTML = '';
+    // ── Stage Colors (single accent color per stage for top color bar) ──
+    const stageColors = {
+      A: '#2563eb',  // 파랑
+      B: '#7c3aed',  // 보라
+      C: '#059669',  // 초록
+      D: '#ea580c',  // 주황
+    };
 
-      // "전체" button
-      const allBtn = document.createElement('button');
-      allBtn.className = `px-4 py-2 rounded-full text-xs font-semibold transition ${
-        selectedStage === null
-          ? 'bg-primary text-white shadow-sm'
-          : 'bg-white text-on-surface-variant border border-outline-variant/40 hover:border-primary/40'
-      }`;
-      allBtn.textContent = '전체';
-      allBtn.addEventListener('click', () => selectStage(null));
-      container.appendChild(allBtn);
-
-      for (const [code, label] of Object.entries(stages)) {
-        const count = Object.values(scenarios).filter(s => s.stage === code).length;
-        const btn = document.createElement('button');
-        btn.className = `px-4 py-2 rounded-full text-xs font-semibold transition ${
-          selectedStage === code
-            ? 'bg-primary text-white shadow-sm'
-            : 'bg-white text-on-surface-variant border border-outline-variant/40 hover:border-primary/40'
-        }`;
-        btn.innerHTML = `${code}. ${label} <span class="ml-1 opacity-60">${count}</span>`;
-        btn.addEventListener('click', () => selectStage(code));
-        container.appendChild(btn);
-      }
-    }
-
-    // ── Industry Filters ──
-    function renderIndustryFilters() {
-      const container = document.getElementById('industry-filters');
-      container.innerHTML = '';
-
-      // "전체" pill
-      const allPill = document.createElement('button');
-      allPill.className = `px-3 py-1.5 rounded-full text-[11px] font-medium transition ${
-        selectedIndustry === null
-          ? 'bg-secondary text-white'
-          : 'bg-white text-on-surface-variant border border-outline-variant/30 hover:border-secondary/40'
-      }`;
-      allPill.textContent = '전체';
-      allPill.addEventListener('click', () => selectIndustry(null));
-      container.appendChild(allPill);
-
-      for (const ind of industries) {
-        const pill = document.createElement('button');
-        pill.className = `px-3 py-1.5 rounded-full text-[11px] font-medium transition ${
-          selectedIndustry === ind
-            ? 'bg-secondary text-white'
-            : 'bg-white text-on-surface-variant border border-outline-variant/30 hover:border-secondary/40'
-        }`;
-        pill.textContent = ind;
-        pill.addEventListener('click', () => selectIndustry(ind));
-        container.appendChild(pill);
-      }
-    }
-
-    // ── Scenario Cards (filtered) ──
+    // ── Scenario Carousel (stage-grouped horizontal rows) ──
     function renderScenarioCards() {
-      const grid = document.getElementById('scenario-grid');
-      const noMsg = document.getElementById('no-scenarios-msg');
-      grid.innerHTML = '';
+      const container = document.getElementById('scenario-carousel');
+      container.innerHTML = '';
 
-      // Stage difficulty mapping
-      const stageDifficulty = { A: 2, B: 3, C: 4, D: 4, E: 3, F: 4, G: 3, H: 5 };
-
-      let filtered = Object.entries(scenarios);
-      if (selectedStage) {
-        filtered = filtered.filter(([, s]) => s.stage === selectedStage);
-      }
-      if (selectedIndustry) {
-        filtered = filtered.filter(([, s]) => s.industry === selectedIndustry);
+      // Group scenarios by stage
+      const grouped = {};
+      for (const [key, scen] of Object.entries(scenarios)) {
+        const st = scen.stage;
+        if (!grouped[st]) grouped[st] = [];
+        grouped[st].push([key, scen]);
       }
 
-      if (filtered.length === 0) {
-        noMsg.classList.remove('hidden');
-        return;
-      }
-      noMsg.classList.add('hidden');
+      // Render each stage as a horizontal row
+      for (const [code, label] of Object.entries(stages)) {
+        const items = grouped[code];
+        if (!items || items.length === 0) continue;
 
-      for (const [key, scen] of filtered) {
-        const stars = stageDifficulty[scen.stage] || 3;
-        const starsStr = '<span class="text-amber-400">' + '&#9733;'.repeat(stars) + '</span>' +
-                         '<span class="text-outline-variant/40">' + '&#9733;'.repeat(5 - stars) + '</span>';
-        const questionsPreview = (scen.key_questions || []).slice(0, 2).map(q =>
-          `<li class="text-xs text-on-surface-variant truncate">"${q}"</li>`
-        ).join('');
-        const stageLabel = stages[scen.stage] || scen.stage;
+        const labelColor = stageColors[code] || '#0071e3';
+        const stageLabel = stages[code] || code;
 
-        const card = document.createElement('div');
-        card.className = `scenario-card bg-white rounded-2xl p-6 border border-outline-variant/30 ${selectedScenario === key ? 'selected' : ''}`;
-        card.dataset.key = key;
-        card.innerHTML = `
-          <div class="flex items-start justify-between mb-3">
-            <h4 class="font-headline font-bold text-sm text-on-surface leading-snug">${scen.title}</h4>
-            <span class="text-xs flex-shrink-0 ml-2">${starsStr}</span>
-          </div>
-          <div class="flex flex-wrap gap-1.5 mb-3">
-            <span class="inline-block text-[10px] font-semibold text-white bg-primary px-2 py-0.5 rounded-full">${scen.stage}. ${stageLabel}</span>
-            <span class="inline-block text-[10px] font-semibold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">${scen.industry}</span>
-            <span class="inline-block text-[10px] font-semibold text-primary bg-primary/8 px-2 py-0.5 rounded-full">${scen.source}</span>
-          </div>
-          <p class="text-xs text-on-surface-variant leading-relaxed mb-3 line-clamp-2">${scen.situation}</p>
-          <p class="text-[10px] text-outline mb-2">
-            <span class="material-symbols-outlined align-middle" style="font-size:13px;">person</span>
-            ${scen.customer_role}
-          </p>
-          <ul class="space-y-1">${questionsPreview}</ul>
-        `;
-        card.addEventListener('click', () => selectScenario(key));
-        grid.appendChild(card);
+        // Stage row wrapper
+        const row = document.createElement('div');
+        row.className = 'stage-row';
+
+        // Row title
+        const title = document.createElement('h4');
+        title.className = 'stage-row__title';
+        title.textContent = `${code}. ${label}`;
+        row.appendChild(title);
+
+        // Horizontal scroll track
+        const track = document.createElement('div');
+        track.className = 'carousel-track';
+
+        items.forEach(([key, scen], idx) => {
+          const isDisabled = !!scen.disabled;
+          const disabledReason = scen.disabled_reason || '비활성';
+
+          const card = document.createElement('div');
+          card.className = `scenario-card ${selectedScenario === key ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`;
+          card.dataset.key = key;
+
+          if (isDisabled) {
+            card.dataset.disabledReason = disabledReason;
+            card.title = disabledReason;
+          }
+
+          // 이미지 지원 (scen.card_image가 있으면 사용)
+          const imgSrc = scen.card_image || null;
+          const imgPos = scen.card_image_position || 'center';
+
+          card.innerHTML = `
+            <div class="scenario-card__content">
+              <div class="scenario-card__label" style="color:${labelColor};">${stageLabel}</div>
+              <div class="scenario-card__title">${scen.title}</div>
+              <div class="scenario-card__desc">${scen.situation ? scen.situation.substring(0, 80) + '...' : ''}</div>
+              <div class="scenario-card__sub">${scen.industry} · ${scen.customer_role}</div>
+            </div>
+            <div class="scenario-card__image-area">
+              ${imgSrc
+                ? `<img src="${imgSrc}" alt="${scen.title}" style="object-position:${imgPos};" />`
+                : `<div class="scenario-card__image-placeholder">
+                     <span class="material-symbols-outlined">image</span>
+                   </div>`
+              }
+            </div>
+          `;
+
+          if (isDisabled) {
+            card.addEventListener('click', () => {
+              alert(`이 시나리오는 현재 비활성 처리되었습니다.\n사유: ${disabledReason}`);
+            });
+          } else {
+            card.addEventListener('click', () => selectScenario(key));
+          }
+          track.appendChild(card);
+        });
+
+        // Enable drag-to-scroll on this track
+        enableDragScroll(track);
+
+        row.appendChild(track);
+        container.appendChild(row);
       }
     }
 
-    // ── Stage / Industry selection ──
-    function selectStage(code) {
-      selectedStage = code;
-      selectedScenario = null; // reset scenario selection on filter change
-      renderStageTabs();
-      renderScenarioCards();
-      updateStartButton();
-    }
-
-    function selectIndustry(ind) {
-      selectedIndustry = ind;
-      selectedScenario = null;
-      renderIndustryFilters();
-      renderScenarioCards();
-      updateStartButton();
+    // ── Drag-to-scroll for carousel tracks ──
+    function enableDragScroll(el) {
+      let isDown = false, startX, scrollLeft;
+      el.addEventListener('mousedown', (e) => {
+        isDown = true;
+        el.style.cursor = 'grabbing';
+        startX = e.pageX - el.offsetLeft;
+        scrollLeft = el.scrollLeft;
+      });
+      el.addEventListener('mouseleave', () => { isDown = false; el.style.cursor = 'grab'; });
+      el.addEventListener('mouseup', () => { isDown = false; el.style.cursor = 'grab'; });
+      el.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - el.offsetLeft;
+        el.scrollLeft = scrollLeft - (x - startX) * 1.5;
+      });
     }
 
     // ── Selection handlers ──
     function selectScenario(key) {
+      if (scenarios[key]?.disabled) return;
       selectedScenario = key;
       document.querySelectorAll('.scenario-card').forEach(c => {
         c.classList.toggle('selected', c.dataset.key === key);
@@ -728,15 +1071,22 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span><span>AI 고객을 준비하고 있습니다...</span>';
 
+      roleplayStartedAt = new Date().toISOString();
       try {
-        const res = await fetch('/api/roleplay/start', {
+        const res = await authFetch('/api/roleplay/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ scenario: selectedScenario, persona: selectedPersona }),
         });
         const data = await res.json();
         systemPrompt = data.system_prompt;
-        chatHistory = [{ role: 'assistant', content: data.opening }];
+        currentMode = data.mode || 'free_text';
+        showHints = data.show_hints || false;
+        currentChoices = Array.isArray(data.choices) ? data.choices : [];
+        currentCorrectIndex = typeof data.correct_index === 'number' ? data.correct_index : 0;
+        currentExplanation = data.explanation || '';
+        answerHistory = [];
+        chatHistory = [{ role: 'assistant', content: cleanAiResponse(data.opening) }];
 
         // Setup playing phase UI
         const scen = scenarios[selectedScenario];
@@ -746,27 +1096,82 @@
         document.getElementById('play-persona-level').textContent = pers.label;
         document.getElementById('play-turn-count').textContent = '0';
 
-        // Hints
-        const hintList = document.getElementById('hint-list');
-        hintList.innerHTML = (scen.key_questions || []).map(q =>
-          `<li class="flex items-start gap-2"><span class="text-tertiary-fixed flex-shrink-0 mt-0.5">&#8226;</span>${q}</li>`
-        ).join('');
+        // Cue Card — 중급(show_hints=true)일 때 응답 키워드 큐카드 표시
+        const hintBar = document.getElementById('hint-bar');
+        if (showHints) {
+          hintBar.classList.remove('hidden');
+          document.getElementById('hint-content').innerHTML =
+            '<span class="text-outline italic">응답 키워드를 생성 중입니다...</span>';
+          // 비동기로 opening에 대한 힌트 가져오기 (UI 블로킹 안 함)
+          fetchHintForMessage(data.opening);
+        } else {
+          hintBar.classList.add('hidden');
+        }
 
-        // Hide ending banner
+        // 객관식/서술형 모드에 따라 입력 UI 전환
+        const inputArea = document.querySelector('.px-6.pb-5.pt-2');
+        const choicesArea = document.getElementById('choices-area');
+        if (currentMode === 'multiple_choice') {
+          inputArea.classList.add('hidden');
+          if (choicesArea) choicesArea.classList.remove('hidden');
+          renderChoices();
+        } else {
+          inputArea.classList.remove('hidden');
+          if (choicesArea) choicesArea.classList.add('hidden');
+        }
+
+        // Hide ending banner & 종료 플래그 초기화
+        isRoleplayEnded = false;
         document.getElementById('ending-banner').classList.add('hidden');
-        // Close hints
-        document.getElementById('hint-panel').classList.add('hidden');
-        document.getElementById('hint-chevron').style.transform = '';
+        const chatInputEl = document.getElementById('chat-input');
+        if (chatInputEl) {
+          chatInputEl.disabled = false;
+          chatInputEl.placeholder = '사업담당자로서 응답하세요...';
+        }
+        const btnSendEl = document.getElementById('btn-send');
+        if (btnSendEl) btnSendEl.disabled = false;
+
+        // 저장 상태 초기화 및 자동 저장 시작
+        savedSessionId = null;
+        clearLocalStorageBackup();
+        if (autoSaveInterval) clearInterval(autoSaveInterval);
+        autoSaveInterval = setInterval(() => {
+          if (chatHistory.length > 1) saveToLocalStorage();
+        }, 30000);
 
         renderChat();
         showPhase('playing');
-        document.getElementById('chat-input').focus();
+
+        // 브리핑 카드 표시
+        showBriefing(scen);
+
       } catch (err) {
         console.error('Start failed:', err);
         alert('롤플레이 시작에 실패했습니다. 서버 상태를 확인해주세요.');
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:22px;">play_arrow</span>롤플레이 시작';
+      }
+    }
+
+    // ── Briefing ──
+    function showBriefing(scen) {
+      const overlay = document.getElementById('briefing-overlay');
+      document.getElementById('briefing-customer-role').textContent = scen.customer_role;
+      document.getElementById('briefing-situation').textContent = scen.situation;
+      document.getElementById('briefing-source').textContent = scen.source || '';
+
+      overlay.classList.remove('hidden');
+      overlay.style.display = 'flex';
+    }
+
+    function dismissBriefing() {
+      const overlay = document.getElementById('briefing-overlay');
+      overlay.classList.add('hidden');
+      overlay.style.display = 'none';
+
+      if (currentMode !== 'multiple_choice') {
+        document.getElementById('chat-input').focus();
       }
     }
 
@@ -796,10 +1201,11 @@
       // Avatar
       const avatar = document.createElement('div');
       if (isAI) {
-        avatar.className = 'w-10 h-10 rounded-full bg-white shadow-sm border border-outline-variant/30 flex items-center justify-center flex-shrink-0';
-        avatar.innerHTML = '<span class="material-symbols-outlined text-primary" style="font-size:20px;">person</span>';
+        avatar.className = 'w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0';
+        avatar.innerHTML = '<span class="material-symbols-outlined text-gray-500" style="font-size:20px;">person</span>';
       } else {
-        avatar.className = 'w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs font-bold';
+        avatar.className = 'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white';
+        avatar.style.backgroundColor = '#007AFF';
         avatar.textContent = 'ME';
       }
 
@@ -809,15 +1215,17 @@
 
       // Name
       const name = document.createElement('p');
-      name.className = `text-[10px] font-semibold uppercase tracking-wider mb-1 ${isAI ? 'text-outline' : 'text-primary'}`;
+      name.className = `text-[10px] font-semibold uppercase tracking-wider mb-1 ${isAI ? 'text-gray-500' : 'text-blue-500'}`;
       name.textContent = isAI ? (scen ? scen.customer_role : 'AI Customer') : 'ME';
 
-      // Bubble
+      // Bubble (iMessage style)
       const bubble = document.createElement('div');
       if (isAI) {
-        bubble.className = 'glass rounded-2xl rounded-tl-none px-5 py-3.5 text-sm text-on-surface leading-relaxed border border-outline-variant/15';
+        bubble.className = 'rounded-2xl rounded-tl-none px-5 py-3.5 text-sm text-gray-900 leading-relaxed';
+        bubble.style.backgroundColor = '#E9E9EB';
       } else {
-        bubble.className = 'bg-primary text-white rounded-2xl rounded-tr-none px-5 py-3.5 text-sm leading-relaxed';
+        bubble.className = 'rounded-2xl rounded-tr-none px-5 py-3.5 text-sm text-white leading-relaxed';
+        bubble.style.backgroundColor = '#007AFF';
       }
       bubble.textContent = msg.content;
       bubble.style.whiteSpace = 'pre-wrap';
@@ -862,12 +1270,12 @@
       typingEl.className = 'flex gap-3 fade-in-up';
       const scen = scenarios[selectedScenario];
       typingEl.innerHTML = `
-        <div class="w-10 h-10 rounded-full bg-white shadow-sm border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-primary" style="font-size:20px;">person</span>
+        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-gray-500" style="font-size:20px;">person</span>
         </div>
         <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider mb-1 text-outline">${scen ? scen.customer_role : 'AI'}</p>
-          <div class="glass rounded-2xl rounded-tl-none px-5 py-4 border border-outline-variant/15">
+          <p class="text-[10px] font-semibold uppercase tracking-wider mb-1 text-gray-500">${scen ? scen.customer_role : 'AI'}</p>
+          <div class="rounded-2xl rounded-tl-none px-5 py-4" style="background-color:#E9E9EB;">
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
@@ -878,18 +1286,48 @@
       scrollChatToBottom();
 
       try {
-        const res = await fetch('/api/roleplay/respond', {
+        const res = await authFetch('/api/roleplay/respond', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ system_prompt: systemPrompt, history: chatHistory }),
+          body: JSON.stringify({ system_prompt: systemPrompt, history: chatHistory, mode: currentMode, persona: selectedPersona }),
         });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => '');
+          throw new Error(`HTTP ${res.status}: ${errText.slice(0, 200)}`);
+        }
         const data = await res.json();
-        chatHistory.push({ role: 'assistant', content: data.response });
+        if (!data.response) {
+          throw new Error('Empty response from server');
+        }
+        chatHistory.push({ role: 'assistant', content: cleanAiResponse(data.response) });
+
+        // 객관식이면 새 선택지 업데이트
+        if (currentMode === 'multiple_choice' && data.choices) {
+          currentChoices = data.choices;
+        }
+
+        // 중급 키워드 큐카드 — 비동기로 별도 호출 (UI 블로킹 없음)
+        if (showHints && data.response) {
+          document.getElementById('hint-content').innerHTML =
+            '<span class="text-outline italic">응답 키워드를 생성 중입니다...</span>';
+          fetchHintForMessage(data.response);
+        }
 
         // Check for ending phrases
-        const endings = ['내부적으로 검토', '다시 연락', '오늘은 여기까지', '감사합니다. 검토', '검토해보고', '다시 연락드리겠습니다'];
+        const endings = ['내부적으로 검토', '내부 검토', '다시 연락', '여기까지', '검토해보', '검토 후', '검토하겠', '오늘 시연', '말씀 잘 들었', '설명 잘 들었', '답변을 기다리'];
         if (endings.some(e => data.response.includes(e))) {
-          document.getElementById('ending-banner').classList.remove('hidden');
+          isRoleplayEnded = true;
+          const banner = document.getElementById('ending-banner');
+          banner.classList.remove('hidden');
+          banner.innerHTML = '<div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3 text-sm font-semibold">고객이 미팅을 마무리했습니다. 아래 \'종료 &amp; 피드백\' 버튼을 눌러 결과를 확인하세요.</div>';
+          // 입력창 비활성화
+          const chatInput = document.getElementById('chat-input');
+          if (chatInput) {
+            chatInput.disabled = true;
+            chatInput.placeholder = '미팅이 종료되었습니다. 종료 & 피드백 버튼을 눌러주세요.';
+          }
+          const btnSend = document.getElementById('btn-send');
+          if (btnSend) btnSend.disabled = true;
         }
       } catch (err) {
         console.error('Response failed:', err);
@@ -902,8 +1340,13 @@
         isWaitingForAI = false;
         input.disabled = false;
         document.getElementById('btn-send').disabled = false;
-        input.focus();
         renderChat();
+
+        if (currentMode === 'multiple_choice') {
+          renderChoices();
+        } else {
+          input.focus();
+        }
       }
     }
 
@@ -935,13 +1378,349 @@
       });
     });
 
-    // ── Toggle Hints ──
-    function toggleHints() {
-      const panel = document.getElementById('hint-panel');
-      const chevron = document.getElementById('hint-chevron');
-      const isHidden = panel.classList.contains('hidden');
-      panel.classList.toggle('hidden');
-      chevron.style.transform = isHidden ? 'rotate(180deg)' : '';
+    // ── Multiple Choice: Render Choices (선택만, 제출은 별도) ──
+    function renderChoices() {
+      const container = document.getElementById('choices-buttons');
+      if (!container) return;
+      container.innerHTML = '';
+      selectedChoiceIndex = -1;
+
+      // 피드백/버튼 초기화
+      const fb = document.getElementById('answer-feedback');
+      if (fb) { fb.classList.add('hidden'); fb.innerHTML = ''; }
+      const btnSubmit = document.getElementById('btn-submit-choice');
+      const btnNext = document.getElementById('btn-next-turn');
+      if (btnSubmit) { btnSubmit.classList.remove('hidden'); btnSubmit.disabled = true; }
+      if (btnNext) btnNext.classList.add('hidden');
+
+      if (!currentChoices || currentChoices.length === 0) {
+        if (isRoleplayEnded) {
+          container.innerHTML = `
+            <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 text-center">
+              <p class="text-amber-800 font-semibold text-sm mb-2">미팅이 종료되었습니다</p>
+              <p class="text-xs text-amber-700 mb-3">아래 '종료 &amp; 피드백' 버튼을 눌러 결과를 확인하세요.</p>
+              <button onclick="endRoleplay()" class="px-4 py-2 bg-primary text-white rounded-lg text-xs font-bold hover:bg-primary-container">
+                종료 &amp; 피드백 받기
+              </button>
+            </div>
+          `;
+        } else {
+          container.innerHTML = '<p class="text-xs text-outline">선택지를 생성하지 못했습니다.</p>';
+        }
+        if (btnSubmit) btnSubmit.classList.add('hidden');
+        return;
+      }
+
+      const labels = ['A', 'B', 'C', 'D'];
+      currentChoices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn w-full text-left px-4 py-2 rounded-xl border-2 border-outline-variant/30 bg-white hover:border-blue-400 transition text-sm text-on-surface flex items-center gap-2';
+        btn.dataset.index = idx;
+        btn.innerHTML = `
+          <span class="choice-label flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 text-gray-600 font-bold text-[10px] flex items-center justify-center">${labels[idx] || ''}</span>
+          <span class="leading-snug text-xs">${escapeHTML(choice)}</span>
+        `;
+        btn.addEventListener('click', () => highlightChoice(idx));
+        container.appendChild(btn);
+      });
+    }
+
+    // ── 선택지 하이라이트 (선택만, 제출 전) ──
+    function highlightChoice(idx) {
+      if (isWaitingForAI) return;
+      selectedChoiceIndex = idx;
+      const btns = document.querySelectorAll('.choice-btn');
+      btns.forEach((b, i) => {
+        if (i === idx) {
+          b.classList.remove('border-outline-variant/30', 'bg-white');
+          b.classList.add('border-blue-500', 'bg-blue-50');
+          b.querySelector('.choice-label').classList.remove('bg-gray-100', 'text-gray-600');
+          b.querySelector('.choice-label').classList.add('bg-blue-500', 'text-white');
+        } else {
+          b.classList.remove('border-blue-500', 'bg-blue-50');
+          b.classList.add('border-outline-variant/30', 'bg-white');
+          b.querySelector('.choice-label').classList.remove('bg-blue-500', 'text-white');
+          b.querySelector('.choice-label').classList.add('bg-gray-100', 'text-gray-600');
+        }
+      });
+      document.getElementById('btn-submit-choice').disabled = false;
+    }
+
+    // ── 제출: 정답/오답 확인 ──
+    function submitChoice() {
+      if (selectedChoiceIndex < 0) return;
+
+      const isCorrect = selectedChoiceIndex === currentCorrectIndex;
+      const lastAiMsg = chatHistory.filter(m => m.role === 'assistant').pop();
+      const turn = answerHistory.length + 1;
+
+      // 답안 기록
+      answerHistory.push({
+        turn,
+        question: lastAiMsg ? lastAiMsg.content : '',
+        selected: currentChoices[selectedChoiceIndex],
+        correct: currentChoices[currentCorrectIndex],
+        isCorrect,
+      });
+
+      // 선택지 버튼 비활성화 + 정답/오답 색상 표시
+      const btns = document.querySelectorAll('.choice-btn');
+      btns.forEach((b, i) => {
+        b.style.pointerEvents = 'none';
+        if (i === currentCorrectIndex) {
+          b.classList.remove('border-outline-variant/30', 'bg-white', 'border-blue-500', 'bg-blue-50');
+          b.classList.add('border-green-500', 'bg-green-50');
+          b.querySelector('.choice-label').classList.remove('bg-gray-100', 'text-gray-600', 'bg-blue-500');
+          b.querySelector('.choice-label').classList.add('bg-green-500', 'text-white');
+        } else if (i === selectedChoiceIndex && !isCorrect) {
+          b.classList.remove('border-blue-500', 'bg-blue-50');
+          b.classList.add('border-red-500', 'bg-red-50');
+          b.querySelector('.choice-label').classList.remove('bg-blue-500');
+          b.querySelector('.choice-label').classList.add('bg-red-500', 'text-white');
+        }
+      });
+
+      // 피드백 표시
+      const fb = document.getElementById('answer-feedback');
+      if (isCorrect) {
+        fb.className = 'mt-2 p-3 rounded-xl text-xs bg-green-50 border border-green-200 text-green-800';
+        fb.innerHTML = `<span class="font-bold">&#10004; 정답입니다!</span>${currentExplanation ? '<br><span class="text-green-700 mt-1 block">' + escapeHTML(currentExplanation) + '</span>' : ''}`;
+      } else {
+        fb.className = 'mt-2 p-3 rounded-xl text-xs bg-red-50 border border-red-200 text-red-800';
+        fb.innerHTML = `<span class="font-bold">&#10008; 오답입니다.</span> 정답은 <strong>${['A','B','C','D'][currentCorrectIndex]}</strong>번입니다.${currentExplanation ? '<br><span class="text-red-700 mt-1 block">' + escapeHTML(currentExplanation) + '</span>' : ''}`;
+      }
+      fb.classList.remove('hidden');
+
+      // 버튼 전환
+      document.getElementById('btn-submit-choice').classList.add('hidden');
+      if (isCorrect) {
+        // 정답: "다음" 버튼 표시
+        document.getElementById('btn-next-turn').classList.remove('hidden');
+      } else {
+        // 오답: "다시 선택" 버튼 표시
+        const btnRetry = document.createElement('button');
+        btnRetry.id = 'btn-retry-choice';
+        btnRetry.className = 'flex-1 py-2 rounded-full font-bold text-sm text-white transition shadow-md';
+        btnRetry.style.backgroundColor = '#FF9500';
+        btnRetry.innerHTML = '<span class="material-symbols-outlined align-middle" style="font-size:16px;">refresh</span> 다시 선택';
+        btnRetry.addEventListener('click', () => {
+          fb.classList.add('hidden');
+          btns.forEach((b, i) => {
+            b.style.pointerEvents = '';
+            b.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'border-blue-500', 'bg-blue-50');
+            b.classList.add('border-outline-variant/30', 'bg-white');
+            b.querySelector('.choice-label').classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500', 'text-white');
+            b.querySelector('.choice-label').classList.add('bg-gray-100', 'text-gray-600');
+          });
+          selectedChoiceIndex = -1;
+          btnRetry.remove();
+          document.getElementById('btn-submit-choice').classList.remove('hidden');
+          document.getElementById('btn-submit-choice').disabled = true;
+        });
+        document.getElementById('choices-action-bar').appendChild(btnRetry);
+      }
+
+      // 피드백/버튼이 보이도록 choices-area 스크롤
+      const choicesArea = document.getElementById('choices-area');
+      if (choicesArea) choicesArea.scrollTop = choicesArea.scrollHeight;
+    }
+
+    // ── 다음 턴으로 진행 (정답 후) ──
+    async function proceedToNextTurn() {
+      // 정답 답변을 채팅에 추가
+      const correctAnswer = currentChoices[currentCorrectIndex];
+      chatHistory.push({ role: 'user', content: correctAnswer });
+      renderChat();
+
+      // UI 정리
+      document.getElementById('btn-next-turn').classList.add('hidden');
+      document.getElementById('answer-feedback').classList.add('hidden');
+
+      // AI 응답 요청
+      isWaitingForAI = true;
+
+      const chatArea = document.getElementById('chat-area');
+      const typingEl = document.createElement('div');
+      typingEl.id = 'typing-indicator';
+      typingEl.className = 'flex gap-3 fade-in-up';
+      const scen = scenarios[selectedScenario];
+      typingEl.innerHTML = `
+        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-gray-500" style="font-size:20px;">person</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-semibold uppercase tracking-wider mb-1 text-gray-500">${scen ? scen.customer_role : 'AI'}</p>
+          <div class="rounded-2xl rounded-tl-none px-5 py-4" style="background-color:#E9E9EB;">
+            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(typingEl);
+      scrollChatToBottom();
+
+      try {
+        const res = await authFetch('/api/roleplay/respond', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ system_prompt: systemPrompt, history: chatHistory, mode: 'multiple_choice', persona: selectedPersona }),
+        });
+        const data = await res.json();
+
+        if (data.response) {
+          chatHistory.push({ role: 'assistant', content: cleanAiResponse(data.response) });
+        }
+
+        currentChoices = Array.isArray(data.choices) ? data.choices : [];
+        currentCorrectIndex = typeof data.correct_index === 'number' ? data.correct_index : 0;
+        currentExplanation = data.explanation || '';
+
+        // 종료 감지 (MC 모드: 마무리 멘트 OR choices 빈 배열)
+        const endings = ['내부적으로 검토', '내부 검토', '다시 연락', '여기까지', '검토해보', '검토 후', '검토하겠', '오늘 시연', '말씀 잘 들었', '설명 잘 들었', '답변을 기다리'];
+        const isEnding = (data.response && endings.some(e => data.response.includes(e))) || currentChoices.length === 0;
+        if (isEnding) {
+          isRoleplayEnded = true;
+          currentChoices = [];  // 더 이상 진행 불가
+          const banner = document.getElementById('ending-banner');
+          if (banner) {
+            banner.classList.remove('hidden');
+            banner.innerHTML = '<div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-3 text-sm font-semibold">고객이 미팅을 마무리했습니다. 아래 \'종료 &amp; 피드백\' 버튼을 눌러 결과를 확인하세요.</div>';
+          }
+        }
+      } catch (err) {
+        console.error('Response failed:', err);
+        chatHistory.push({ role: 'assistant', content: '(응답을 생성하지 못했습니다. 다시 시도해주세요.)' });
+        currentChoices = [];
+      } finally {
+        const ti = document.getElementById('typing-indicator');
+        if (ti) ti.remove();
+        isWaitingForAI = false;
+        renderChat();
+        renderChoices();
+      }
+    }
+
+    // ── Save Session ──
+    async function saveSession() {
+      const btn = document.getElementById('btn-save');
+      if (!btn || btn.disabled || isWaitingForAI) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span><span>저장 중...</span>';
+
+      const scen = scenarios[selectedScenario];
+      const durationSec = roleplayStartedAt
+        ? Math.round((Date.now() - new Date(roleplayStartedAt).getTime()) / 1000)
+        : null;
+      const turnCount = chatHistory.filter(m => m.role === 'user').length;
+
+      try {
+        if (savedSessionId) {
+          await authFetch('/api/history/roleplay/' + savedSessionId, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversation: chatHistory,
+              turn_count: turnCount,
+              duration_seconds: durationSec,
+            }),
+          });
+        } else {
+          const res = await authFetch('/api/history/roleplay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenario_key: selectedScenario,
+              scenario_title: scen.title,
+              persona_level: selectedPersona,
+              overall_grade: null,
+              conversation: chatHistory,
+              feedback: null,
+              turn_count: turnCount,
+              started_at: roleplayStartedAt,
+              duration_seconds: durationSec,
+            }),
+          });
+          const data = await res.json();
+          savedSessionId = data.id;
+        }
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">check</span> 저장됨';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> 저장';
+        }, 1500);
+      } catch (err) {
+        console.error('Save failed:', err);
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">error</span> 실패';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> 저장';
+        }, 2000);
+      }
+      saveToLocalStorage();
+    }
+
+    function saveToLocalStorage() {
+      try {
+        const backup = {
+          selectedScenario, selectedPersona, systemPrompt,
+          chatHistory, roleplayStartedAt, currentMode, showHints, savedSessionId,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem('roleplay_backup', JSON.stringify(backup));
+      } catch (e) { console.warn('localStorage save failed:', e); }
+    }
+
+    function clearLocalStorageBackup() {
+      localStorage.removeItem('roleplay_backup');
+    }
+
+    // ── Dynamic Cue Card (응답 키워드) ──
+    let dynamicKeywords = [];
+
+    async function fetchHintForMessage(message) {
+      if (!message) return;
+      try {
+        const res = await authFetch('/api/roleplay/hint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, scenario: selectedScenario || '' }),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data.keywords) && data.keywords.length > 0) {
+          renderHintGuide(data.keywords);
+        }
+      } catch (err) {
+        console.warn('hint fetch failed:', err);
+      }
+    }
+
+    function renderHintGuide(keywords) {
+      const bar = document.getElementById('hint-bar');
+      const container = document.getElementById('hint-content');
+      if (!bar || !container) return;
+
+      // 백워드 호환: 문자열이 들어오면 배열로 변환
+      if (typeof keywords === 'string') {
+        keywords = keywords ? [keywords] : [];
+      }
+      if (!Array.isArray(keywords) || keywords.length === 0) {
+        bar.classList.add('hidden');
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      const badges = keywords.slice(0, 4).map(kw =>
+        `<span class="inline-block px-2.5 py-1 mr-1.5 mb-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-semibold border border-amber-300">${escapeHTML(kw)}</span>`
+      ).join('');
+
+      container.innerHTML = `
+        <div class="flex items-center gap-1.5 mb-1.5">
+          <span class="font-bold text-amber-700 text-[11px]">응답 키워드 큐카드</span>
+          <span class="text-[10px] text-amber-600/80">위 키워드를 활용해 답변을 구성해보세요</span>
+        </div>
+        <div class="flex flex-wrap">${badges}</div>
+      `;
     }
 
     // ── End Roleplay ──
@@ -960,17 +1739,64 @@
       const pers = personas[selectedPersona];
 
       try {
-        const res = await fetch('/api/roleplay/feedback', {
+        const res = await authFetch('/api/roleplay/feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             history: chatHistory,
             scenario_title: scen.title,
             persona_level: selectedPersona,
+            mode: currentMode,
+            answer_history: currentMode === 'multiple_choice' ? answerHistory : null,
           }),
         });
         feedback = await res.json();
         renderFeedback(scen, pers);
+
+        // 이력 저장 (기존 세션이 있으면 PATCH, 없으면 POST)
+        try {
+          const durationSec = roleplayStartedAt
+            ? Math.round((Date.now() - new Date(roleplayStartedAt).getTime()) / 1000)
+            : null;
+          const turnCount = chatHistory.filter(m => m.role === 'user').length;
+
+          if (savedSessionId) {
+            await authFetch('/api/history/roleplay/' + savedSessionId, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                conversation: chatHistory,
+                feedback: feedback,
+                overall_grade: feedback.overall_score || null,
+                turn_count: turnCount,
+                duration_seconds: durationSec,
+              }),
+            });
+          } else {
+            await authFetch('/api/history/roleplay', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                scenario_key: selectedScenario,
+                scenario_title: scen.title,
+                persona_level: selectedPersona,
+                overall_grade: feedback.overall_score || null,
+                conversation: chatHistory,
+                feedback: feedback,
+                turn_count: turnCount,
+                started_at: roleplayStartedAt,
+                duration_seconds: durationSec,
+              }),
+            });
+          }
+        } catch (saveErr) {
+          console.warn('History save failed:', saveErr);
+        }
+
+        // 자동 저장 정리
+        if (autoSaveInterval) clearInterval(autoSaveInterval);
+        clearLocalStorageBackup();
+        savedSessionId = null;
       } catch (err) {
         console.error('Feedback failed:', err);
         document.getElementById('feedback-loading').innerHTML = `
@@ -987,79 +1813,146 @@
       document.getElementById('feedback-loading').classList.add('hidden');
       document.getElementById('feedback-content').classList.remove('hidden');
 
-      // Meta
-      document.getElementById('feedback-meta').textContent = `${scen.title} | ${pers.label} | ${chatHistory.filter(m => m.role === 'user').length}턴 대화`;
+      const turnCount = chatHistory.filter(m => m.role === 'user').length;
+      document.getElementById('feedback-meta').textContent = `${scen.title} | ${pers.label} | ${turnCount}턴 대화`;
+
+      // ── SVG Ring helper ──
+      const circumference = 2 * Math.PI * 58; // 364.42
+      const ringColors = { A: '#30d158', B: '#0071e3', C: '#ff9f0a', D: '#ff3b30' };
+      const ringPercent = { A: 0.95, B: 0.75, C: 0.50, D: 0.25 };
+      const gradeLabels = { A: '우수 — 훌륭한 대응이었습니다.', B: '양호 — 좋은 수준이에요.', C: '보통 — 개선할 부분이 있어요.', D: '미흡 — 더 연습이 필요해요.' };
+
+      function animateRing(grade) {
+        const fill = document.getElementById('ring-fill');
+        const text = document.getElementById('ring-grade');
+        const pct = ringPercent[grade] || 0.25;
+        const color = ringColors[grade] || '#86868b';
+        fill.setAttribute('stroke', color);
+        text.textContent = grade;
+        // trigger animation after paint
+        requestAnimationFrame(() => {
+          fill.style.strokeDashoffset = circumference * (1 - pct);
+        });
+      }
 
       // Error case
       if (feedback.error) {
-        document.getElementById('feedback-grade-badge').className = 'w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-headline font-extrabold grade-D';
-        document.getElementById('feedback-grade-badge').textContent = '?';
+        animateRing('D');
         document.getElementById('feedback-grade-label').textContent = feedback.error;
         return;
       }
 
       // Grade
       const grade = feedback.overall_score || '?';
-      const gradeBadge = document.getElementById('feedback-grade-badge');
-      gradeBadge.className = `w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-headline font-extrabold grade-${grade}`;
-      gradeBadge.textContent = grade;
-
-      const gradeLabels = { A: '우수 - 훌륭한 대응이었습니다!', B: '양호 - 좋은 수준이에요.', C: '보통 - 개선할 부분이 있어요.', D: '미흡 - 더 연습이 필요해요.' };
+      animateRing(grade);
       document.getElementById('feedback-grade-label').textContent = gradeLabels[grade] || '';
 
-      // Strengths
-      const strengthsList = document.getElementById('feedback-strengths');
-      strengthsList.innerHTML = (feedback.strengths || []).map(s =>
-        `<li class="flex items-start gap-2"><span class="text-green-500 flex-shrink-0 mt-0.5">&#10003;</span><span>${s}</span></li>`
-      ).join('') || '<li class="text-outline">-</li>';
+      // ── Multiple choice mode ──
+      if (currentMode === 'multiple_choice' && feedback.correct_rate) {
+        const strengthsEl = document.getElementById('feedback-strengths');
+        strengthsEl.innerHTML =
+          `<div class="fb-item fb-item--blue" style="font-weight:600;">정답률: ${escapeHTML(feedback.correct_rate)}</div>` +
+          (feedback.strengths || []).map(s =>
+            `<div class="fb-item fb-item--green">${escapeHTML(s)}</div>`
+          ).join('');
 
-      // Improvements
-      const improvementsList = document.getElementById('feedback-improvements');
-      improvementsList.innerHTML = (feedback.improvements || []).map(s =>
-        `<li class="flex items-start gap-2"><span class="text-amber-500 flex-shrink-0 mt-0.5">&#9679;</span><span>${s}</span></li>`
-      ).join('') || '<li class="text-outline">-</li>';
+        const improvEl = document.getElementById('feedback-improvements');
+        const wrongAnswers = feedback.wrong_answers || [];
+        if (wrongAnswers.length > 0) {
+          improvEl.innerHTML = wrongAnswers.map(w => `
+            <div class="fb-wrong">
+              <p class="fb-wrong__q">턴 ${w.turn}: ${escapeHTML(w.question || '')}</p>
+              <p class="fb-wrong__selected">내 선택: <span style="text-decoration:line-through;">${escapeHTML(w.selected || '')}</span></p>
+              <p class="fb-wrong__correct">정답: ${escapeHTML(w.correct || '')}</p>
+              ${w.explanation ? `<p class="fb-wrong__explain">${escapeHTML(w.explanation)}</p>` : ''}
+            </div>
+          `).join('');
+        } else {
+          improvEl.innerHTML = '<div class="fb-item fb-item--green" style="font-weight:600;">모든 문항을 맞혔습니다!</div>';
+        }
+        if (feedback.improvements && feedback.improvements.length > 0) {
+          improvEl.innerHTML += feedback.improvements.map(s =>
+            `<div class="fb-item fb-item--amber">${escapeHTML(s)}</div>`
+          ).join('');
+        }
 
-      // Terminology
-      const termCheck = feedback.terminology_check || {};
-      const termsCorrect = document.getElementById('feedback-terms-correct');
-      termsCorrect.innerHTML = (termCheck.correctly_used || []).map(t =>
-        `<span class="inline-block text-xs font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full">${t}</span>`
-      ).join('') || '<span class="text-xs text-outline">-</span>';
+        // hide term/moment sections
+        document.getElementById('feedback-terms-card').style.display = 'none';
+        document.getElementById('feedback-moments-grid').style.display = 'none';
+        document.getElementById('feedback-expert-section').classList.add('hidden');
 
-      const termsMissed = document.getElementById('feedback-terms-missed');
-      termsMissed.innerHTML = (termCheck.missed_or_wrong || []).map(t =>
-        `<span class="inline-block text-xs font-medium bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">${t}</span>`
-      ).join('') || '<span class="text-xs text-outline">-</span>';
+        const focusSection = document.getElementById('feedback-focus-section');
+        if (feedback.next_focus) {
+          focusSection.classList.remove('hidden');
+          document.getElementById('feedback-focus').textContent = feedback.next_focus;
+        } else {
+          focusSection.classList.add('hidden');
+        }
 
-      const tipEl = document.getElementById('feedback-term-tip');
-      const tipTextEl = document.getElementById('feedback-term-tip-text');
-      if (termCheck.tip) {
-        tipEl.classList.remove('hidden');
-        tipTextEl.textContent = termCheck.tip;
       } else {
-        tipEl.classList.add('hidden');
-      }
+        // ── Standard mode (중급/고급) ──
+        document.getElementById('feedback-terms-card').style.display = '';
+        document.getElementById('feedback-moments-grid').style.display = '';
 
-      // Best / Worst moments
-      document.getElementById('feedback-best').textContent = feedback.best_moment || '-';
-      document.getElementById('feedback-worst').textContent = feedback.worst_moment || '-';
+        // Strengths
+        document.getElementById('feedback-strengths').innerHTML =
+          (feedback.strengths || []).map(s =>
+            `<div class="fb-item fb-item--green">${escapeHTML(s)}</div>`
+          ).join('') || '<p style="color:#86868b;font-size:15px;">-</p>';
 
-      // Expert answer
-      const expertSection = document.getElementById('feedback-expert-section');
-      if (feedback.expert_answer) {
-        expertSection.classList.remove('hidden');
-        document.getElementById('feedback-expert').textContent = feedback.expert_answer;
-      } else {
-        expertSection.classList.add('hidden');
-      }
+        // Improvements
+        document.getElementById('feedback-improvements').innerHTML =
+          (feedback.improvements || []).map(s =>
+            `<div class="fb-item fb-item--blue">${escapeHTML(s)}</div>`
+          ).join('') || '<p style="color:#86868b;font-size:15px;">-</p>';
 
-      // Next focus
-      const focusSection = document.getElementById('feedback-focus-section');
-      if (feedback.next_focus) {
-        focusSection.classList.remove('hidden');
-        document.getElementById('feedback-focus').textContent = feedback.next_focus;
-      } else {
-        focusSection.classList.add('hidden');
+        // Terminology — bar + tags
+        const termCheck = feedback.terminology_check || {};
+        const correctTerms = termCheck.correctly_used || [];
+        const missedTerms = termCheck.missed_or_wrong || [];
+        const totalTerms = correctTerms.length + missedTerms.length;
+        const termPct = totalTerms > 0 ? Math.round(100 * correctTerms.length / totalTerms) : 0;
+
+        document.getElementById('term-correct-count').textContent = correctTerms.length;
+        document.getElementById('term-missed-count').textContent = missedTerms.length;
+        requestAnimationFrame(() => {
+          document.getElementById('term-bar-fill').style.width = termPct + '%';
+        });
+
+        document.getElementById('feedback-terms-correct').innerHTML =
+          correctTerms.map(t => `<span class="fb-tag">${escapeHTML(t)}</span>`).join('');
+        document.getElementById('feedback-terms-missed').innerHTML =
+          missedTerms.map(t => `<span class="fb-tag fb-tag--missed">${escapeHTML(t)}</span>`).join('');
+
+        const tipEl = document.getElementById('feedback-term-tip');
+        if (termCheck.tip) {
+          tipEl.classList.remove('hidden');
+          document.getElementById('feedback-term-tip-text').textContent = termCheck.tip;
+        } else {
+          tipEl.classList.add('hidden');
+        }
+
+        // Best / Worst
+        document.getElementById('feedback-best').textContent = feedback.best_moment || '-';
+        document.getElementById('feedback-worst').textContent = feedback.worst_moment || '-';
+
+        // Expert
+        const expertSection = document.getElementById('feedback-expert-section');
+        if (feedback.expert_answer) {
+          expertSection.classList.remove('hidden');
+          document.getElementById('feedback-expert').textContent = feedback.expert_answer;
+        } else {
+          expertSection.classList.add('hidden');
+        }
+
+        // Focus
+        const focusSection = document.getElementById('feedback-focus-section');
+        if (feedback.next_focus) {
+          focusSection.classList.remove('hidden');
+          document.getElementById('feedback-focus').textContent = feedback.next_focus;
+        } else {
+          focusSection.classList.add('hidden');
+        }
       }
 
       // Conversation history
@@ -1067,15 +1960,15 @@
       historyEl.innerHTML = chatHistory.map(msg => {
         const isAI = msg.role === 'assistant';
         return `
-          <div class="flex items-start gap-3 ${isAI ? '' : 'flex-row-reverse'}">
-            <div class="w-7 h-7 rounded-full ${isAI ? 'bg-surface-container-high' : 'bg-primary'} flex items-center justify-center flex-shrink-0">
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;${isAI ? '' : 'flex-direction:row-reverse;'}">
+            <div style="width:28px;height:28px;border-radius:14px;${isAI ? 'background:#e5e5ea;' : 'background:#0071e3;'}display:flex;align-items:center;justify-content:center;flex-shrink:0;">
               ${isAI
-                ? '<span class="material-symbols-outlined text-on-surface-variant" style="font-size:14px;">person</span>'
-                : '<span class="text-white text-[9px] font-bold">ME</span>'}
+                ? '<span class="material-symbols-outlined" style="font-size:14px;color:#6e6e73;">person</span>'
+                : '<span style="color:#fff;font-size:9px;font-weight:700;">ME</span>'}
             </div>
-            <div class="max-w-[80%] ${isAI ? '' : 'text-right'}">
-              <p class="text-[10px] font-semibold text-outline mb-1">${isAI ? (scen ? scen.customer_role : 'AI') : '나 (사업담당)'}</p>
-              <p class="text-sm text-on-surface-variant leading-relaxed">${msg.content}</p>
+            <div style="max-width:80%;${isAI ? '' : 'text-align:right;'}">
+              <p style="font-size:11px;font-weight:600;color:#86868b;margin-bottom:4px;">${isAI ? (scen ? scen.customer_role : 'AI') : '나 (사업담당)'}</p>
+              <p style="font-size:14px;line-height:1.6;color:#1d1d1f;">${msg.content}</p>
             </div>
           </div>
         `;
@@ -1095,11 +1988,14 @@
     async function retrySameScenario() {
       chatHistory = [];
       feedback = null;
+      roleplayStartedAt = new Date().toISOString();
+      savedSessionId = null;
+      answerHistory = [];
+      clearLocalStorageBackup();
 
       showPhase('playing');
       document.getElementById('ending-banner').classList.add('hidden');
-      document.getElementById('hint-panel').classList.add('hidden');
-      document.getElementById('hint-chevron').style.transform = '';
+      document.getElementById('hint-bar').classList.add('hidden');
 
       // Show loading in chat
       const chatArea = document.getElementById('chat-area');
@@ -1113,18 +2009,39 @@
       `;
 
       try {
-        const res = await fetch('/api/roleplay/start', {
+        const res = await authFetch('/api/roleplay/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ scenario: selectedScenario, persona: selectedPersona }),
         });
         const data = await res.json();
         systemPrompt = data.system_prompt;
-        chatHistory = [{ role: 'assistant', content: data.opening }];
+        currentMode = data.mode || 'free_text';
+        showHints = data.show_hints || false;
+        currentChoices = Array.isArray(data.choices) ? data.choices : [];
+        currentCorrectIndex = typeof data.correct_index === 'number' ? data.correct_index : 0;
+        currentExplanation = data.explanation || '';
+        chatHistory = [{ role: 'assistant', content: cleanAiResponse(data.opening) }];
 
         document.getElementById('play-turn-count').textContent = '0';
+
+        // 모드에 따른 입력 UI 전환
+        const inputArea = document.querySelector('.px-6.pb-5.pt-2');
+        const choicesArea = document.getElementById('choices-area');
+        if (currentMode === 'multiple_choice') {
+          if (inputArea) inputArea.classList.add('hidden');
+          if (choicesArea) choicesArea.classList.remove('hidden');
+        } else {
+          if (inputArea) inputArea.classList.remove('hidden');
+          if (choicesArea) choicesArea.classList.add('hidden');
+        }
+
         renderChat();
-        document.getElementById('chat-input').focus();
+        if (currentMode === 'multiple_choice') {
+          renderChoices();
+        } else {
+          document.getElementById('chat-input').focus();
+        }
       } catch (err) {
         console.error('Retry failed:', err);
         alert('재시작에 실패했습니다.');
@@ -1139,13 +2056,14 @@
       systemPrompt = '';
       selectedScenario = null;
       selectedPersona = null;
-      selectedStage = null;
-      selectedIndustry = null;
       isWaitingForAI = false;
+      roleplayStartedAt = null;
+      savedSessionId = null;
+      answerHistory = [];
+      if (autoSaveInterval) clearInterval(autoSaveInterval);
+      clearLocalStorageBackup();
 
-      // Re-render setup with reset filters
-      renderStageTabs();
-      renderIndustryFilters();
+      // Re-render scenario carousel
       renderScenarioCards();
       document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('selected'));
       updateStartButton();

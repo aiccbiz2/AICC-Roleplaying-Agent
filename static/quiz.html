@@ -15,10 +15,10 @@
       theme: {
         extend: {
           colors: {
-            primary: '#002859',
-            'primary-container': '#003d82',
-            secondary: '#b50062',
-            'secondary-fixed': '#ffd9e2',
+            primary: '#0071e3',
+            'primary-container': '#0077ed',
+            secondary: '#0071e3',
+            'secondary-fixed': '#e8f0fe',
             surface: '#f7fafd',
             'surface-container-low': '#f1f4f7',
             'surface-container-high': '#e5e8eb',
@@ -80,14 +80,14 @@
       transition: all 0.2s ease;
     }
     .option-btn:hover:not(.answered) {
-      background-color: #ffd9e2;
+      background-color: #e8f0fe;
     }
     .option-btn.selected:not(.answered) {
-      border-color: #b50062;
-      background-color: #ffd9e2;
+      border-color: #0071e3;
+      background-color: #e8f0fe;
     }
     .option-btn.selected:not(.answered) .letter-badge {
-      background-color: #b50062;
+      background-color: #0071e3;
       color: #ffffff;
     }
     /* Progress bar */
@@ -103,8 +103,8 @@
       border-color: #ba1a1a;
     }
     .progress-dot.current {
-      border-color: #b50062;
-      box-shadow: 0 0 0 3px rgba(181, 0, 98, 0.2);
+      border-color: #0071e3;
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
     }
     /* Result card animation */
     @keyframes slideUp {
@@ -114,6 +114,166 @@
     .result-card {
       animation: slideUp 0.4s ease-out;
     }
+
+    /* ── Quiz Category Grid ── */
+    .quiz-category-section {
+      width: 100%;
+    }
+    .quiz-category-section__title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 32px;
+      color: #1d1d1f;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .quiz-category-section__subtitle {
+      font-size: 15px;
+      color: #6e6e73;
+      margin-bottom: 28px;
+    }
+
+    /* Grid layout — all cards visible */
+    .quiz-category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 4px;
+    }
+    @media (max-width: 1024px) { .quiz-category-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 768px)  { .quiz-category-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px)  { .quiz-category-grid { grid-template-columns: 1fr; } }
+
+    .quiz-category-card {
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f7;
+      user-select: none;
+      min-height: 280px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .quiz-category-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    /* Top half — text content */
+    .quiz-category-card__body {
+      padding: 22px 22px 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .quiz-category-card__label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      align-self: flex-start;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      background: rgba(0,0,0,0.06);
+      color: #6e6e73;
+    }
+    .quiz-category-card__title {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      line-height: 1.25;
+      color: #1d1d1f;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .quiz-category-card__desc {
+      font-size: 13px;
+      color: #6e6e73;
+      line-height: 1.5;
+    }
+    .quiz-category-card__action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0071e3;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+    .quiz-category-card__action .material-symbols-outlined {
+      font-size: 14px;
+    }
+
+    /* Bottom 60% — image area */
+    .quiz-category-card__image {
+      height: 60%;
+      min-height: 160px;
+      background-size: cover;
+      background-position: center;
+      background-color: rgba(0,0,0,0.03);
+      position: relative;
+    }
+    /* Gradient fade from content to image */
+    .quiz-category-card__image::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 24px;
+      background: linear-gradient(to bottom, #f5f5f7, transparent);
+      pointer-events: none;
+    }
+    /* Fallback icon when no image */
+    .quiz-category-card__image-icon {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+    }
+    .quiz-category-card__image-icon .material-symbols-outlined {
+      font-size: 28px;
+      color: #fff;
+    }
+
+    /* Difficulty selector */
+    .quiz-difficulty-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .quiz-difficulty-chip {
+      padding: 8px 20px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1.5px solid #d1d5db;
+      background: #ffffff;
+      color: #6e6e73;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .quiz-difficulty-chip:hover {
+      border-color: #9ca3af;
+      color: #1d1d1f;
+    }
+    .quiz-difficulty-chip.active {
+      border-color: #0071e3;
+      background: #0071e3;
+      color: #ffffff;
+    }
+
   </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen">
@@ -123,60 +283,37 @@
 
   <!-- ====== MAIN CONTENT ====== -->
   <main class="app-main min-h-[calc(100vh-4rem)]">
-    <div class="max-w-4xl mx-auto px-6 py-8">
+    <div id="mainContainer" class="mx-auto px-6 py-8">
 
       <!-- ====== SCREEN 1: INITIAL (Category/Difficulty Selection) ====== -->
       <div id="setupScreen">
-        <!-- Empty State / Start -->
-        <div class="flex flex-col items-center justify-center py-16 text-center">
-          <div class="w-20 h-20 rounded-3xl bg-secondary-fixed/50 flex items-center justify-center mb-6">
-            <span class="material-symbols-outlined text-secondary text-4xl">quiz</span>
-          </div>
-          <h2 class="font-headline font-bold text-2xl text-on-surface mb-2">AICC 도메인 퀴즈</h2>
-          <p class="text-on-surface-variant text-sm max-w-md mb-10">
-            카테고리와 난이도를 선택하고 퀴즈를 시작하세요.<br />10문제가 출제되며, 끝나면 결과를 확인할 수 있습니다.
-          </p>
-
-          <!-- Selection Controls -->
-          <div class="w-full max-w-lg space-y-4 mb-8">
-            <!-- Category Dropdown -->
-            <div class="text-left">
-              <label for="categorySelect" class="block text-xs font-medium text-on-surface-variant mb-1.5">
-                카테고리
-              </label>
-              <select
-                id="categorySelect"
-                class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary"
-              >
-                <option value="">전체 (랜덤 출제)</option>
-              </select>
-            </div>
-
-            <!-- Difficulty Dropdown -->
-            <div class="text-left">
-              <label for="difficultySelect" class="block text-xs font-medium text-on-surface-variant mb-1.5">
-                난이도
-              </label>
-              <select
-                id="difficultySelect"
-                class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary"
-              >
-                <option value="초급">초급</option>
-                <option value="중급" selected>중급</option>
-                <option value="고급">고급</option>
-              </select>
-            </div>
+        <div class="quiz-category-section">
+          <!-- Header -->
+          <div class="mb-2">
+            <h2 class="quiz-category-section__title">AICC 도메인 퀴즈</h2>
+            <p class="quiz-category-section__subtitle">카테고리를 선택하고 퀴즈를 시작하세요. 10문제가 출제됩니다.</p>
           </div>
 
-          <!-- Start Button -->
-          <button
-            id="startQuizBtn"
-            onclick="startQuizSet()"
-            class="flex items-center gap-3 px-10 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-base font-bold shadow-lg hover:shadow-xl transition-all"
-          >
-            <span class="material-symbols-outlined text-xl">play_arrow</span>
-            퀴즈 시작 (10문제)
-          </button>
+          <!-- Difficulty Chips -->
+          <div class="quiz-difficulty-bar mb-6">
+            <span class="text-sm text-on-surface-variant font-medium mr-2">난이도</span>
+            <button class="quiz-difficulty-chip" data-difficulty="초급" onclick="selectDifficulty('초급', this)">초급</button>
+            <button class="quiz-difficulty-chip active" data-difficulty="중급" onclick="selectDifficulty('중급', this)">중급</button>
+            <button class="quiz-difficulty-chip" data-difficulty="고급" onclick="selectDifficulty('고급', this)">고급</button>
+          </div>
+
+          <!-- Hidden selects (keep for JS compatibility) -->
+          <select id="categorySelect" class="hidden"><option value="">전체 (랜덤 출제)</option></select>
+          <select id="difficultySelect" class="hidden">
+            <option value="초급">초급</option>
+            <option value="중급" selected>중급</option>
+            <option value="고급">고급</option>
+          </select>
+
+          <!-- Category Cards Grid -->
+          <div id="categoryCardsGrid" class="quiz-category-grid">
+            <!-- Cards rendered by JS -->
+          </div>
         </div>
       </div>
 
@@ -385,21 +522,120 @@
     function showScreen(screenId) {
       [setupScreen, quizScreen, resultScreen, reviewScreen].forEach(s => s.classList.add('hidden'));
       document.getElementById(screenId).classList.remove('hidden');
+
+      // Setup screen uses full width; others use max-w-4xl
+      const container = document.getElementById('mainContainer');
+      if (screenId === 'setupScreen') {
+        container.classList.remove('max-w-4xl');
+      } else {
+        container.classList.add('max-w-4xl');
+      }
     }
 
-    // ── Load Categories on Page Load ──
+    // ── Category Meta Data ──
+    const quizCategoryMeta = {
+      'IPCC 아키텍처 (PBX, CTI, IVR, 녹취)': { icon: 'dns', color: '#2563eb', desc: 'PBX, CTI, IVR, 녹취 등 IPCC 핵심 구성요소' },
+      '음성기술 (STT, TTS, 화자분리)':       { icon: 'graphic_eq', color: '#7c3aed', desc: 'STT 인식률, TTS 합성, 화자분리 기술' },
+      'AI/LLM (RAG, 콜봇, 챗봇)':           { icon: 'smart_toy', color: '#059669', desc: 'RAG 구축, LLM 활용, 콜봇·챗봇 기술' },
+      '상담운영 (ACD, WFM, QA)':             { icon: 'support_agent', color: '#ea580c', desc: '자동분배, 인력계획, 품질관리 실무' },
+      '도입/구축 (PoC, 레퍼런스, 연동)':       { icon: 'build', color: '#0d9488', desc: 'PoC 프로세스, 시스템 연동, 마이그레이션' },
+      '비용/라이센스':                        { icon: 'payments', color: '#b45309', desc: '라이센싱 모델, 비용 산정, 가격 구조' },
+      'AICC 기능 (상담 어드바이저, 보이스봇)':  { icon: 'record_voice_over', color: '#db2777', desc: '실시간 어드바이저, 보이스봇 활용' },
+      'CTI 핵심':                            { icon: 'phone_in_talk', color: '#4f46e5', desc: 'Computer Telephony Integration 핵심' },
+      'IVR/기관계/녹취':                      { icon: 'mic', color: '#0891b2', desc: 'IVR 시나리오, 기관통신, 녹음 시스템' },
+      '사업 전략 (영업 대응)':                 { icon: 'trending_up', color: '#9333ea', desc: '솔루션 포지셔닝, 경쟁사 대응 전략' },
+    };
+
+    // ── Difficulty Chip Selector ──
+    function selectDifficulty(value, chipEl) {
+      difficultySelect.value = value;
+      document.querySelectorAll('.quiz-difficulty-chip').forEach(c => c.classList.remove('active'));
+      chipEl.classList.add('active');
+    }
+
+    // ── Category images ──
+    const quizCategoryImages = {
+      'IPCC 아키텍처 (PBX, CTI, IVR, 녹취)': '/static/images/quiz/ipcc.png',
+      '음성기술 (STT, TTS, 화자분리)': '/static/images/quiz/stt-tts.png',
+      'AI/LLM (RAG, 콜봇, 챗봇)': '/static/images/quiz/ai-llm-rag.jpeg',
+      '상담운영 (ACD, WFM, QA)': '/static/images/quiz/qa.webp',
+      '도입/구축 (PoC, 레퍼런스, 연동)': '/static/images/quiz/poc.jpeg',
+      '비용/라이센스': '/static/images/quiz/license.webp',
+      'AICC 기능 (상담 어드바이저, 보이스봇)': '/static/images/quiz/aicc.jpg',
+      '사업 전략 (영업 대응)': '/static/images/quiz/strategy.jpeg',
+    };
+
+    // ── Load Categories and Render Cards ──
     async function loadCategories() {
+      const grid = document.getElementById('categoryCardsGrid');
       try {
-        const res = await fetch('/api/quiz/categories');
+        const res = await authFetch('/api/quiz/categories');
         const categories = await res.json();
+
+        // Populate hidden select for compatibility
         categories.forEach((cat) => {
           const option = document.createElement('option');
           option.value = cat;
           option.textContent = cat;
           categorySelect.appendChild(option);
         });
+
+        // Render category cards
+        categories.forEach((cat) => {
+          const meta = quizCategoryMeta[cat] || { icon: 'quiz', color: '#6e6e73', desc: cat };
+          const card = createCategoryCard(cat, cat, meta, false);
+          grid.appendChild(card);
+        });
+
+        // Check URL param
+        handleUrlCategory();
       } catch (err) {
         console.error('Failed to load categories:', err);
+      }
+    }
+
+    // ── Create a single category card ──
+    function createCategoryCard(value, title, meta) {
+      const card = document.createElement('div');
+      card.className = 'quiz-category-card';
+      card.dataset.category = value;
+
+      const shortTitle = title.length > 20 ? title.replace(/\s*\(.*\)/, '') : title;
+      const subTitle = title.includes('(') ? title.match(/\(([^)]+)\)/)?.[1] || '' : '';
+      const imgUrl = quizCategoryImages[value] || '';
+
+      card.innerHTML = `
+        <div class="quiz-category-card__body">
+          <span class="quiz-category-card__label">${subTitle || 'QUIZ'}</span>
+          <div class="quiz-category-card__title">${shortTitle}</div>
+          <div class="quiz-category-card__desc">${meta.desc}</div>
+          <span class="quiz-category-card__action">
+            10문제 풀기
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </span>
+        </div>
+        <div class="quiz-category-card__image" ${imgUrl ? `style="background-image:url('${imgUrl}')"` : ''}>
+          ${!imgUrl ? `<div class="quiz-category-card__image-icon" style="background:${meta.color};">
+            <span class="material-symbols-outlined">${meta.icon}</span>
+          </div>` : ''}
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        categorySelect.value = value;
+        startQuizSet();
+      });
+
+      return card;
+    }
+
+    // ── Handle URL ?category= parameter ──
+    function handleUrlCategory() {
+      const params = new URLSearchParams(window.location.search);
+      const urlCategory = params.get('category');
+      if (urlCategory) {
+        categorySelect.value = urlCategory;
+        startQuizSet();
       }
     }
 
@@ -429,7 +665,7 @@
         params.set('difficulty', difficulty);
         params.set('count', SET_SIZE);
 
-        const res = await fetch(`/api/quiz/set?${params.toString()}`);
+        const res = await authFetch(`/api/quiz/set?${params.toString()}`);
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
         quizSet = data.quizzes || [];
@@ -579,6 +815,21 @@
       results.push({ quiz, selectedAnswer: selectedLetter, isCorrect });
       updateScoreDisplay();
       updateProgressDots();
+
+      // 퀴즈 이력 저장
+      try {
+        authFetch('/api/history/quiz', {
+          method: 'POST',
+          body: JSON.stringify({
+            category: quiz.category || '',
+            difficulty: quiz.difficulty || '',
+            question: quiz.question || '',
+            user_answer: selectedLetter,
+            correct_answer: correctLetter,
+            is_correct: isCorrect,
+          }),
+        }).catch(function () { /* ignore */ });
+      } catch (e) { /* ignore */ }
 
       // Mark options as answered
       document.querySelectorAll('.option-btn').forEach((b) => {

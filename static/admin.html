@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin | AI Roleplay Agent</title>
+  <link rel="stylesheet" href="/static/shared.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0071e3', 'primary-container': '#0077ed',
+            secondary: '#0071e3', 'secondary-fixed': '#e8f0fe',
+            surface: '#f7fafd', 'surface-container-low': '#f1f4f7',
+            'surface-container-high': '#e5e8eb', 'surface-container-lowest': '#ffffff',
+            'on-surface': '#181c1e', 'on-surface-variant': '#434751',
+            outline: '#737782', 'outline-variant': '#c3c6d2',
+            tertiary: '#002f2c', 'tertiary-fixed': '#72f7ed', error: '#ba1a1a',
+          },
+          fontFamily: { headline: ['Manrope','sans-serif'], body: ['Inter','sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    h1,h2,h3,h4,h5,h6 { font-family: 'Manrope', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .grade-A { background: #dcfce7; color: #166534; }
+    .grade-B { background: #dbeafe; color: #1e40af; }
+    .grade-C { background: #fef3c7; color: #92400e; }
+    .grade-D { background: #fecaca; color: #991b1b; }
+    .grade-badge { display:inline-flex; align-items:center; justify-content:center; width:1.75rem; height:1.75rem; border-radius:0.375rem; font-weight:800; font-size:0.75rem; }
+    .admin-tab { padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+    .admin-tab.active { background: #0071e3; color: white; }
+    .admin-tab:not(.active) { background: #f1f4f7; color: #434751; }
+    .admin-tab:not(.active):hover { background: #e5e8eb; }
+    .chat-bubble-ai { background: #f1f4f7; border-radius: 1rem 1rem 1rem 0.25rem; }
+    .chat-bubble-user { background: #0071e3; color: white; border-radius: 1rem 1rem 0.25rem 1rem; }
+    .report-content h2 { font-size:1.125rem; font-weight:700; margin:1.5rem 0 0.5rem; color:#0071e3; }
+    .report-content h3 { font-size:0.95rem; font-weight:700; margin:1rem 0 0.375rem; color:#181c1e; }
+    .report-content ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+    .report-content li { font-size: 0.8125rem; margin: 0.25rem 0; color: #434751; }
+    .report-content table { width:100%; border-collapse:collapse; margin:0.75rem 0; font-size:0.75rem; }
+    .report-content th { background:#f1f4f7; padding:0.5rem; text-align:left; font-weight:600; border-bottom:2px solid #c3c6d2; }
+    .report-content td { padding:0.5rem; border-bottom:1px solid #e5e8eb; }
+    .report-content p { font-size: 0.8125rem; color: #434751; margin: 0.375rem 0; }
+  </style>
+</head>
+<body class="min-h-screen bg-surface">
+  <script src="/static/shared.js"></script>
+
+  <main class="app-main p-6 md:p-8">
+    <div class="max-w-[1200px] mx-auto">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-3xl font-extrabold text-on-surface">관리자 대시보드</h2>
+          <p class="text-on-surface-variant text-sm mt-1">팀원 학습 현황 및 활동 이력을 관리합니다.</p>
+        </div>
+        <span class="bg-secondary-fixed text-secondary px-3 py-1 rounded-full text-xs font-bold">Admin Only</span>
+      </div>
+
+      <!-- Admin Tabs -->
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button onclick="showAdminTab('overview')" class="admin-tab active" id="atab-overview">팀 현황</button>
+        <button onclick="showAdminTab('members')" class="admin-tab" id="atab-members">팀원별 활동</button>
+        <button onclick="showAdminTab('logs')" class="admin-tab" id="atab-logs">접속 로그</button>
+        <button onclick="showAdminTab('detail')" class="admin-tab" id="atab-detail">상세 이력</button>
+        <button onclick="showAdminTab('report')" class="admin-tab" id="atab-report">AI 리포트</button>
+        <button onclick="showAdminTab('improve')" class="admin-tab" id="atab-improve">개선점 트래킹</button>
+        <button onclick="showAdminTab('settings')" class="admin-tab" id="atab-settings">LLM 설정</button>
+      </div>
+
+      <!-- ═══ A. 팀 전체 현황 ═══ -->
+      <div id="panel-overview">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="overview-cards">
+          <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 text-center">
+            <span class="material-symbols-outlined text-primary mb-2" style="font-size:28px;">group</span>
+            <p class="text-2xl font-extrabold text-primary" id="ov-users">-</p>
+            <p class="text-xs text-on-surface-variant">등록 사용자</p>
+          </div>
+          <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 text-center">
+            <span class="material-symbols-outlined text-primary mb-2" style="font-size:28px;">event_available</span>
+            <p class="text-2xl font-extrabold text-primary" id="ov-active">-</p>
+            <p class="text-xs text-on-surface-variant">이번 주 활성</p>
+          </div>
+          <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 text-center">
+            <span class="material-symbols-outlined text-primary mb-2" style="font-size:28px;">sports_esports</span>
+            <p class="text-2xl font-extrabold text-primary" id="ov-roleplay">-</p>
+            <p class="text-xs text-on-surface-variant">총 롤플레이</p>
+          </div>
+          <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 text-center">
+            <span class="material-symbols-outlined text-primary mb-2" style="font-size:28px;">quiz</span>
+            <p class="text-2xl font-extrabold text-primary" id="ov-quiz">-</p>
+            <p class="text-xs text-on-surface-variant">총 퀴즈 풀이</p>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/20">
+          <h3 class="font-bold text-sm text-on-surface mb-3">일별 활동 추이 (최근 30일)</h3>
+          <div style="height:220px;"><canvas id="dailyChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ═══ B. 팀원별 활동 현황 ═══ -->
+      <div id="panel-members" class="hidden">
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-surface-container-low text-on-surface-variant text-xs font-semibold">
+                  <th class="p-3 text-left">이름</th>
+                  <th class="p-3 text-left">부서</th>
+                  <th class="p-3 text-left">직책</th>
+                  <th class="p-3 text-center">롤플레이</th>
+                  <th class="p-3 text-center">평균 등급</th>
+                  <th class="p-3 text-center">퀴즈</th>
+                  <th class="p-3 text-center">정답률</th>
+                  <th class="p-3 text-left">최근 활동</th>
+                </tr>
+              </thead>
+              <tbody id="members-tbody">
+                <tr><td colspan="8" class="p-8 text-center text-outline">로딩 중...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ C. 접속 로그 ═══ -->
+      <div id="panel-logs" class="hidden">
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 mb-4">
+          <div class="flex flex-wrap gap-3 items-end">
+            <div>
+              <label class="text-xs text-on-surface-variant font-medium">사용자</label>
+              <select id="log-user" class="block mt-1 text-sm border border-outline-variant/50 rounded-lg px-3 py-1.5">
+                <option value="">전체</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-on-surface-variant font-medium">시작일</label>
+              <input type="date" id="log-start" class="block mt-1 text-sm border border-outline-variant/50 rounded-lg px-3 py-1.5" />
+            </div>
+            <div>
+              <label class="text-xs text-on-surface-variant font-medium">종료일</label>
+              <input type="date" id="log-end" class="block mt-1 text-sm border border-outline-variant/50 rounded-lg px-3 py-1.5" />
+            </div>
+            <div>
+              <label class="text-xs text-on-surface-variant font-medium">페이지</label>
+              <select id="log-page" class="block mt-1 text-sm border border-outline-variant/50 rounded-lg px-3 py-1.5">
+                <option value="">전체</option>
+                <option value="/login">Login</option>
+                <option value="/">Dashboard</option>
+                <option value="/simulation">Simulation</option>
+                <option value="/quiz">Quiz</option>
+                <option value="/dictionary">Dictionary</option>
+                <option value="/history">History</option>
+                <option value="/admin">Admin</option>
+              </select>
+            </div>
+            <button onclick="loadLogs()" class="px-4 py-1.5 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-container transition-colors">조회</button>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-surface-container-low text-on-surface-variant text-xs font-semibold">
+                  <th class="p-3 text-left">시간</th>
+                  <th class="p-3 text-left">사용자</th>
+                  <th class="p-3 text-left">액션</th>
+                  <th class="p-3 text-left">페이지</th>
+                  <th class="p-3 text-left">IP</th>
+                </tr>
+              </thead>
+              <tbody id="logs-tbody">
+                <tr><td colspan="5" class="p-8 text-center text-outline">조회 버튼을 클릭하세요.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ D. 상세 이력 조회 ═══ -->
+      <div id="panel-detail" class="hidden">
+        <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 mb-4">
+          <div class="flex gap-3 items-end">
+            <div>
+              <label class="text-xs text-on-surface-variant font-medium">팀원 선택</label>
+              <select id="detail-user" class="block mt-1 text-sm border border-outline-variant/50 rounded-lg px-3 py-1.5" onchange="loadMemberDetail()">
+                <option value="">선택하세요</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="detail-content"></div>
+      </div>
+
+      <!-- ═══ E. AI 종합 리포트 ═══ -->
+      <div id="panel-report" class="hidden">
+        <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/20">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">smart_toy</span>
+              AI 종합 리포트
+            </h3>
+            <button onclick="generateReport()" id="report-btn" class="px-5 py-2 bg-primary text-white text-sm font-bold rounded-full hover:bg-primary-container transition-colors flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">auto_awesome</span>
+              종합 리포트 생성
+            </button>
+          </div>
+          <div id="report-content" class="report-content">
+            <p class="text-center text-outline py-8">"종합 리포트 생성" 버튼을 클릭하면 Claude가 팀 전체 데이터를 분석합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ F. 개선점 트래킹 ═══ -->
+      <div id="panel-improve" class="hidden">
+        <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/20">
+          <h3 class="font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">trending_down</span>
+            공통 개선점 TOP 10
+          </h3>
+          <div style="height:300px;"><canvas id="improveChart"></canvas></div>
+          <p id="improve-empty" class="hidden text-center text-outline text-sm py-8">아직 피드백 데이터가 없습니다.</p>
+        </div>
+      </div>
+
+      <!-- ═══ G. LLM 설정 ═══ -->
+      <div id="panel-settings" class="hidden">
+        <!-- 현재 LLM 설정 -->
+        <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/20 mb-6">
+          <h3 class="font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">tune</span>
+            LLM Provider 설정
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-4">
+            변경 즉시 서버에 반영되며 재기동이 필요 없습니다. 설정값은 <code>data/runtime_config.json</code>에 저장됩니다.
+          </p>
+          <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-semibold text-on-surface-variant mb-1">Provider</label>
+              <select id="llm-provider-select" class="w-full border border-outline-variant/40 rounded-lg px-3 py-2 text-sm bg-white"
+                onchange="onProviderChange()">
+                <option value="gemini">Google (Gemini / Gemma API)</option>
+                <option value="claude-cli">Claude CLI</option>
+                <option value="ollama">Ollama (로컬)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-on-surface-variant mb-1">Model</label>
+              <select id="llm-model-select" class="w-full border border-outline-variant/40 rounded-lg px-3 py-2 text-sm bg-white"
+                onchange="onModelSelectChange()">
+                <!-- 동적으로 채워짐 -->
+              </select>
+              <input id="llm-model-input" type="text"
+                class="w-full mt-2 border border-outline-variant/40 rounded-lg px-3 py-2 text-sm bg-white hidden"
+                placeholder="커스텀 모델 이름 직접 입력" />
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="saveLLMConfig()" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary-container">
+              설정 저장
+            </button>
+            <span id="llm-save-status" class="text-xs text-on-surface-variant"></span>
+          </div>
+        </div>
+
+        <!-- Gemini 일일 사용량 -->
+        <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/20 mb-6">
+          <h3 class="font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">monitoring</span>
+            Gemini 일일 사용량
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div class="bg-surface rounded-lg p-4 text-center">
+              <p class="text-2xl font-extrabold text-primary" id="gu-requests">-</p>
+              <p class="text-xs text-on-surface-variant">오늘 요청 수</p>
+            </div>
+            <div class="bg-surface rounded-lg p-4 text-center">
+              <p class="text-2xl font-extrabold text-tertiary" id="gu-remaining">-</p>
+              <p class="text-xs text-on-surface-variant">남은 요청</p>
+            </div>
+            <div class="bg-surface rounded-lg p-4 text-center">
+              <p class="text-2xl font-extrabold text-on-surface" id="gu-limit">-</p>
+              <p class="text-xs text-on-surface-variant">일일 한도</p>
+            </div>
+            <div class="bg-surface rounded-lg p-4 text-center">
+              <p class="text-2xl font-extrabold" id="gu-percentage">-</p>
+              <p class="text-xs text-on-surface-variant">사용률</p>
+            </div>
+          </div>
+          <!-- Progress bar -->
+          <div class="mb-4">
+            <div class="h-3 bg-surface-container-high rounded-full overflow-hidden">
+              <div id="gu-progress-bar" class="h-full bg-primary transition-all" style="width:0%"></div>
+            </div>
+            <p class="text-[10px] text-outline mt-1" id="gu-date"></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-xs text-on-surface-variant">일일 한도 조정:</label>
+            <input id="gu-limit-input" type="number" min="0"
+              class="w-24 border border-outline-variant/40 rounded-lg px-2 py-1 text-sm" />
+            <button onclick="saveGeminiLimit()" class="px-3 py-1 bg-secondary text-white rounded-lg text-xs font-semibold hover:bg-primary-container">
+              한도 저장
+            </button>
+            <button onclick="resetGeminiToday()" class="px-3 py-1 bg-error text-white rounded-lg text-xs font-semibold hover:opacity-90">
+              오늘 카운터 초기화
+            </button>
+          </div>
+        </div>
+
+        <!-- Gemini 사용 이력 -->
+        <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/20">
+          <h3 class="font-bold text-on-surface mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">history</span>
+            Gemini 최근 14일 사용 이력
+          </h3>
+          <div style="height:240px;"><canvas id="geminiHistoryChart"></canvas></div>
+          <p id="gu-history-empty" class="hidden text-center text-outline text-sm py-8">아직 사용 이력이 없습니다.</p>
+        </div>
+      </div>
+
+      <!-- Detail Modal -->
+      <div id="admin-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.5);">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/20">
+            <h3 id="admin-modal-title" class="font-bold text-on-surface">세션 상세</h3>
+            <button onclick="closeAdminModal()" class="w-8 h-8 rounded-full hover:bg-surface-container-high flex items-center justify-center">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div id="admin-modal-body" class="flex-1 overflow-y-auto p-6"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── Admin access check ──
+    (function() {
+      const user = window.getCurrentUser ? window.getCurrentUser() : null;
+      if (!user || user.role !== 'admin') {
+        window.location.href = '/';
+        return;
+      }
+    })();
+
+    let membersData = [];
+    let dailyChartInstance = null;
+    let improveChartInstance = null;
+
+    // ── Tab switching ──
+    function showAdminTab(tab) {
+      const panels = ['overview','members','logs','detail','report','improve','settings'];
+      panels.forEach(p => {
+        document.getElementById('panel-' + p).classList.toggle('hidden', p !== tab);
+        document.getElementById('atab-' + p).classList.toggle('active', p === tab);
+      });
+      if (tab === 'settings') loadLLMSettings();
+    }
+
+    // ── LLM 설정 로드/저장 ──
+    let _providerModelsMap = {};
+    let geminiHistoryChart = null;
+
+    async function loadLLMSettings() {
+      try {
+        const res = await authFetch('/api/admin/llm-config');
+        const d = await res.json();
+
+        // Provider select
+        const providerSelect = document.getElementById('llm-provider-select');
+        providerSelect.value = d.llm.provider;
+
+        // Provider별 모델 목록 저장
+        _providerModelsMap = d.llm.provider_models || {};
+        // 현재 모델을 select 옵션에 반영 (없으면 추가)
+        updateModelSelect(d.llm.provider, d.llm.model);
+
+        // Gemini 사용량
+        const gu = d.gemini_usage || {};
+        document.getElementById('gu-requests').textContent = gu.requests_today ?? '-';
+        document.getElementById('gu-remaining').textContent = gu.remaining ?? '-';
+        document.getElementById('gu-limit').textContent = gu.daily_limit ?? '-';
+        const pct = gu.percentage ?? 0;
+        const pctEl = document.getElementById('gu-percentage');
+        pctEl.textContent = pct + '%';
+        pctEl.className = 'text-2xl font-extrabold ' +
+          (pct >= 90 ? 'text-error' : pct >= 70 ? 'text-amber-600' : 'text-tertiary');
+
+        const bar = document.getElementById('gu-progress-bar');
+        bar.style.width = Math.min(100, pct) + '%';
+        bar.className = 'h-full transition-all ' +
+          (pct >= 90 ? 'bg-error' : pct >= 70 ? 'bg-amber-500' : 'bg-primary');
+
+        document.getElementById('gu-date').textContent = '기준일: ' + (gu.date || '-');
+        document.getElementById('gu-limit-input').value = gu.daily_limit ?? 250;
+
+        // 이력 차트
+        renderGeminiHistory(d.gemini_history || []);
+      } catch (err) {
+        console.error('LLM 설정 로드 실패:', err);
+      }
+    }
+
+    function updateModelSelect(provider, currentModel) {
+      const select = document.getElementById('llm-model-select');
+      const customInput = document.getElementById('llm-model-input');
+      select.innerHTML = '';
+      const models = _providerModelsMap[provider] || [];
+
+      // 사전 정의 옵션 추가
+      models.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        select.appendChild(opt);
+      });
+
+      // 현재 모델이 사전 정의에 없으면 별도 추가 (커스텀 호환)
+      if (currentModel && !models.includes(currentModel)) {
+        const opt = document.createElement('option');
+        opt.value = currentModel;
+        opt.textContent = currentModel + ' (커스텀)';
+        select.appendChild(opt);
+      }
+
+      // "커스텀..." 옵션
+      const customOpt = document.createElement('option');
+      customOpt.value = '__custom__';
+      customOpt.textContent = '── 직접 입력...';
+      select.appendChild(customOpt);
+
+      // 현재 값 선택
+      select.value = currentModel || (models[0] || '');
+      customInput.value = '';
+      customInput.classList.add('hidden');
+    }
+
+    function onProviderChange() {
+      const provider = document.getElementById('llm-provider-select').value;
+      // provider 변경 시 첫 모델을 기본값으로 설정
+      const first = (_providerModelsMap[provider] || [])[0];
+      updateModelSelect(provider, first || '');
+    }
+
+    function onModelSelectChange() {
+      const select = document.getElementById('llm-model-select');
+      const customInput = document.getElementById('llm-model-input');
+      if (select.value === '__custom__') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+      } else {
+        customInput.classList.add('hidden');
+        customInput.value = '';
+      }
+    }
+
+    async function saveLLMConfig() {
+      const provider = document.getElementById('llm-provider-select').value;
+      const select = document.getElementById('llm-model-select');
+      const customInput = document.getElementById('llm-model-input');
+      let model = select.value;
+      if (model === '__custom__') {
+        model = customInput.value.trim();
+      }
+      const status = document.getElementById('llm-save-status');
+
+      if (!model) {
+        status.textContent = '모델 이름을 입력하세요.';
+        status.className = 'text-xs text-error';
+        return;
+      }
+
+      status.textContent = '저장 중...';
+      status.className = 'text-xs text-on-surface-variant';
+
+      try {
+        const res = await authFetch('/api/admin/llm-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider, model }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || '저장 실패');
+        }
+        status.textContent = '저장 완료! 즉시 반영됩니다.';
+        status.className = 'text-xs text-tertiary font-semibold';
+        setTimeout(() => { status.textContent = ''; }, 3000);
+      } catch (err) {
+        status.textContent = '에러: ' + err.message;
+        status.className = 'text-xs text-error';
+      }
+    }
+
+    async function saveGeminiLimit() {
+      const limit = parseInt(document.getElementById('gu-limit-input').value, 10);
+      if (isNaN(limit) || limit < 0) return;
+      try {
+        await authFetch('/api/admin/gemini-limit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ daily_limit: limit }),
+        });
+        await loadLLMSettings();
+      } catch (err) {
+        alert('한도 저장 실패: ' + err.message);
+      }
+    }
+
+    async function resetGeminiToday() {
+      if (!confirm('오늘 Gemini 사용 카운터를 0으로 초기화할까요?')) return;
+      try {
+        await authFetch('/api/admin/gemini-reset', { method: 'POST' });
+        await loadLLMSettings();
+      } catch (err) {
+        alert('초기화 실패: ' + err.message);
+      }
+    }
+
+    function renderGeminiHistory(history) {
+      const empty = document.getElementById('gu-history-empty');
+      const canvas = document.getElementById('geminiHistoryChart');
+      if (!history || history.length === 0) {
+        empty.classList.remove('hidden');
+        canvas.style.display = 'none';
+        return;
+      }
+      empty.classList.add('hidden');
+      canvas.style.display = 'block';
+
+      // 오래된 것부터 (오른쪽이 최신)
+      const sorted = [...history].reverse();
+      const labels = sorted.map(h => h.date.slice(5));
+      const requests = sorted.map(h => h.requests);
+
+      if (geminiHistoryChart) geminiHistoryChart.destroy();
+      geminiHistoryChart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: '요청 수',
+            data: requests,
+            backgroundColor: '#0071e3',
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+          },
+        },
+      });
+    }
+
+    // ── Load Overview ──
+    async function loadOverview() {
+      try {
+        const res = await authFetch('/api/admin/overview');
+        const d = await res.json();
+        document.getElementById('ov-users').textContent = d.total_users;
+        document.getElementById('ov-active').textContent = d.week_active;
+        document.getElementById('ov-roleplay').textContent = d.total_roleplay;
+        document.getElementById('ov-quiz').textContent = d.total_quiz;
+
+        // Daily chart
+        if (d.daily_activity && d.daily_activity.length) {
+          const labels = d.daily_activity.map(r => r.date.slice(5));
+          if (dailyChartInstance) dailyChartInstance.destroy();
+          dailyChartInstance = new Chart(document.getElementById('dailyChart').getContext('2d'), {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                { label: '활성 사용자', data: d.daily_activity.map(r => r.active_users), borderColor: '#0071e3', backgroundColor: 'rgba(0,113,227,0.1)', fill: true, tension: 0.3 },
+                { label: '롤플레이', data: d.daily_activity.map(r => r.roleplay_views), borderColor: '#0071e3', backgroundColor: 'rgba(0,113,227,0.05)', fill: false, tension: 0.3 },
+                { label: '퀴즈', data: d.daily_activity.map(r => r.quiz_views), borderColor: '#002f2c', backgroundColor: 'rgba(0,47,44,0.05)', fill: false, tension: 0.3 },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } },
+              scales: { y: { beginAtZero: true } },
+            },
+          });
+        }
+      } catch (e) { console.error('Overview failed:', e); }
+    }
+
+    // ── Load Members ──
+    async function loadMembers() {
+      try {
+        const res = await authFetch('/api/admin/members');
+        membersData = await res.json();
+        const tbody = document.getElementById('members-tbody');
+        if (!membersData.length) {
+          tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-outline">등록된 팀원이 없습니다.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = membersData.map(m => {
+          const grade = m.avg_grade || '-';
+          const acc = m.accuracy != null ? m.accuracy + '%' : '-';
+          const lastDate = m.last_active ? new Date(m.last_active).toLocaleDateString('ko-KR') : '-';
+          return `
+            <tr class="hover:bg-surface-container-low/50 cursor-pointer transition-colors" onclick="showAdminTab('detail'); document.getElementById('detail-user').value='${escapeHTML(String(m.id))}'; loadMemberDetail();">
+              <td class="p-3 font-semibold">${escapeHTML(m.name)}</td>
+              <td class="p-3 text-on-surface-variant">${escapeHTML(m.department)}</td>
+              <td class="p-3 text-on-surface-variant">${escapeHTML(m.position)}</td>
+              <td class="p-3 text-center">${m.roleplay_count}</td>
+              <td class="p-3 text-center"><span class="grade-badge grade-${grade}">${grade}</span></td>
+              <td class="p-3 text-center">${m.quiz_count}</td>
+              <td class="p-3 text-center">${acc}</td>
+              <td class="p-3 text-on-surface-variant text-xs">${lastDate}</td>
+            </tr>`;
+        }).join('');
+
+        // Populate user dropdowns
+        populateUserDropdowns(membersData);
+      } catch (e) { console.error('Members failed:', e); }
+    }
+
+    function populateUserDropdowns(members) {
+      ['log-user', 'detail-user'].forEach(id => {
+        const sel = document.getElementById(id);
+        const existing = sel.value;
+        const firstOpt = sel.options[0].outerHTML;
+        sel.innerHTML = firstOpt + members.map(m =>
+          `<option value="${escapeHTML(String(m.id))}">${escapeHTML(m.name)} (${escapeHTML(m.position)})</option>`
+        ).join('');
+        if (existing) sel.value = existing;
+      });
+    }
+
+    // ── Load Logs ──
+    async function loadLogs() {
+      const params = new URLSearchParams();
+      const userId = document.getElementById('log-user').value;
+      const start = document.getElementById('log-start').value;
+      const end = document.getElementById('log-end').value;
+      const page = document.getElementById('log-page').value;
+      if (userId) params.set('user_id', userId);
+      if (start) params.set('start_date', start);
+      if (end) params.set('end_date', end + 'T23:59:59');
+      if (page) params.set('page', page);
+
+      try {
+        const res = await authFetch('/api/admin/access-logs?' + params.toString());
+        const logs = await res.json();
+        const tbody = document.getElementById('logs-tbody');
+        if (!logs.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-outline">조건에 맞는 로그가 없습니다.</td></tr>';
+          return;
+        }
+        const actionLabels = { login: '로그인', page_view: '페이지 조회', logout: '로그아웃' };
+        tbody.innerHTML = logs.map(l => `
+          <tr class="hover:bg-surface-container-low/50 transition-colors text-xs">
+            <td class="p-3">${l.created_at ? new Date(l.created_at).toLocaleString('ko-KR') : '-'}</td>
+            <td class="p-3 font-medium">${escapeHTML(l.name || l.user_id)}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${l.action === 'login' ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-blue-600'}">${escapeHTML(actionLabels[l.action] || l.action)}</span></td>
+            <td class="p-3 text-on-surface-variant">${escapeHTML(l.page || '-')}</td>
+            <td class="p-3 text-outline">${escapeHTML(l.ip_address || '-')}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error('Logs failed:', e); }
+    }
+
+    // ── Load Member Detail ──
+    async function loadMemberDetail() {
+      const userId = document.getElementById('detail-user').value;
+      const container = document.getElementById('detail-content');
+      if (!userId) { container.innerHTML = ''; return; }
+
+      container.innerHTML = '<p class="text-center text-outline py-8">로딩 중...</p>';
+      try {
+        const res = await authFetch('/api/admin/members/' + userId);
+        const d = await res.json();
+        const user = d.user;
+        const sessions = d.roleplay_sessions || [];
+        const quizzes = d.quiz_records || [];
+
+        let html = `
+          <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/20 mb-4">
+            <h3 class="font-bold text-on-surface mb-1">${escapeHTML(user.name)} <span class="text-on-surface-variant font-normal text-sm">${escapeHTML(user.position)} | ${escapeHTML(user.department)}</span></h3>
+            <p class="text-xs text-outline">가입일: ${user.created_at ? new Date(user.created_at).toLocaleDateString('ko-KR') : '-'}</p>
+          </div>
+
+          <h4 class="font-bold text-sm text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary" style="font-size:18px;">sports_esports</span>
+            롤플레이 세션 (${sessions.length}건)
+          </h4>`;
+
+        if (sessions.length) {
+          html += '<div class="space-y-2 mb-6">';
+          sessions.forEach(s => {
+            const grade = s.overall_grade || '?';
+            const date = s.ended_at ? new Date(s.ended_at).toLocaleDateString('ko-KR') : '-';
+            const dur = s.duration_seconds ? Math.round(s.duration_seconds / 60) + '분' : '-';
+            html += `
+              <div onclick="openAdminSessionModal('${escapeHTML(String(userId))}', ${s.id})" class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 hover:border-primary/30 hover:shadow-sm cursor-pointer transition-all flex items-center gap-4">
+                <div class="grade-badge grade-${escapeHTML(grade)}">${escapeHTML(grade)}</div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-sm text-on-surface truncate">${escapeHTML(s.scenario_title)}</p>
+                  <p class="text-xs text-on-surface-variant">${escapeHTML(s.persona_level)} | ${s.turn_count || 0}턴 | ${dur}</p>
+                </div>
+                <div class="text-xs text-outline">${date}</div>
+                <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+              </div>`;
+          });
+          html += '</div>';
+        } else {
+          html += '<p class="text-sm text-outline mb-6">롤플레이 기록이 없습니다.</p>';
+        }
+
+        // Quiz summary
+        html += `
+          <h4 class="font-bold text-sm text-on-surface mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary" style="font-size:18px;">quiz</span>
+            퀴즈 기록 (${quizzes.length}건)
+          </h4>`;
+
+        if (quizzes.length) {
+          const catStats = {};
+          quizzes.forEach(r => {
+            if (!catStats[r.category]) catStats[r.category] = { correct: 0, total: 0 };
+            catStats[r.category].total++;
+            if (r.is_correct) catStats[r.category].correct++;
+          });
+          html += '<div class="space-y-2 mb-4">';
+          Object.entries(catStats).forEach(([cat, st]) => {
+            const pct = Math.round(100 * st.correct / st.total);
+            html += `
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-on-surface-variant w-40 truncate">${escapeHTML(cat)}</span>
+                <div class="flex-1 h-2 bg-surface-container-high rounded-full overflow-hidden">
+                  <div class="h-full rounded-full" style="width:${pct}%; background:#0071e3;"></div>
+                </div>
+                <span class="text-xs font-semibold text-on-surface w-12 text-right">${pct}%</span>
+              </div>`;
+          });
+          html += '</div>';
+
+          // Recent quiz records
+          html += '<details class="mb-4"><summary class="text-xs text-primary font-semibold cursor-pointer mb-2">최근 퀴즈 상세 보기</summary><div class="space-y-1">';
+          quizzes.slice(0, 30).forEach(r => {
+            const icon = r.is_correct ? 'check_circle' : 'cancel';
+            const color = r.is_correct ? 'text-green-600' : 'text-red-500';
+            html += `
+              <div class="flex items-center gap-2 py-1 px-2 text-xs">
+                <span class="material-symbols-outlined ${color}" style="font-size:14px;">${icon}</span>
+                <span class="flex-1 truncate text-on-surface-variant">${escapeHTML(r.question)}</span>
+                <span class="text-outline">${escapeHTML(r.user_answer)}/${escapeHTML(r.correct_answer)}</span>
+              </div>`;
+          });
+          html += '</div></details>';
+        } else {
+          html += '<p class="text-sm text-outline">퀴즈 기록이 없습니다.</p>';
+        }
+
+        container.innerHTML = html;
+      } catch (e) {
+        container.innerHTML = '<p class="text-center text-error text-sm py-8">데이터를 불러올 수 없습니다.</p>';
+      }
+    }
+
+    // ── Session Detail Modal (Admin) ──
+    async function openAdminSessionModal(userId, sessionId) {
+      const modal = document.getElementById('admin-modal');
+      const body = document.getElementById('admin-modal-body');
+      modal.classList.remove('hidden');
+      body.innerHTML = '<p class="text-center text-outline py-8">로딩 중...</p>';
+
+      try {
+        const res = await authFetch('/api/admin/members/' + userId);
+        const d = await res.json();
+        const session = (d.roleplay_sessions || []).find(s => s.id == sessionId);
+        if (!session) { body.innerHTML = '<p class="text-center text-error py-8">세션을 찾을 수 없습니다.</p>'; return; }
+
+        document.getElementById('admin-modal-title').textContent = d.user.name + ' — ' + session.scenario_title;
+        const dur = session.duration_seconds ? Math.round(session.duration_seconds / 60) + '분' : '-';
+
+        let feedbackHtml = '';
+        if (session.feedback) {
+          const fb = session.feedback;
+          feedbackHtml = `
+            <div class="mt-6 pt-6 border-t border-outline-variant/20">
+              <h4 class="font-bold text-sm mb-3">피드백</h4>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="grade-badge grade-${fb.overall_score || '?'}">${fb.overall_score || '?'}</div>
+                <span class="text-sm text-on-surface-variant">${session.persona_level} | ${session.turn_count || 0}턴 | ${dur}</span>
+              </div>
+              ${fb.strengths ? '<p class="text-xs font-semibold text-green-700 mb-1">잘한 점</p><ul class="text-xs text-on-surface-variant mb-3 space-y-1">' + fb.strengths.map(s => '<li>• ' + escapeHTML(s) + '</li>').join('') + '</ul>' : ''}
+              ${fb.improvements ? '<p class="text-xs font-semibold text-amber-700 mb-1">개선할 점</p><ul class="text-xs text-on-surface-variant mb-3 space-y-1">' + fb.improvements.map(s => '<li>• ' + escapeHTML(s) + '</li>').join('') + '</ul>' : ''}
+              ${fb.best_moment ? '<p class="text-xs"><span class="font-semibold text-green-700">베스트:</span> ' + escapeHTML(fb.best_moment) + '</p>' : ''}
+              ${fb.worst_moment ? '<p class="text-xs mt-1"><span class="font-semibold text-amber-700">아쉬운:</span> ' + escapeHTML(fb.worst_moment) + '</p>' : ''}
+              ${fb.expert_answer ? '<p class="text-xs mt-2 p-2 bg-primary/5 rounded-lg"><span class="font-semibold text-primary">전문가 답변:</span> ' + escapeHTML(fb.expert_answer) + '</p>' : ''}
+            </div>`;
+        }
+
+        body.innerHTML = `
+          <div class="text-xs text-outline mb-4">${session.started_at ? new Date(session.started_at).toLocaleString('ko-KR') : ''} | ${dur}</div>
+          <div class="space-y-3">
+            ${(session.conversation || []).map(msg => {
+              const isAI = msg.role === 'assistant';
+              return `
+                <div class="flex ${isAI ? 'justify-start' : 'justify-end'}">
+                  <div class="${isAI ? 'chat-bubble-ai' : 'chat-bubble-user'} px-4 py-3 max-w-[80%]">
+                    <p class="text-[10px] font-semibold ${isAI ? 'text-outline' : 'text-white/70'} mb-1">${isAI ? 'AI 고객' : escapeHTML(d.user.name) + ' (사업담당)'}</p>
+                    <p class="text-sm leading-relaxed">${escapeHTML(msg.content)}</p>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+          ${feedbackHtml}
+        `;
+      } catch (e) {
+        body.innerHTML = '<p class="text-center text-error text-sm py-8">데이터를 불러올 수 없습니다.</p>';
+      }
+    }
+
+    function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+    document.getElementById('admin-modal').addEventListener('click', function(e) { if (e.target === this) closeAdminModal(); });
+
+    // ── Generate AI Report ──
+    async function generateReport() {
+      const btn = document.getElementById('report-btn');
+      const content = document.getElementById('report-content');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> 생성 중... (1-2분 소요)';
+      content.innerHTML = '<p class="text-center text-outline py-8">Claude가 팀 데이터를 분석하고 있습니다...</p>';
+
+      try {
+        const res = await authFetch('/api/admin/report', { method: 'POST' });
+        const data = await res.json();
+        content.innerHTML = renderMarkdown(data.report || '리포트를 생성할 수 없습니다.');
+      } catch (e) {
+        content.innerHTML = '<p class="text-center text-error py-8">리포트 생성에 실패했습니다.</p>';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-base">auto_awesome</span> 종합 리포트 생성';
+      }
+    }
+
+    // Simple markdown renderer (HTML sanitized first)
+    function renderMarkdown(md) {
+      // Strip raw HTML to prevent XSS
+      md = md.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return md
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^\- (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+        .replace(/\n{2,}/g, '<br/><br/>')
+        .replace(/\n/g, '<br/>');
+    }
+
+    // ── Load Improvements ──
+    async function loadImprovements() {
+      try {
+        const res = await authFetch('/api/admin/improvements');
+        const data = await res.json();
+        if (!data.length) {
+          document.getElementById('improve-empty').classList.remove('hidden');
+          return;
+        }
+        if (improveChartInstance) improveChartInstance.destroy();
+        improveChartInstance = new Chart(document.getElementById('improveChart').getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: data.map(d => d.improvement.length > 30 ? d.improvement.substring(0, 30) + '...' : d.improvement),
+            datasets: [{
+              label: '빈도',
+              data: data.map(d => d.count),
+              backgroundColor: 'rgba(0,113,227,0.7)',
+              borderRadius: 6,
+            }],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
+            plugins: { legend: { display: false } },
+          },
+        });
+      } catch (e) { console.error('Improvements failed:', e); }
+    }
+
+    // ── Init ──
+    loadOverview();
+    loadMembers();
+    loadImprovements();
+  </script>
+</body>
+</html>

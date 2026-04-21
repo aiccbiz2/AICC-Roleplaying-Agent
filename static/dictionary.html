@@ -15,20 +15,20 @@
       theme: {
         extend: {
           colors: {
-            primary: '#002859',
-            'primary-container': '#003d82',
-            secondary: '#b50062',
-            'secondary-fixed': '#ffd9e2',
-            'primary-fixed': '#d7e2ff',
-            surface: '#f7fafd',
-            'surface-container-low': '#f1f4f7',
-            'surface-container-high': '#e5e8eb',
+            primary: '#1d1d1f',
+            'primary-container': '#424245',
+            secondary: '#6e6e73',
+            'secondary-fixed': '#f5f5f7',
+            'primary-fixed': '#f5f5f7',
+            surface: '#fbfbfd',
+            'surface-container-low': '#f5f5f7',
+            'surface-container-high': '#e5e5ea',
             'surface-container-lowest': '#ffffff',
-            'on-surface': '#181c1e',
-            'on-surface-variant': '#434751',
-            outline: '#737782',
-            'outline-variant': '#c3c6d2',
-            tertiary: '#002f2c',
+            'on-surface': '#1d1d1f',
+            'on-surface-variant': '#6e6e73',
+            outline: '#86868b',
+            'outline-variant': '#d2d2d7',
+            tertiary: '#1d1d1f',
             'tertiary-fixed': '#72f7ed',
             'tertiary-container': '#004743',
             error: '#ba1a1a',
@@ -58,19 +58,19 @@
   <main class="app-main p-8 max-w-[1440px]">
 
     <!-- Hero Search Section -->
-    <section class="bg-primary rounded-3xl p-12 mb-8">
-      <h2 class="font-headline font-extrabold text-white text-4xl mb-3">용어 사전 및 아키텍처 가이드</h2>
-      <p class="text-primary-fixed text-base mb-8 max-w-2xl">IPCC 전문 용어와 현장 표현의 매핑 정보를 검색하고, 시스템 아키텍처 구성을 학습하세요.</p>
+    <section class="mb-10 pt-4">
+      <h2 class="font-headline font-extrabold text-[#1d1d1f] text-4xl mb-3">용어 사전 및 아키텍처 가이드</h2>
+      <p class="text-[#6e6e73] text-base mb-8 max-w-2xl">IPCC 전문 용어와 현장 표현의 매핑 정보를 검색하고, 시스템 아키텍처 구성을 학습하세요.</p>
       <div class="relative max-w-2xl">
-        <div class="flex items-center bg-white/10 backdrop-blur rounded-2xl border border-white/20 overflow-hidden">
-          <span class="material-symbols-outlined text-white/60 pl-5 pr-2 text-[22px]">search</span>
+        <div class="flex items-center bg-[#f5f5f7] rounded-2xl border border-[#d2d2d7] overflow-hidden">
+          <span class="material-symbols-outlined text-[#86868b] pl-5 pr-2 text-[22px]">search</span>
           <input
             id="heroSearch"
             type="text"
             placeholder="용어, 약어, 현장 표현 검색..."
-            class="flex-1 bg-transparent border-none text-white placeholder-white/50 py-4 px-2 text-sm focus:ring-0 focus:outline-none"
+            class="flex-1 bg-transparent border-none text-[#1d1d1f] placeholder-[#86868b] py-4 px-2 text-sm focus:ring-0 focus:outline-none"
           />
-          <button onclick="applySearch()" class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2.5 rounded-xl text-sm font-semibold m-1.5 transition">검색</button>
+          <button onclick="applySearch()" class="bg-[#1d1d1f] hover:bg-[#424245] text-white px-6 py-2.5 rounded-xl text-sm font-semibold m-1.5 transition">검색</button>
         </div>
       </div>
     </section>
@@ -572,7 +572,7 @@
     // ── Fetch glossary ──
     async function loadGlossary() {
       try {
-        const res = await fetch('/api/glossary');
+        const res = await authFetch('/api/glossary');
         glossaryData = await res.json();
         buildCategoryPills();
         renderCards();

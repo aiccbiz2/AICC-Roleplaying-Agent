@@ -1,6 +1,7 @@
 """퀴즈 풀 사전 생성 스크립트 — CLI에서 실행: python3 generate_quiz_pool.py"""
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 
@@ -12,7 +13,7 @@ PER_COMBO = 5  # 카테고리×난이도 조합당 문제 수
 DIFFICULTIES = ["초급", "중급", "고급"]
 
 
-def main():
+async def main():
     # 기존 풀이 있으면 로드 (이어서 생성 가능)
     if POOL_PATH.exists():
         pool = json.loads(POOL_PATH.read_text(encoding="utf-8"))
@@ -39,7 +40,7 @@ def main():
             print(f"  [GEN] {cat} / {diff} — {needed}문제 생성 중...")
             for i in range(needed):
                 try:
-                    quiz = generate_quiz(category=cat, difficulty=diff)
+                    quiz = await generate_quiz(category=cat, difficulty=diff)
                     pool.append(quiz)
                     total_new += 1
                     print(f"    #{already + i + 1} 완료")
@@ -57,4 +58,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

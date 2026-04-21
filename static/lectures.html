@@ -1,0 +1,3104 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lectures | AI Roleplay Agent</title>
+  <link rel="stylesheet" href="/static/shared.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1d1d1f',
+            secondary: '#6e6e73',
+            'secondary-fixed': '#f5f5f7',
+            surface: '#fbfbfd',
+            'surface-container-low': '#f5f5f7',
+            'on-surface': '#1d1d1f',
+            'on-surface-variant': '#6e6e73',
+            outline: '#86868b',
+            'outline-variant': '#d2d2d7',
+          },
+          fontFamily: {
+            headline: ['Manrope', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Manrope', sans-serif;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    /* ── Card Grid ── */
+    .lecture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .lecture-card {
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .lecture-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .lecture-card__banner {
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+      background: #1d1d1f;
+    }
+
+    .lecture-card__banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .lecture-card__banner--no-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f5f5f7;
+    }
+
+    .lecture-card__banner--no-img .lecture-card__banner-icon {
+      font-size: 56px;
+      color: #d2d2d7;
+    }
+
+    .lecture-card__badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      padding: 4px 12px;
+      border-radius: 980px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #fff;
+    }
+
+    .lecture-card__body {
+      padding: 24px;
+    }
+
+    .lecture-card__title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #1d1d1f;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .lecture-card__desc {
+      font-size: 14px;
+      color: #6e6e73;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .lecture-card__meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      color: #86868b;
+    }
+
+    .lecture-card__meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .lecture-card__meta-item .material-symbols-outlined {
+      font-size: 16px;
+    }
+
+    /* ── Detail View ── */
+    .detail-view {
+      display: none;
+    }
+
+    .detail-view.active {
+      display: block;
+    }
+
+    .list-view.hidden {
+      display: none;
+    }
+
+    .detail-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #0071e3;
+      cursor: pointer;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+
+    .detail-back:hover {
+      color: #0077ed;
+    }
+
+    .detail-back .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    .detail-header {
+      margin-bottom: 40px;
+    }
+
+    .detail-header__badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 980px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .detail-header__title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #1d1d1f;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .detail-header__subtitle {
+      font-size: 16px;
+      color: #6e6e73;
+      line-height: 1.5;
+    }
+
+    /* ── Article Content ── */
+    .article-content {
+      max-width: 800px;
+    }
+
+    .article-content h2 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: #1d1d1f;
+      margin: 48px 0 16px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f5f5f7;
+    }
+
+    .article-content h3 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin: 32px 0 12px 0;
+    }
+
+    .article-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #424245;
+      margin: 24px 0 8px 0;
+    }
+
+    .article-content p {
+      font-size: 15px;
+      color: #424245;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .article-content ul,
+    .article-content ol {
+      margin: 12px 0 20px 0;
+      padding-left: 24px;
+    }
+
+    .article-content li {
+      font-size: 15px;
+      color: #424245;
+      line-height: 1.8;
+      margin-bottom: 6px;
+    }
+
+    .article-content strong {
+      color: #1d1d1f;
+      font-weight: 600;
+    }
+
+    .article-content blockquote {
+      border-left: 3px solid #0071e3;
+      padding: 12px 20px;
+      margin: 20px 0;
+      background: #f5f5f7;
+      border-radius: 0 12px 12px 0;
+      font-size: 15px;
+      color: #424245;
+    }
+
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .article-content thead th {
+      background: #1d1d1f;
+      color: #fff;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .article-content tbody td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #f5f5f7;
+      color: #424245;
+    }
+
+    .article-content tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .article-content tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    .article-content pre {
+      background: #1d1d1f;
+      color: #e5e5ea;
+      padding: 20px 24px;
+      border-radius: 12px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 20px 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .article-content code {
+      background: #f5f5f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #e3004a;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .article-content pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* ── Checklist ── */
+    .checklist {
+      background: #f5f5f7;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin: 32px 0;
+    }
+
+    .checklist h4 {
+      margin-top: 0 !important;
+      margin-bottom: 16px !important;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: #424245;
+    }
+
+    .checklist-item .material-symbols-outlined {
+      font-size: 20px;
+      color: #86868b;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface">
+  <script src="/static/shared.js"></script>
+
+  <main class="main-content">
+    <div class="px-8 py-10" style="max-width:1200px; margin:0 auto; padding-top:80px;">
+
+      <!-- ══ List View ══ -->
+      <div class="list-view" id="listView">
+        <div class="mb-8">
+          <h1 class="font-headline text-3xl font-extrabold text-primary mb-2">Lecture Materials</h1>
+          <p class="text-secondary text-base">IPCC/AICC 실무 교육자료를 확인하세요.</p>
+        </div>
+
+        <div class="lecture-grid" id="lectureGrid">
+          <!-- Cards rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ══ Detail View ══ -->
+      <div class="detail-view" id="detailView">
+        <div class="detail-back" onclick="showList()">
+          <span class="material-symbols-outlined">arrow_back_ios</span>
+          목록으로 돌아가기
+        </div>
+        <div class="detail-header" id="detailHeader"></div>
+        <div class="article-content" id="detailContent"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ── Lecture Data ──
+    const LECTURES = [
+      {
+        id: 'ipcc-1',
+        title: 'IPCC 구축 실무 교육 (1차)',
+        subtitle: '동양생명 구축 사례를 통한 IPCC 핵심 구성요소 이해',
+        desc: 'PBX, CTI, IVR, 녹취 등 IPCC 핵심 구성요소의 역할과 상호 연관성을 실무 관점에서 이해합니다.',
+        badge: '1차 교육',
+        date: '2026.01.07',
+        duration: '약 2시간',
+        instructor: '이진용',
+        image: '/static/lecture1.jpg',
+        icon: 'dns',
+        color: '#0071e3',
+        sections: 7,
+      },
+      {
+        id: 'ipcc-2',
+        title: 'IPCC 심화 교육 (2차)',
+        subtitle: 'PDS, 옴니채널, SBC, 벤더 현황 및 견적 구성',
+        desc: 'PDS 아웃바운드, 옴니채널 전략, SBC/미디어 게이트웨이, 원벤더 트렌드, 견적 구성까지 심화 학습합니다.',
+        badge: '2차 교육',
+        date: '2026.01.12',
+        duration: '약 2시간',
+        instructor: '이진용',
+        image: '/static/lecture2.webp',
+        icon: 'hub',
+        color: '#5856d6',
+        sections: 11,
+      },
+      {
+        id: 'ipcc-seminar',
+        title: 'IPCC 팀 세미나 핵심 정리',
+        subtitle: '콜센터 발전사, 벤더 현황, 핵심 트렌드 총정리',
+        desc: '콜센터 발전 역사부터 어플라이언스 vs 범용 장비, 가상화, 벤더별 현황, 원벤더 트렌드까지 한눈에 정리합니다.',
+        badge: '세미나',
+        date: '2026.01.07',
+        duration: '약 1.5시간',
+        instructor: '이진용',
+        image: '/static/lecture3.webp',
+        icon: 'school',
+        color: '#ff9500',
+        sections: 9,
+      },
+      {
+        id: 'exaone',
+        title: 'LG EXAONE 솔루션 소개',
+        subtitle: 'LG AI연구원 × LGU+ 독점 협력 — 한국어 특화 엔터프라이즈 AI',
+        desc: 'LG EXAONE 모델의 기술적 강점, B2B 사업화 전략, 그리고 AICC 적용 방안을 이해합니다.',
+        badge: 'AI 솔루션',
+        date: '2026.02',
+        duration: '약 1시간',
+        instructor: '양준모',
+        image: '/static/exaone.jpg',
+        icon: 'psychology',
+        color: '#34c759',
+        sections: 7,
+      },
+      {
+        id: 'advisor',
+        title: 'LG U+ 상담 어드바이저 솔루션',
+        subtitle: '4,500명 고객센터 20년 운영 경험 기반 실전형 AICC',
+        desc: 'AI 콜봇, 실시간 STT 지식추천, 상담 후처리 자동화, 오토QA 등 LGU+ AICC 솔루션 전체를 학습합니다.',
+        badge: 'AICC 솔루션',
+        date: '2026.02',
+        duration: '약 1.5시간',
+        instructor: '양준모',
+        image: '/static/advisor.jpg',
+        icon: 'smart_toy',
+        color: '#e8344b',
+        sections: 7,
+      },
+
+    ];
+
+    // ── Render Cards ──
+    function renderCards() {
+      const grid = document.getElementById('lectureGrid');
+      grid.innerHTML = LECTURES.map(l => `
+    <div class="lecture-card" onclick="showDetail('${l.id}')">
+      <div class="lecture-card__banner ${l.image ? '' : 'lecture-card__banner--no-img'}">
+        ${l.image
+          ? `<img src="${l.image}" alt="${l.title}" />`
+          : `<span class="material-symbols-outlined lecture-card__banner-icon">${l.icon}</span>`
+        }
+        <span class="lecture-card__badge">${l.badge}</span>
+      </div>
+      <div class="lecture-card__body">
+        <div class="lecture-card__title">${l.title}</div>
+        <div class="lecture-card__desc">${l.desc}</div>
+        <div class="lecture-card__meta">
+          <span class="lecture-card__meta-item">
+            <span class="material-symbols-outlined">calendar_today</span> ${l.date}
+          </span>
+          <span class="lecture-card__meta-item">
+            <span class="material-symbols-outlined">schedule</span> ${l.duration}
+          </span>
+          <span class="lecture-card__meta-item">
+            <span class="material-symbols-outlined">person</span> ${l.instructor}
+          </span>
+          <span class="lecture-card__meta-item">
+            <span class="material-symbols-outlined">article</span> ${l.sections}개 섹션
+          </span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+    }
+
+    // ── Detail Content ──
+    const LECTURE_CONTENT = {};
+
+    LECTURE_CONTENT['ipcc-1'] = `
+<style>
+  .ex-apple { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1d1d1f; }
+  .ex-apple .ex-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 16px; }
+  .ex-apple .ex-h-hero { font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; color: #1d1d1f; margin: 0 0 20px; }
+  .ex-apple .ex-h-section { font-size: clamp(28px, 3.6vw, 44px); font-weight: 700; line-height: 1.1; letter-spacing: -0.022em; margin: 0 0 20px; }
+  .ex-apple .ex-h-sub { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; margin: 32px 0 12px; color: #1d1d1f; }
+  .ex-apple .ex-h-card { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.012em; margin: 0 0 10px; }
+  .ex-apple .ex-lead { font-size: clamp(18px, 1.6vw, 22px); font-weight: 400; line-height: 1.45; color: #6e6e73; margin: 0 0 28px; letter-spacing: -0.005em; }
+  .ex-apple .ex-body { font-size: 17px; line-height: 1.7; color: #1d1d1f; margin: 0 0 18px; max-width: 720px; letter-spacing: -0.003em; }
+  .ex-apple .ex-body--muted { color: #6e6e73; }
+  .ex-apple .ex-caption { font-size: 14px; line-height: 1.55; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section { padding: clamp(48px, 7vw, 88px) clamp(24px, 4vw, 48px); border-radius: 22px; margin: 16px 0; }
+  .ex-apple .ex-section--light { background: #f5f5f7; }
+  .ex-apple .ex-section--white { background: #fff; }
+  .ex-apple .ex-section--dark { background: #000; color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-h-section,
+  .ex-apple .ex-section--dark .ex-h-card,
+  .ex-apple .ex-section--dark .ex-h-sub,
+  .ex-apple .ex-section--dark .ex-h-hero { color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-lead { color: #a1a1a6; }
+  .ex-apple .ex-section--dark .ex-body { color: #d2d2d7; }
+  .ex-apple .ex-section--dark .ex-caption { color: #86868b; }
+  .ex-apple .ex-section--dark .ex-eyebrow { color: #86868b; }
+  .ex-apple .ex-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ex-apple .ex-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .ex-apple .ex-card { background: #fff; border-radius: 18px; padding: 28px; }
+  .ex-apple .ex-section--dark .ex-card { background: #1d1d1f; }
+  .ex-apple .ex-section--white .ex-card { background: #f5f5f7; }
+  .ex-apple .ex-num { font-size: clamp(48px, 6vw, 80px); font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #1d1d1f; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-num { color: #f5f5f7; }
+  .ex-apple .ex-divider { height: 1px; background: #d2d2d7; border: none; margin: 32px 0; }
+  .ex-apple .ex-section--dark .ex-divider { background: #424245; }
+
+  /* Blog-style elements */
+  .ex-apple .ex-pullquote { font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; line-height: 1.35; letter-spacing: -0.018em; color: #1d1d1f; margin: 40px 0; padding: 0 0 0 24px; border-left: 3px solid #1d1d1f; max-width: 720px; }
+  .ex-apple .ex-section--dark .ex-pullquote { color: #f5f5f7; border-left-color: #f5f5f7; }
+  .ex-apple .ex-callout { background: #fff; border-radius: 16px; padding: 24px 28px; margin: 28px 0; max-width: 720px; }
+  .ex-apple .ex-section--white .ex-callout { background: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-callout { background: #1d1d1f; }
+  .ex-apple .ex-callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: #6e6e73; text-transform: uppercase; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-callout__label { color: #86868b; }
+  .ex-apple .ex-callout__text { font-size: 16px; line-height: 1.6; color: #1d1d1f; margin: 0; }
+  .ex-apple .ex-section--dark .ex-callout__text { color: #f5f5f7; }
+  .ex-apple .ex-list { list-style: none; padding: 0; margin: 24px 0; max-width: 720px; }
+  .ex-apple .ex-list li { padding: 16px 0; border-bottom: 1px solid #d2d2d7; font-size: 16px; line-height: 1.55; color: #1d1d1f; }
+  .ex-apple .ex-list li:last-child { border-bottom: none; }
+  .ex-apple .ex-section--dark .ex-list li { color: #d2d2d7; border-bottom-color: #424245; }
+
+  /* Table */
+  .ex-apple table.ex-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+  .ex-apple table.ex-table thead th { text-align: left; padding: 16px 12px; color: #6e6e73; font-weight: 500; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; border-bottom: 1px solid #d2d2d7; }
+  .ex-apple table.ex-table tbody td { padding: 20px 12px; border-bottom: 1px solid #e8e8ed; vertical-align: top; color: #1d1d1f; }
+  .ex-apple table.ex-table tbody tr:last-child td { border-bottom: none; }
+  .ex-apple table.ex-table .ex-tag { display: inline-block; padding: 3px 10px; border-radius: 980px; background: #f5f5f7; color: #6e6e73; font-size: 12px; font-weight: 500; }
+  .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
+
+  /* Pipeline */
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+
+  /* Q&A */
+  .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
+  .ex-apple .ex-qa:first-of-type { border-top: 1px solid #d2d2d7; }
+  .ex-apple .ex-qa__q { font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.012em; color: #1d1d1f; margin: 0 0 10px; }
+  .ex-apple .ex-qa__a { font-size: 16px; line-height: 1.65; color: #6e6e73; margin: 0; }
+
+  /* Closing */
+  .ex-apple .ex-quote { font-size: clamp(24px, 3vw, 40px); font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; color: #f5f5f7; margin: 0; }
+  .ex-apple .ex-strong { color: #1d1d1f; font-weight: 600; }
+  .ex-apple .ex-section--dark .ex-strong { color: #fff; }
+
+  /* Flow chain (mono replacement for IPCC pipeline) */
+  .ex-apple .ex-chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; margin: 28px 0; }
+  .ex-apple .ex-chain__node { background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; padding: 14px 18px; font-size: 14px; font-weight: 500; color: #1d1d1f; min-width: 110px; text-align: center; line-height: 1.35; }
+  .ex-apple .ex-chain__node--dark { background: #1d1d1f; color: #f5f5f7; border-color: #1d1d1f; }
+  .ex-apple .ex-section--dark .ex-chain__node { background: #1d1d1f; color: #f5f5f7; border-color: #424245; }
+  .ex-apple .ex-section--dark .ex-chain__node--dark { background: #f5f5f7; color: #1d1d1f; border-color: #f5f5f7; }
+  .ex-apple .ex-chain__arrow { display: flex; align-items: center; color: #86868b; font-size: 20px; font-weight: 300; }
+
+  /* Numbered step list */
+  .ex-apple .ex-steplist { display: grid; gap: 14px; margin: 24px 0; max-width: 760px; }
+  .ex-apple .ex-steplist__item { display: grid; grid-template-columns: 56px 1fr; gap: 18px; align-items: start; padding: 20px 0; border-bottom: 1px solid #d2d2d7; }
+  .ex-apple .ex-steplist__item:last-child { border-bottom: none; }
+  .ex-apple .ex-steplist__num { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; line-height: 1; }
+  .ex-apple .ex-section--dark .ex-steplist__num { color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-steplist__item { border-bottom-color: #424245; }
+  .ex-apple .ex-steplist__title { font-size: 17px; font-weight: 600; color: #1d1d1f; margin: 0 0 6px; }
+  .ex-apple .ex-section--dark .ex-steplist__title { color: #f5f5f7; }
+  .ex-apple .ex-steplist__desc { font-size: 15px; line-height: 1.6; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section--dark .ex-steplist__desc { color: #a1a1a6; }
+
+  @media (max-width: 768px) {
+    .ex-apple .ex-grid-3, .ex-apple .ex-grid-2 { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline__arrow { transform: rotate(90deg); padding: 8px 0; }
+    .ex-apple .ex-chain__arrow { transform: rotate(90deg); width: 100%; justify-content: center; }
+  }
+</style>
+
+<div class="ex-apple">
+
+  <!-- HERO -->
+  <section class="ex-section ex-section--light" style="padding-top: clamp(72px, 10vw, 140px); padding-bottom: clamp(56px, 7vw, 96px); text-align: left;">
+    <p class="ex-eyebrow">IPCC 구축 실무 · 1차</p>
+    <h2 class="ex-h-hero">IPCC.</h2>
+    <p class="ex-lead" style="max-width: 620px;">전화 한 통이 걸려오는 그 순간,<br/>수많은 장비와 소프트웨어가 어떻게 맞물리는가.<br/>동양생명 구축 사례로 풀어보는 차세대 컨택센터의 해부학.</p>
+    <p class="ex-caption" style="margin-top: 32px;">읽는 시간 · 약 12분</p>
+  </section>
+
+  <!-- SECTION 0: 들어가며 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">들어가며</p>
+    <h3 class="ex-h-section">콜센터에 전화를 걸어본 적 있다면, 이미 IPCC를 경험한 것입니다.</h3>
+
+    <p class="ex-body">"안녕하세요. 1번을 누르시면 대출 상담, 2번을 누르시면 보험 상담입니다." 누구나 한 번쯤 들어본 멘트입니다. 별거 아닌 것처럼 들리지만, 이 짧은 안내음 뒤에서는 <span class="ex-strong">통신사 회선, 게이트웨이, 교환기, 자동응답 시스템, 미들웨어, 그리고 상담원 PC</span>까지 수많은 구성요소가 1초도 안 되는 순간에 함께 움직입니다.</p>
+
+    <p class="ex-body">우리가 흔히 "콜센터"라고 부르는 그 시스템의 정식 이름은 <span class="ex-strong">IPCC(Internet Protocol Contact Center)</span>입니다. IP 네트워크 위에서 전화와 고객 데이터를 함께 처리하는 차세대 컨택센터죠. 이 강의는 그 안을 차근차근 열어 봅니다.</p>
+
+    <p class="ex-pullquote">"이번 강의의 목표는 단 하나 — IPCC라는 블랙박스를 열어, 안에서 무슨 일이 일어나는지 직접 보는 것."</p>
+
+    <p class="ex-body ex-body--muted">실무 사례는 동양생명 구축 프로젝트를 기준으로 합니다. 추상적인 개념 설명에 그치지 않고, "동양생명에서는 E1을 몇 회선 깔았고, 왜 그렇게 설계했는가"까지 따라가 봅니다. 영업·기획·개발 어느 포지션에서 일하든, 이 강의를 마치면 IPCC 제안서나 견적서를 펼쳤을 때 어떤 항목이 왜 들어가 있는지 한눈에 보일 것입니다.</p>
+  </section>
+
+  <!-- SECTION 1: IPCC 개요 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 1 · 개요</p>
+    <h3 class="ex-h-section">IP 위에서 음성과 데이터가 한 몸으로 움직입니다.</h3>
+
+    <p class="ex-body">IPCC를 한 줄로 정의하면 이렇습니다. <span class="ex-strong">인터넷 프로토콜(IP) 기반으로 전화·채팅·이메일 등 모든 고객 접점을 통합 관리하는 시스템.</span> 풀어 쓰면, 과거 교환기로 대표되는 아날로그 콜센터와 달리, 음성 통화와 고객 데이터를 같은 네트워크에서 함께 처리한다는 뜻입니다.</p>
+
+    <p class="ex-body">왜 이게 중요할까요? 기존 콜센터는 "전화선"과 "고객 정보 시스템"이 완전히 따로 놀았습니다. 상담원은 전화를 받자마자 "고객님 성함이 어떻게 되시죠? 주민번호 뒷자리는요?"부터 묻고 시작해야 했죠. IPCC가 바뀐 점은 단순합니다. <span class="ex-strong">전화가 연결되는 그 순간, 누가 거는지, 어떤 계약이 있는지, 지난번 민원이 무엇이었는지를 상담원 화면에 자동으로 띄워 줍니다.</span></p>
+
+    <h4 class="ex-h-sub">기존 콜센터(TDM) vs IPCC, 무엇이 달라졌나</h4>
+    <div class="ex-grid-2" style="margin-top: 24px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">기존 · TDM</p>
+        <h4 class="ex-h-card">전화선과 데이터가 분리된 세계</h4>
+        <ul class="ex-list" style="margin-top: 12px;">
+          <li>아날로그·디지털 전용 회선 사용</li>
+          <li>전화와 데이터가 완전히 분리</li>
+          <li>고객 정보를 상담원이 직접 묻고 입력</li>
+          <li>확장·변경 시 물리적 공사 필수</li>
+        </ul>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">차세대 · IPCC</p>
+        <h4 class="ex-h-card">하나의 IP 망에서 전부 처리</h4>
+        <ul class="ex-list" style="margin-top: 12px;">
+          <li>IP 네트워크로 음성·데이터 통합</li>
+          <li>전화 연결과 동시에 고객 정보 팝업</li>
+          <li>지능형 라우팅으로 최적 상담원 연결</li>
+          <li>소프트웨어 설정만으로 유연하게 확장</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">한 문장으로</p>
+      <p class="ex-callout__text">IPCC의 본질은 <span class="ex-strong">"전화"와 "데이터"의 동시 처리</span>입니다. 전화벨이 울리는 그 순간, 상담원 모니터에 고객의 계좌·보험·민원 이력이 함께 뜨는 것 — 그게 핵심입니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 2: IPT vs IPCC -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 2 · 핵심 개념</p>
+    <h3 class="ex-h-section">IP 전화라고 다 IPCC가 아닙니다.</h3>
+
+    <p class="ex-body">현장에서 가장 자주 보는 혼동이 있습니다. "우리 회사는 인터넷 전화 깔았으니까 IPCC 하는 거 아닌가요?" 결론부터 말씀드리면, <span class="ex-strong">아닙니다.</span> 인터넷으로 음성을 주고받는 것과, 그 음성을 고객 데이터와 연결해 지능적으로 처리하는 것은 완전히 다른 차원의 이야기입니다.</p>
+
+    <p class="ex-body">이 차이를 가르는 두 약어가 <span class="ex-strong">IPT(IP Telephony)</span>와 <span class="ex-strong">IPCC(IP Contact Center)</span>입니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">IPT · Internet Protocol Telephony</p>
+        <h4 class="ex-h-card">"IP 기반 전화기" — 그 이상도 이하도 아님</h4>
+        <p class="ex-caption" style="margin-top: 12px;">카카오톡 음성통화를 떠올리면 정확합니다. IP 망을 통해 음성을 전달할 뿐, 고객 정보 연동이나 지능형 라우팅은 없습니다.</p>
+        <ul class="ex-list" style="margin-top: 12px;">
+          <li>음성 통화만 처리</li>
+          <li>고객 정보 시스템과 미연동</li>
+          <li>단순 착발신만 가능</li>
+        </ul>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">IPCC · Internet Protocol Contact Center</p>
+        <h4 class="ex-h-card">"IP 기반 전화기 + 두뇌"</h4>
+        <p class="ex-caption" style="margin-top: 12px;">IPT 위에 CTI 미들웨어를 얹어 고객 정보와 통화를 실시간으로 연동합니다. "이 전화는 VIP 고객이니 전담 상담원에게" 같은 지능이 생깁니다.</p>
+        <ul class="ex-list" style="margin-top: 12px;">
+          <li>고객 정보 실시간 조회·팝업</li>
+          <li>스킬 기반 자동 라우팅</li>
+          <li>IVR·녹취·통계 완전 통합</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="ex-pullquote">"IPCC = IPT + CTI 미들웨어. CTI가 없으면 IPCC가 아니다."</p>
+
+    <p class="ex-body ex-body--muted">이 한 문장이 강의 전체를 관통하는 핵심입니다. 뒤에서 CTI를 다룰 때 다시 한 번 등장합니다. 일단 머릿속에 새겨 두세요.</p>
+  </section>
+
+  <!-- SECTION 3: 전체 아키텍처 흐름 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 3 · 전체 아키텍처</p>
+    <h3 class="ex-h-section">전화 한 통이 거치는 여덟 개의 정거장.</h3>
+    <p class="ex-lead" style="max-width: 720px;">고객이 1588 번호를 누르고 상담원과 인사를 나누기까지 — 그 짧은 순간 전화는 여덟 개의 시스템을 통과합니다. 한번 천천히 따라가 봅니다.</p>
+
+    <div class="ex-chain" style="margin-top: 48px;">
+      <div class="ex-chain__node">고객 발신</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">PSTN<br/>(통신사)</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">E1/PRI<br/>회선</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">보이스<br/>게이트웨이</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">IP-PBX<br/>(교환기)</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">IVR<br/>(자동응답)</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">CTI<br/>(미들웨어)</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node ex-chain__node--dark">상담원<br/>연결</div>
+    </div>
+
+    <p class="ex-body">길게 보이지만, 실제로는 1초 안에 일어나는 일입니다. 각 정거장이 무엇을 하는지를 안다는 것은 곧 IPCC라는 시스템 전체를 이해한다는 뜻입니다. 이 강의의 4~9장은 정확히 이 정거장들을 하나씩 분해해 봅니다.</p>
+
+    <hr class="ex-divider"/>
+
+    <h4 class="ex-h-sub">전체 흐름은 세 개의 큰 구간으로 나뉩니다</h4>
+
+    <div class="ex-grid-3" style="margin-top: 24px;">
+      <div class="ex-card">
+        <p class="ex-step__num">Zone 01</p>
+        <h4 class="ex-h-card">E1/PRI 구간</h4>
+        <p class="ex-caption" style="margin-top: 12px;">통신사에서 기업 내부로 들어오는 물리적 회선. 여기까지는 여전히 TDM(아날로그) 신호가 흐릅니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-step__num">Zone 02</p>
+        <h4 class="ex-h-card">게이트웨이 구간</h4>
+        <p class="ex-caption" style="margin-top: 12px;">TDM 신호가 IP 패킷으로 변환되는 경계선. 이 다음부터는 모든 것이 IP 네트워크 위에서 움직입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-step__num">Zone 03</p>
+        <h4 class="ex-h-card">CTI 구간</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화 이벤트와 고객 데이터를 결합하는 두뇌. IPCC의 진짜 가치가 만들어지는 곳입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: E1/PRI + 게이트웨이 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 4 · 핵심 인프라</p>
+    <h3 class="ex-h-section">E1 한 회선이면, 30명이 동시에 통화합니다.</h3>
+
+    <p class="ex-body">IPCC 인프라 견적을 처음 보는 분이 가장 먼저 만나는 숫자가 <span class="ex-strong">"E1 몇 회선"</span>입니다. 이 숫자가 무엇을 의미하는지 알면, 그 컨택센터가 얼마나 큰 규모인지를 한눈에 가늠할 수 있습니다.</p>
+
+    <h4 class="ex-h-sub">E1/PRI · 통신사가 깔아주는 디지털 회선</h4>
+    <p class="ex-body">E1/PRI는 유럽 표준 디지털 전송 방식입니다. KT, SKT 같은 통신사에서 기업 교환기까지 연결되는 물리적 회선이라고 보면 됩니다. 이 회선의 스펙은 정해져 있습니다.</p>
+
+    <ul class="ex-list">
+      <li><span class="ex-strong">전송 속도</span> — 2.048 Mbps</li>
+      <li><span class="ex-strong">총 채널</span> — 32개 (이 중 2개는 시그널링용으로 예약)</li>
+      <li><span class="ex-strong">실사용 채널</span> — 30개</li>
+      <li><span class="ex-strong">의미</span> — E1 1회선 = 30명이 동시에 통화 가능</li>
+    </ul>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">동양생명 사례</p>
+      <p class="ex-callout__text">동양생명은 <span class="ex-strong">E1 20회선</span>을 도입했습니다. 단순 곱셈으로 20 &times; 30 = <span class="ex-strong">600채널</span>. 즉, 최대 600통의 전화를 동시에 받을 수 있는 규모입니다. "이 회사 콜센터는 한 번에 몇 통화까지 견디는가?"라는 질문은 곧 "E1을 몇 회선 깔았는가?"라는 질문과 같습니다.</p>
+    </div>
+
+    <h4 class="ex-h-sub">보이스 게이트웨이 · TDM과 IP 사이의 통역사</h4>
+    <p class="ex-body">통신사에서 들어온 신호는 여전히 <span class="ex-strong">TDM(시분할 다중화) 형식의 아날로그 디지털 신호</span>입니다. 이걸 IP 네트워크가 이해할 수 있는 IP 패킷으로 바꿔 주는 장비가 보이스 게이트웨이입니다.</p>
+
+    <div class="ex-chain" style="margin: 24px 0;">
+      <div class="ex-chain__node">TDM 신호</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node ex-chain__node--dark">보이스<br/>게이트웨이</div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">IP 패킷</div>
+    </div>
+
+    <p class="ex-body">이 장비가 없으면 IP 네트워크에서 음성을 처리할 방법이 없습니다. 대표 벤더는 <span class="ex-strong">시스코 ASR</span>과 <span class="ex-strong">Audiocodes</span>입니다. 견적서에 이 두 이름이 자주 보이는 이유입니다.</p>
+  </section>
+
+  <!-- SECTION 5: PBX -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 5 · 교환기</p>
+    <h3 class="ex-h-section">PBX는 컨택센터의 교통경찰입니다.</h3>
+
+    <p class="ex-body">PBX(Private Branch Exchange)는 한마디로 <span class="ex-strong">기업 내 전화 교환을 담당하는 장비</span>입니다. 옛날 영화에서 교환수가 코드를 꽂아 전화를 연결하던 모습을 떠올리면 비슷합니다. 그 역할을 자동화한 것이 PBX, 그리고 그것을 IP 기반 소프트웨어로 만든 것이 IPCC에서 쓰는 <span class="ex-strong">IP-PBX</span>입니다.</p>
+
+    <p class="ex-body">PBX가 어렵게 느껴지는 이유는 다섯 가지 번호 개념을 한꺼번에 다뤄야 하기 때문입니다. 하나씩 분리해서 보면 어렵지 않습니다.</p>
+
+    <h4 class="ex-h-sub">PBX가 다루는 다섯 가지 번호 체계</h4>
+
+    <div class="ex-grid-3" style="margin-top: 24px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01 · 대표번호</p>
+        <h4 class="ex-h-card">고객이 걸어오는 번호</h4>
+        <p class="ex-caption" style="margin-top: 12px;">1588-XXXX 같은 번호. 외부에 노출되는 단 하나의 입구입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02 · 회선번호</p>
+        <h4 class="ex-h-card">E1 채널에 붙은 식별자</h4>
+        <p class="ex-caption" style="margin-top: 12px;">물리적 연결을 구분하기 위해 각 채널에 부여된 번호입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03 · 내선번호</p>
+        <h4 class="ex-h-card">상담원 개인 번호</h4>
+        <p class="ex-caption" style="margin-top: 12px;">3001, 3002 같은 번호. 누구에게 전화가 가야 할지를 결정합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">04 · IVR 포트</p>
+        <h4 class="ex-h-card">자동응답이 점유하는 채널</h4>
+        <p class="ex-caption" style="margin-top: 12px;">"1번 누르세요" 안내가 흐르는 동안 점유되는 가상 채널입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">05 · 스킬 그룹</p>
+        <h4 class="ex-h-card">동일 업무 상담원 묶음</h4>
+        <p class="ex-caption" style="margin-top: 12px;">대출팀·보험팀처럼 같은 업무를 하는 상담원을 묶은 논리적 단위입니다.</p>
+      </div>
+      <div class="ex-card" style="background: #1d1d1f; color: #f5f5f7;">
+        <p class="ex-eyebrow" style="color: #86868b;">PBX의 역할</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">이 모든 번호의 교통 정리</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">대표번호로 들어온 전화를, 회선·IVR 포트·스킬 그룹·내선을 거쳐 올바른 자리로 보내줍니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub">동양생명 사례로 한 줄에 꿰어 보기</h4>
+    <p class="ex-body">"고객이 1588 번호를 누르면 무슨 일이 일어나는지" 동양생명 환경에 맞춰 한 줄로 그려 봅니다. 5개의 번호 개념이 어떻게 차례로 호출되는지 보입니다.</p>
+
+    <div class="ex-chain" style="margin: 24px 0;">
+      <div class="ex-chain__node">1588-XXXX<br/><span style="font-weight:400; font-size:12px; color:#6e6e73;">대표번호</span></div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">E1 회선<br/><span style="font-weight:400; font-size:12px; color:#6e6e73;">600채널 수신</span></div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">IVR 포트<br/><span style="font-weight:400; font-size:12px; color:#6e6e73;">자동응답 처리</span></div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node">스킬 그룹<br/><span style="font-weight:400; font-size:12px; color:#6e6e73;">대출/보험팀</span></div>
+      <div class="ex-chain__arrow">&rarr;</div>
+      <div class="ex-chain__node ex-chain__node--dark">내선 3001<br/><span style="font-weight:400; font-size:12px; color:#a1a1a6;">상담원 연결</span></div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: CTI (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 6 · 미들웨어</p>
+    <h3 class="ex-h-section">CTI가 없으면, IPCC가 아닙니다.</h3>
+    <p class="ex-lead" style="max-width: 720px;">앞에서도 한 번 짚었지만, 다시 강조합니다. <span style="color:#fff; font-weight:600;">전화 시스템과 컴퓨터 시스템을 연결하는 미들웨어 — 그것이 CTI입니다.</span> 이 한 덩어리가 빠지면, 아무리 비싼 IP 전화기를 들여도 그저 IPT일 뿐입니다.</p>
+
+    <p class="ex-pullquote" style="margin-top: 56px;">"CTI가 없으면 IPCC가 아니다."<br/>&mdash; 이 강의에서 가장 중요한 한 문장.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">CTI가 실제로 하는 여섯 가지 일</h4>
+    <p class="ex-body">CTI는 추상적인 개념이 아닙니다. 매우 구체적인 여섯 가지 일을 합니다. 견적서나 PRD에서 "CTI 라이센스" 항목이 보이면, 사실은 이 여섯 가지를 모두 사고 있는 것입니다.</p>
+
+    <div class="ex-steplist">
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">01</div>
+        <div>
+          <p class="ex-steplist__title">레지스터(Register)</p>
+          <p class="ex-steplist__desc">상담원이 로그인하면 CTI에 자신의 상태를 등록합니다. "나는 지금 내선 3001번, 대출팀, 상담 가능 상태"라고 선언하는 것입니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">02</div>
+        <div>
+          <p class="ex-steplist__title">이벤트 감시</p>
+          <p class="ex-steplist__desc">PBX에서 발생하는 모든 전화 이벤트(착신·연결·종료·대기)를 실시간으로 감지합니다. 이벤트가 곧 CTI의 입력 신호입니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">03</div>
+        <div>
+          <p class="ex-steplist__title">데이터 생성</p>
+          <p class="ex-steplist__desc">전화 이벤트에 고객 정보(계좌·이름·민원 이력)를 매핑해 의미 있는 데이터를 만들어냅니다. 단순 전화 이벤트가 "고객 컨텍스트"로 바뀌는 순간입니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">04</div>
+        <div>
+          <p class="ex-steplist__title">로그 관리</p>
+          <p class="ex-steplist__desc">모든 통화 이벤트를 시간순으로 기록합니다. 분쟁이나 감사가 발생했을 때 가장 먼저 꺼내 보는 자료가 이 로그입니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">05</div>
+        <div>
+          <p class="ex-steplist__title">통계 생성</p>
+          <p class="ex-steplist__desc">인입량·응답률·대기시간·통화시간 같은 KPI 지표를 실시간 또는 일별로 집계합니다. 컨택센터 매니저가 매일 보는 그 대시보드의 데이터 소스입니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">06</div>
+        <div>
+          <p class="ex-steplist__title">라우팅 지시</p>
+          <p class="ex-steplist__desc">IVR이 수집한 고객 정보를 분석해 PBX에게 명령합니다. "이 고객은 VIP니 3번 스킬 그룹으로 연결하라" 같은 의사결정이 여기서 일어납니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="ex-divider" style="margin-top: 48px;"/>
+
+    <h4 class="ex-h-sub">현장에서 자주 헷갈리는 두 단어 · Register vs Connection</h4>
+    <p class="ex-body">CTI를 처음 배우는 분이 거의 100% 헷갈리는 것이 <span style="color:#fff; font-weight:600;">레지스터(Register)</span>와 <span style="color:#fff; font-weight:600;">커넥션(Connection)</span>의 차이입니다. 한 번에 정리합니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 24px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">Register</p>
+        <h4 class="ex-h-card">"등록" — 출근 도장</h4>
+        <p class="ex-caption" style="margin-top: 12px;">상담원이 업무 시작 전에 CTI에 자신의 상태를 선언하는 행위. 로그인 후 "나는 준비됨" 상태. 전화가 오기 전에 이루어집니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">Connection</p>
+        <h4 class="ex-h-card">"연결" — 실제 통화 중</h4>
+        <p class="ex-caption" style="margin-top: 12px;">실제 전화가 들어와서 상담원과 고객이 실시간으로 대화 중인 상태. PBX와 CTI가 함께 관리합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: IVR -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 7 · 자동응답</p>
+    <h3 class="ex-h-section">ARS와 IVR은 닮았지만, 같지 않습니다.</h3>
+
+    <p class="ex-body">둘 다 "자동응답"이라고 뭉뚱그려 부르지만, 실무에서 두 단어는 엄연히 다른 의미로 쓰입니다. 이 차이를 모르면 제안서에서 어색한 표현이 나옵니다. 간단히 구분하면 이렇습니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">ARS · 자동응답</p>
+        <h4 class="ex-h-card">일방향 음성 안내</h4>
+        <p class="ex-caption" style="margin-top: 12px;">고객은 듣기만 합니다. 상호작용 없이 미리 녹음된 멘트를 그대로 재생하는 방식입니다.</p>
+        <p class="ex-caption" style="margin-top: 12px; font-style: italic; color: #1d1d1f;">"영업시간은 오전 9시부터 오후 6시까지입니다. 감사합니다."</p>
+        <p class="ex-caption" style="margin-top: 8px;">&rarr; 고객 입력 없음, 단순 안내만</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">IVR · 대화형 응답</p>
+        <h4 class="ex-h-card">양방향 인터랙티브</h4>
+        <p class="ex-caption" style="margin-top: 12px;">고객이 번호를 누르거나 말하면, 시스템이 반응하여 다음 단계로 분기합니다.</p>
+        <p class="ex-caption" style="margin-top: 12px; font-style: italic; color: #1d1d1f;">"대출 상담은 1번, 보험 상담은 2번을 누르세요." &rarr; 1번 &rarr; 대출팀 분기</p>
+        <p class="ex-caption" style="margin-top: 8px;">&rarr; 고객 입력을 받아 시나리오 분기</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub">IVR이 실제로 하는 세 가지</h4>
+    <p class="ex-body">IVR이라는 시스템을 뜯어 보면 결국 세 가지 동작으로 요약됩니다. 멘트를 들려주고, 고객 반응을 받아서 분기하고, 필요하면 뒤쪽 업무 시스템에서 데이터를 끌어오는 것. 이 세 가지가 자유롭게 조합되면서 복잡한 ARS 메뉴가 만들어집니다.</p>
+
+    <div class="ex-steplist">
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">01</div>
+        <div>
+          <p class="ex-steplist__title">멘트 플레이</p>
+          <p class="ex-steplist__desc">녹음된 음성 안내를 재생합니다. "대기자가 3명입니다. 잠시만 기다려 주세요." 같은 안내가 여기서 흘러나옵니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">02</div>
+        <div>
+          <p class="ex-steplist__title">시나리오 분기</p>
+          <p class="ex-steplist__desc">고객 입력(DTMF 버튼 또는 음성)에 따라 다음 메뉴로 이동합니다. 복잡한 트리 구조로 설계할 수 있고, 이 시나리오 설계가 곧 상담 경험의 90%를 좌우합니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">03</div>
+        <div>
+          <p class="ex-steplist__title">기관계 연동</p>
+          <p class="ex-steplist__desc">EAI/MCI 같은 미들웨어를 통해 핵심 업무 시스템을 조회합니다. ARS에서 "잔액 조회"가 가능한 이유가 바로 이것입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub">IVR ↔ 기관계 연동 구조</h4>
+    <p class="ex-body">IVR이 고객 계약 정보를 조회하려면, 회사 내부의 핵심 업무 시스템(흔히 "기관계"라고 부릅니다)에 접근해야 합니다. 이 사이를 직접 연결하지 않고 <span class="ex-strong">EAI/MCI 미들웨어</span>를 경유하는 것이 일반적입니다. 각자 다른 시스템과 개별 인터페이스를 만드는 대신, 한 곳의 미들웨어를 표준으로 두는 것이죠.</p>
+
+    <div class="ex-chain" style="margin: 24px 0;">
+      <div class="ex-chain__node">IVR</div>
+      <div class="ex-chain__arrow">&harr;</div>
+      <div class="ex-chain__node ex-chain__node--dark">EAI/MCI<br/><span style="font-weight:400; font-size:12px; color:#a1a1a6;">(미들웨어)</span></div>
+      <div class="ex-chain__arrow">&harr;</div>
+      <div class="ex-chain__node">핵심계정계 · 보험계약계 · CRM</div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: 상담원 환경 & 녹취 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 8 · 상담원 환경 &amp; 녹취</p>
+    <h3 class="ex-h-section">상담원의 책상 위에는 더 이상 전화기가 없습니다.</h3>
+
+    <p class="ex-body">옛날 콜센터 사진을 보면 상담원 책상마다 시커먼 전화기가 한 대씩 놓여 있었습니다. 요즘은 다릅니다. 책상 위에는 PC와 헤드셋만 있고, 그 PC 안에 전화기가 들어 있습니다. 이 변화의 이름이 <span class="ex-strong">Softphone</span>입니다. 그리고 그 옆에서 모든 통화를 자동으로 녹음하는 또 다른 시스템이 함께 돌아가고 있습니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">상담원 업무 환경</p>
+        <h4 class="ex-h-card">PC + 헤드셋이 곧 전화기</h4>
+        <p class="ex-caption" style="margin-top: 12px;"><span class="ex-strong" style="color:#1d1d1f;">Softphone</span> &mdash; 물리적 전화기 없이 PC로 통화합니다. 헤드셋과 소프트웨어가 그 자리를 대신하면서, 설치와 유지보수 비용이 크게 줄었습니다.</p>
+        <p class="ex-caption" style="margin-top: 16px;"><span class="ex-strong" style="color:#1d1d1f;">상담 AP + 스크린 팝업</span> &mdash; CTI 이벤트가 들어오는 순간, 상담 화면에 고객 정보가 자동으로 뜹니다. 상담원이 묻기 전에 이미 모든 것을 알고 있는 상태로 통화가 시작됩니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">녹취 시스템</p>
+        <h4 class="ex-h-card">모든 통화는 자동으로 기록됩니다</h4>
+        <p class="ex-caption" style="margin-top: 12px;"><span class="ex-strong" style="color:#1d1d1f;">CTI 이벤트 기반 녹취</span> &mdash; 통화 시작·종료 이벤트를 CTI에서 받아옵니다. 상담원이 별도로 "녹음 시작" 버튼을 누르지 않아도 모든 통화가 자동 기록됩니다.</p>
+        <p class="ex-caption" style="margin-top: 16px;"><span class="ex-strong" style="color:#1d1d1f;">메타데이터 매핑</span> &mdash; 녹음 파일에 고객번호·상담원ID·통화시각이 자동 태깅됩니다. 나중에 "지난주 김 고객 통화 찾아 줘"가 가능한 이유입니다.</p>
+        <p class="ex-caption" style="margin-top: 16px;"><span class="ex-strong" style="color:#1d1d1f;">화자 분리</span> &mdash; 고객 음성과 상담원 음성을 별도 채널로 분리해 저장합니다. QA와 AI 분석에 결정적인 기능입니다.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">왜 화자 분리가 중요한가</p>
+      <p class="ex-callout__text">화자 분리가 안 된 녹음은 두 사람의 목소리가 한 채널에 섞여 있어, AI 분석에서 "누가 무슨 말을 했는지"를 정확히 가려내기 어렵습니다. <span class="ex-strong">상담 품질 평가, 불완전판매 검증, 상담원 코칭</span> 같은 고급 분석을 하려면 처음부터 채널을 나눠 저장해야 합니다. 녹취 시스템 사양을 정할 때 가장 먼저 챙겨야 할 항목입니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 9: 전체 콜 흐름 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 9 · 한 통의 전화, 9단계의 여정</p>
+    <h3 class="ex-h-section">고객이 2번을 누르는 순간, 시스템에서는 이런 일이 일어납니다.</h3>
+    <p class="ex-lead" style="max-width: 720px;">앞에서 본 모든 구성요소를 하나의 시나리오로 엮어 봅니다. 한 명의 고객이 보험 상담을 위해 전화를 걸었다고 가정하고, 그 통화가 끝날 때까지 9단계의 여정을 따라가 봅니다.</p>
+
+    <div class="ex-steplist" style="margin-top: 56px;">
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">01</div>
+        <div>
+          <p class="ex-steplist__title">고객 발신</p>
+          <p class="ex-steplist__desc">고객이 1588-XXXX 번호로 전화를 겁니다. 스마트폰이든 유선전화든 무관합니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">02</div>
+        <div>
+          <p class="ex-steplist__title">통신사(PSTN) 수신</p>
+          <p class="ex-steplist__desc">KT·SKT 같은 통신사 네트워크가 전화를 수신합니다. 그리고 기업의 대표번호로 라우팅합니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">03</div>
+        <div>
+          <p class="ex-steplist__title">E1/PRI 회선 진입</p>
+          <p class="ex-steplist__desc">통신사에서 기업 내부로 들어오는 E1 회선의 30채널 중 1개를 점유합니다. 이때까지는 여전히 TDM 신호로 전달됩니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">04</div>
+        <div>
+          <p class="ex-steplist__title">보이스 게이트웨이 변환</p>
+          <p class="ex-steplist__desc">TDM 신호가 IP 패킷으로 변환됩니다. 이 다음부터는 완전한 IP 네트워크 위에서 모든 일이 일어납니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">05</div>
+        <div>
+          <p class="ex-steplist__title">IP-PBX 처리 + CTI 이벤트 발생</p>
+          <p class="ex-steplist__desc">PBX가 콜을 수신함과 동시에 CTI에 "착신 이벤트"를 전송합니다. CTI는 발신번호를 기반으로 고객 정보 조회를 시작합니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">06</div>
+        <div>
+          <p class="ex-steplist__title">IVR 메뉴 진입 + 기관계 조회</p>
+          <p class="ex-steplist__desc">"1번은 대출, 2번은 보험" 안내가 흐릅니다. 고객이 2번을 누르면 IVR이 EAI/MCI를 통해 고객의 보험 계약 정보를 조회합니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">07</div>
+        <div>
+          <p class="ex-steplist__title">CTI 라우팅 지시</p>
+          <p class="ex-steplist__desc">CTI가 조회 결과를 분석합니다. "VIP 고객 + 보험 문의 → 보험 전담 스킬 그룹 중 가장 오래 대기한 상담원에게 연결" 같은 의사결정이 이 순간에 내려집니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">08</div>
+        <div>
+          <p class="ex-steplist__title">상담원 연결 + 스크린 팝업</p>
+          <p class="ex-steplist__desc">Softphone에 전화가 연결됨과 동시에 상담 AP에 고객 정보가 자동으로 팝업됩니다. 상담원은 이미 고객의 모든 것을 아는 상태로 인사를 건넵니다.</p>
+        </div>
+      </div>
+      <div class="ex-steplist__item">
+        <div class="ex-steplist__num">09</div>
+        <div>
+          <p class="ex-steplist__title">녹취 시작 + 통계 집계</p>
+          <p class="ex-steplist__desc">CTI의 연결 이벤트를 받아 녹취가 자동으로 시작됩니다. 통화가 끝나면 메타데이터가 저장되고, 동시에 KPI 통계에도 반영됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="ex-pullquote" style="margin-top: 56px;">"눈에는 1초, 시스템에는 9단계. 이 흐름을 머릿속에 그릴 수 있다면 IPCC를 이해한 것입니다."</p>
+  </section>
+
+  <!-- SECTION 10: 라이센스 & 벤더 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 10 · 라이센스 &amp; 벤더</p>
+    <h3 class="ex-h-section">견적서 한 장으로 회사의 IPCC 전략이 드러납니다.</h3>
+
+    <p class="ex-body">IPCC 사업의 가격은 결국 <span class="ex-strong">"무엇을, 몇 개씩, 어떤 방식으로 사느냐"</span>의 조합으로 결정됩니다. 이걸 결정하는 두 축이 라이센스 유형과 벤더 선택입니다. 현장에서 한 번이라도 견적서를 펼쳐 본 분이라면 익숙한 단어들이지만, 처음 보는 분을 위해 차근차근 정리합니다.</p>
+
+    <h4 class="ex-h-sub">네 가지 라이센스 유형</h4>
+
+    <div class="ex-grid-2" style="margin-top: 24px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01 · Named</p>
+        <h4 class="ex-h-card">사람에게 귀속</h4>
+        <p class="ex-caption" style="margin-top: 12px;">특정 사람에게 귀속됩니다. 1인 = 1 라이센스. 동시 사용 여부와 무관하게, 그 사람이 항상 사용하는 경우에 적합합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02 · Concurrent</p>
+        <h4 class="ex-h-card">동시 접속자 수 기준</h4>
+        <p class="ex-caption" style="margin-top: 12px;">100명 직원이라도 동시 접속이 50명이면 50개만 사면 됩니다. 교대 근무가 일상인 콜센터에서 자주 선택하는 모델입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03 · Perpetual</p>
+        <h4 class="ex-h-card">영구 구매</h4>
+        <p class="ex-caption" style="margin-top: 12px;">한 번 사면 계속 사용합니다. 다만 유지보수는 별도 계약(연간 15~20%)이 필요합니다. 온프레미스 환경에서 일반적입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">04 · Subscription</p>
+        <h4 class="ex-h-card">월·연 단위 구독</h4>
+        <p class="ex-caption" style="margin-top: 12px;">클라우드 IPCC에서 표준입니다. 초기 비용은 낮지만 장기적으로는 더 비싸질 수 있어, 운영 기간을 함께 따져야 합니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub">구성 요소별로 무엇을 기준으로 과금되는가</h4>
+    <p class="ex-body">IPCC는 단일 제품이 아니라 여러 시스템의 묶음입니다. 그래서 라이센스도 시스템별로 과금 단위가 다릅니다. 이걸 모르면 견적서를 봐도 어디가 비싼지 짐작이 안 됩니다.</p>
+
+    <ul class="ex-list">
+      <li><span class="ex-strong">PBX</span> — 채널 수 기반 라이센스</li>
+      <li><span class="ex-strong">CTI</span> — 상담원 좌석 수 기반 라이센스</li>
+      <li><span class="ex-strong">IVR</span> — IVR 포트 수 기반 라이센스</li>
+      <li><span class="ex-strong">녹취</span> — 동시 녹취 채널 수 기반 라이센스</li>
+    </ul>
+
+    <h4 class="ex-h-sub">주요 벤더 한눈에 비교</h4>
+    <p class="ex-body">시장에는 수많은 IPCC 벤더가 있지만, 국내 엔터프라이즈 환경에서 자주 보는 이름은 네 개로 좁혀집니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>벤더</th>
+          <th>특징</th>
+          <th>주요 고객</th>
+          <th>포지션</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">시스코 (Cisco)</span></td>
+          <td>글로벌 1위. UCCE/UCCX 라인업. 풍부한 생태계.</td>
+          <td>대형 금융사, 통신사</td>
+          <td><span class="ex-tag ex-tag--primary">엔터프라이즈</span></td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">어바이어 (Avaya)</span></td>
+          <td>전통 강자. 안정성이 높고 레거시 구축이 많습니다.</td>
+          <td>보험사, 카드사</td>
+          <td><span class="ex-tag">엔터프라이즈</span></td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">제네시스 (Genesys)</span></td>
+          <td>클라우드 IPCC 선도. AI와 옴니채널이 강점.</td>
+          <td>유통, 이커머스</td>
+          <td><span class="ex-tag">클라우드</span></td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">브리지텍</span></td>
+          <td>국내 독자 개발. 금융권 레퍼런스 다수.</td>
+          <td>국내 금융사, 공공</td>
+          <td><span class="ex-tag">국내 전문</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">실무 팁</p>
+      <p class="ex-callout__text">"우리 회사에 어느 벤더가 맞는가"는 보통 <span class="ex-strong">기존 인프라 호환성, 금융 규제 대응 경험, 유지보수 인력 확보 가능성</span> 세 가지로 결정됩니다. 단순히 기능 비교표만 보고 결정하면 운영 단계에서 비용이 폭증합니다. 제안서를 받을 때 이 세 항목을 반드시 체크하세요.</p>
+    </div>
+  </section>
+
+  <!-- CLOSING (DARK) -->
+  <section class="ex-section ex-section--dark" style="padding-top: clamp(80px, 10vw, 140px); padding-bottom: clamp(80px, 10vw, 140px);">
+    <p class="ex-eyebrow" style="color: #86868b;">마치며 · 1강 핵심 정리</p>
+    <h3 class="ex-h-section">여섯 줄로 압축한 IPCC.</h3>
+
+    <p class="ex-body">긴 강의를 한 번에 머릿속에 담기는 어렵습니다. 이 여섯 줄만 외워 두면, 다음에 IPCC 미팅 자리에 들어갔을 때 무엇을 들어야 하고 무엇을 물어야 할지 감이 잡힐 것입니다.</p>
+
+    <ul class="ex-list" style="margin-top: 32px;">
+      <li><span style="color:#fff; font-weight:600;">IPCC = IP 기반 통화 + CTI(고객 정보 연동) + 지능형 라우팅</span></li>
+      <li>E1 1회선 = 30채널 동시통화. 동양생명은 20회선 = 600채널 규모.</li>
+      <li>보이스 게이트웨이가 TDM &rarr; IP 변환의 경계.</li>
+      <li><span style="color:#fff; font-weight:600;">CTI가 없으면 IPCC가 아니다</span> &mdash; 이것이 강의 전체의 핵심.</li>
+      <li>IVR은 ARS(일방향)와 달리 양방향 인터랙티브, 기관계 연동까지 가능.</li>
+      <li>녹취는 CTI 이벤트 기반으로 자동화, 메타데이터까지 자동 매핑.</li>
+    </ul>
+
+    <p class="ex-pullquote" style="margin-top: 48px;">"한 통의 전화 뒤에 숨은 시스템을 볼 수 있게 되었다면,<br/>이미 IPCC 실무자의 입구에 들어선 것입니다."</p>
+
+    <p class="ex-caption" style="color: #86868b; margin-top: 32px;">&mdash; IPCC 구축 실무 교육 1차 · 동양생명 사례</p>
+  </section>
+
+</div>
+`;
+
+    LECTURE_CONTENT['ipcc-2'] = `
+<style>
+  .ex-apple { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1d1d1f; }
+  .ex-apple .ex-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 16px; }
+  .ex-apple .ex-h-hero { font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; color: #1d1d1f; margin: 0 0 20px; }
+  .ex-apple .ex-h-section { font-size: clamp(28px, 3.6vw, 44px); font-weight: 700; line-height: 1.1; letter-spacing: -0.022em; margin: 0 0 20px; }
+  .ex-apple .ex-h-sub { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; margin: 32px 0 12px; color: #1d1d1f; }
+  .ex-apple .ex-h-card { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.012em; margin: 0 0 10px; }
+  .ex-apple .ex-lead { font-size: clamp(18px, 1.6vw, 22px); font-weight: 400; line-height: 1.45; color: #6e6e73; margin: 0 0 28px; letter-spacing: -0.005em; }
+  .ex-apple .ex-body { font-size: 17px; line-height: 1.7; color: #1d1d1f; margin: 0 0 18px; max-width: 720px; letter-spacing: -0.003em; }
+  .ex-apple .ex-body--muted { color: #6e6e73; }
+  .ex-apple .ex-caption { font-size: 14px; line-height: 1.55; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section { padding: clamp(48px, 7vw, 88px) clamp(24px, 4vw, 48px); border-radius: 22px; margin: 16px 0; }
+  .ex-apple .ex-section--light { background: #f5f5f7; }
+  .ex-apple .ex-section--white { background: #fff; }
+  .ex-apple .ex-section--dark { background: #000; color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-h-section,
+  .ex-apple .ex-section--dark .ex-h-card,
+  .ex-apple .ex-section--dark .ex-h-sub,
+  .ex-apple .ex-section--dark .ex-h-hero { color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-lead { color: #a1a1a6; }
+  .ex-apple .ex-section--dark .ex-body { color: #d2d2d7; }
+  .ex-apple .ex-section--dark .ex-caption { color: #86868b; }
+  .ex-apple .ex-section--dark .ex-eyebrow { color: #86868b; }
+  .ex-apple .ex-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ex-apple .ex-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .ex-apple .ex-card { background: #fff; border-radius: 18px; padding: 28px; }
+  .ex-apple .ex-section--dark .ex-card { background: #1d1d1f; }
+  .ex-apple .ex-section--white .ex-card { background: #f5f5f7; }
+  .ex-apple .ex-num { font-size: clamp(48px, 6vw, 80px); font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #1d1d1f; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-num { color: #f5f5f7; }
+  .ex-apple .ex-divider { height: 1px; background: #d2d2d7; border: none; margin: 32px 0; }
+  .ex-apple .ex-section--dark .ex-divider { background: #424245; }
+  .ex-apple .ex-pullquote { font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; line-height: 1.35; letter-spacing: -0.018em; color: #1d1d1f; margin: 40px 0; padding: 0 0 0 24px; border-left: 3px solid #1d1d1f; max-width: 720px; }
+  .ex-apple .ex-section--dark .ex-pullquote { color: #f5f5f7; border-left-color: #f5f5f7; }
+  .ex-apple .ex-callout { background: #fff; border-radius: 16px; padding: 24px 28px; margin: 28px 0; max-width: 720px; }
+  .ex-apple .ex-section--white .ex-callout { background: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-callout { background: #1d1d1f; }
+  .ex-apple .ex-callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: #6e6e73; text-transform: uppercase; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-callout__label { color: #86868b; }
+  .ex-apple .ex-callout__text { font-size: 16px; line-height: 1.6; color: #1d1d1f; margin: 0; }
+  .ex-apple .ex-section--dark .ex-callout__text { color: #f5f5f7; }
+  .ex-apple .ex-list { list-style: none; padding: 0; margin: 24px 0; max-width: 720px; }
+  .ex-apple .ex-list li { padding: 16px 0; border-bottom: 1px solid #d2d2d7; font-size: 16px; line-height: 1.55; color: #1d1d1f; }
+  .ex-apple .ex-list li:last-child { border-bottom: none; }
+  .ex-apple .ex-section--dark .ex-list li { color: #d2d2d7; border-bottom-color: #424245; }
+  .ex-apple table.ex-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+  .ex-apple table.ex-table thead th { text-align: left; padding: 16px 12px; color: #6e6e73; font-weight: 500; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; border-bottom: 1px solid #d2d2d7; }
+  .ex-apple .ex-section--dark table.ex-table thead th { color: #86868b; border-bottom-color: #424245; }
+  .ex-apple table.ex-table tbody td { padding: 20px 12px; border-bottom: 1px solid #e8e8ed; vertical-align: top; color: #1d1d1f; }
+  .ex-apple .ex-section--dark table.ex-table tbody td { color: #d2d2d7; border-bottom-color: #2a2a2c; }
+  .ex-apple table.ex-table tbody tr:last-child td { border-bottom: none; }
+  .ex-apple table.ex-table .ex-tag { display: inline-block; padding: 3px 10px; border-radius: 980px; background: #f5f5f7; color: #6e6e73; font-size: 12px; font-weight: 500; }
+  .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
+  .ex-apple .ex-section--dark table.ex-table .ex-tag { background: #2a2a2c; color: #a1a1a6; }
+  .ex-apple .ex-section--dark table.ex-table .ex-tag--primary { background: #f5f5f7; color: #1d1d1f; }
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+  .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
+  .ex-apple .ex-qa:first-of-type { border-top: 1px solid #d2d2d7; }
+  .ex-apple .ex-qa__q { font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.012em; color: #1d1d1f; margin: 0 0 10px; }
+  .ex-apple .ex-qa__a { font-size: 16px; line-height: 1.65; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-quote { font-size: clamp(24px, 3vw, 40px); font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; color: #f5f5f7; margin: 0; }
+  .ex-apple .ex-strong { color: #1d1d1f; font-weight: 600; }
+  .ex-apple .ex-section--dark .ex-strong { color: #fff; }
+  @media (max-width: 768px) {
+    .ex-apple .ex-grid-3, .ex-apple .ex-grid-2 { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline__arrow { transform: rotate(90deg); padding: 8px 0; }
+  }
+</style>
+
+<div class="ex-apple">
+
+  <!-- HERO -->
+  <section class="ex-section ex-section--light" style="padding-top: clamp(72px, 10vw, 140px); padding-bottom: clamp(56px, 7vw, 96px); text-align: left;">
+    <p class="ex-eyebrow">IPCC 심화 교육 · 2차</p>
+    <h2 class="ex-h-hero">그 다음,<br/>더 깊은 이야기.</h2>
+    <p class="ex-lead" style="max-width: 620px;">PDS 아웃바운드, 옴니채널, SBC·미디어 게이트웨이, 벤더 현황, 그리고 견적 구성까지.<br/>현장에서 실제로 맞닥뜨리는 심화 주제를 하나씩 풀어 봅니다.</p>
+    <p class="ex-caption" style="margin-top: 32px;">읽는 시간 · 약 12분</p>
+  </section>
+
+  <!-- SECTION 0: 들어가며 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">들어가며</p>
+    <h3 class="ex-h-section">왜 심화 교육이 필요한가요?</h3>
+
+    <p class="ex-body">1차 교육에서는 IPCC를 이루는 다섯 개 핵심 시스템 — PBX, CTI, IVR, 녹취, 상담AP — 를 살펴봤습니다. 각자의 역할이 어떻게 맞물리는지, 고객의 전화 한 통이 상담사의 헤드셋까지 도달하기 위해 얼마나 많은 장비를 거쳐가는지 배웠습니다.</p>
+
+    <p class="ex-body">하지만 영업 현장이나 기술 미팅에 들어가 보면, 실제로 대화가 시작되는 지점은 그 다음부터입니다. <span class="ex-strong">"아웃바운드는 어떻게 합니까?"</span>, <span class="ex-strong">"카카오톡 상담도 통합이 되나요?"</span>, <span class="ex-strong">"AI 콜봇을 연동하려면 뭐가 필요하죠?"</span>, <span class="ex-strong">"경쟁사 견적과 비교해 봤는데 왜 가격이 이렇게 차이나죠?"</span> — 이런 질문들입니다.</p>
+
+    <p class="ex-pullquote">"IPCC를 안다는 것은, 구조를 아는 것에 그치지 않고 견적 한 줄의 의미까지 읽어낼 수 있다는 것이다."</p>
+
+    <p class="ex-body ex-body--muted">이 글은 그 "다음 단계"를 위한 것입니다. PDS의 세 가지 발신 모드, 옴니채널과 멀티채널의 진짜 차이, SBC와 미디어 게이트웨이가 AI 콜봇 연동에서 왜 핵심인지, 국내 주요 벤더가 어떤 포지션을 차지하고 있는지, 그리고 견적을 짤 때 어떤 유형으로 접근해야 하는지를 차례로 풀어 봅니다.</p>
+  </section>
+
+  <!-- SECTION 1: 기본 구성 복습 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 1 · 복습</p>
+    <h3 class="ex-h-section">심화로 들어가기 전에 — 한 번 더 짚고 갑니다.</h3>
+
+    <p class="ex-body">복습은 지루할 수 있지만, 심화는 기본 위에 쌓입니다. IPCC는 단순한 전화 교환 장비가 아니라, <span class="ex-strong">다섯 개의 핵심 시스템이 유기적으로 연동</span>되어 작동하는 지능형 컨택센터입니다. 한 통의 고객 전화가 상담사와 연결되기까지 이 다섯 시스템이 모두 참여합니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01 · 교환기</p>
+        <h4 class="ex-h-card">PBX</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화를 물리적으로 연결하는 교환기. 모든 내선과 대표번호를 관리합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02 · 미들웨어</p>
+        <h4 class="ex-h-card">CTI</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화와 컴퓨터를 연결하는 두뇌. 라우팅 지시와 통계 생성을 담당합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03 · 음성응답</p>
+        <h4 class="ex-h-card">IVR</h4>
+        <p class="ex-caption" style="margin-top: 12px;">고객을 처음 맞이하는 자동응답. 고객 정보를 조회하고 시나리오로 분기합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">04 · 음성 저장</p>
+        <h4 class="ex-h-card">녹취</h4>
+        <p class="ex-caption" style="margin-top: 12px;">상담 통화를 녹음해 저장. 법적 근거와 품질 관리의 토대입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">05 · 상담 화면</p>
+        <h4 class="ex-h-card">상담AP</h4>
+        <p class="ex-caption" style="margin-top: 12px;">상담사가 실제로 쓰는 화면. 고객 정보와 이력이 모이는 창구입니다.</p>
+      </div>
+      <div class="ex-card" style="background: #1d1d1f; color: #f5f5f7;">
+        <p class="ex-eyebrow" style="color: #86868b;">콜 흐름</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">유기적 연동</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">고객 → PSTN → E1/PRI → VoIP GW → PBX → CTI → IVR → 상담석 → 녹취/통계</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">쉽게 비유하면</p>
+      <p class="ex-callout__text">PBX가 <span class="ex-strong">도로와 차선</span>이라면, CTI는 <span class="ex-strong">신호등과 내비게이션</span>입니다. IVR은 <span class="ex-strong">입구의 안내데스크</span>, 녹취는 <span class="ex-strong">블랙박스</span>, 상담AP는 <span class="ex-strong">상담사의 대시보드</span>입니다. 하나만 빠져도 IPCC가 아닙니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 2: PBX 자원 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 2 · PBX 자원</p>
+    <h3 class="ex-h-section">PBX 안에는 네 가지 자원이 삽니다.</h3>
+
+    <p class="ex-body">PBX는 전화를 연결하는 장비입니다. 그런데 그 안을 열어 보면, 여러 종류의 <span class="ex-strong">자원(Resource)</span>이 있습니다. 마치 건물의 층수·호수처럼 각 번호가 역할별로 나뉘어 있습니다. 견적을 짤 때 "상담석 100석"이라는 한 줄 뒤에는, 사실 이 네 가지 자원이 모두 얽혀 있습니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01 · 대표번호 (Q, Queue)</p>
+        <h4 class="ex-h-card">고객이 거는 그 번호.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">1588-XXXX 같은 대표 번호입니다. PBX 안에서는 "큐(Queue)"로 부릅니다. 벤더마다 이름이 다른데, 어바이어는 <span class="ex-strong">VDN</span>, 시스코는 <span class="ex-strong">CDN</span>, 제네시스는 <span class="ex-strong">라우팅 포인트</span>라고 부릅니다. 용어는 다르지만 같은 개념입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02 · 내선번호</p>
+        <h4 class="ex-h-card">상담사 자리마다 하나씩.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">1001, 1002, 1003… 이렇게 순차적으로 부여됩니다. 100석 규모라면 내선 1001~1100, 총 100개가 필요합니다. 내선 개수가 곧 상담석 개수입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03 · IVR 포트</p>
+        <h4 class="ex-h-card">안내음이 쓰는 논리적 내선.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">IVR 시스템에 연결되는 포트로, 고객이 안내음을 듣는 동안 이 자원을 점유합니다. 예를 들어 IVR 포트 2001~2100, 총 100채널을 설정해 둡니다. 동시에 몇 명의 고객이 IVR을 듣고 있을 수 있느냐가 여기서 결정됩니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">04 · 스킬 그룹</p>
+        <h4 class="ex-h-card">상담사 묶음.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">"보험 문의" 전담 그룹, "VIP 고객" 전담 그룹처럼 능력·업무별로 상담사를 묶습니다. CTI는 이 스킬 그룹 정보를 보고 최적의 상담사에게 콜을 연결합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: CTI 두뇌 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 3 · CTI</p>
+    <h3 class="ex-h-section">CTI가 없으면, IPCC가 아닙니다.</h3>
+    <p class="ex-lead" style="max-width: 720px;">CTI(Computer Telephony Integration)는 전화(Telephony)와 컴퓨터(Computer)를 통합(Integration)하는 미들웨어입니다. 이 한 겹이 있어야 비로소 "지능형" 컨택센터가 됩니다.</p>
+
+    <p class="ex-body" style="margin-top: 40px;">CTI는 마치 숨 쉬듯 다섯 가지 일을 동시에 합니다. 레지스터, 이벤트 감지, 데이터 변환, 라우팅 지시, 통계 생성. 하나씩 풀어 보겠습니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 48px;">1. 레지스터 — DN 모니터링</h4>
+    <p class="ex-body">PBX의 모든 내선번호(DN, Directory Number)를 CTI에 등록합니다. 그 순간부터 CTI는 <span class="ex-strong">24시간 그 번호들의 상태를 감시</span>합니다. 상담사가 전화를 받았는지, 통화 중인지, 자리를 비웠는지 — 실시간으로 파악합니다.</p>
+
+    <h4 class="ex-h-sub">2. 이벤트 감지</h4>
+    <p class="ex-body">콜 인입, 전화 받음, 전화 끊김, 대기, 보류, 전환 — 이 모든 이벤트를 실시간으로 감지합니다. 마치 CCTV처럼, 통화를 둘러싼 어떤 움직임도 놓치지 않습니다.</p>
+
+    <h4 class="ex-h-sub">3. 데이터 생성 — 16진수를 사람이 읽는 데이터로</h4>
+    <p class="ex-body">PBX가 보내는 신호는 <span class="ex-strong">0x1A2B3C…</span> 같은 16진수(HEX) 덩어리입니다. 기계끼리 주고받는 언어입니다. CTI는 이것을 사람이 이해할 수 있는 형태로 변환합니다. "발신번호: 010-1234-5678, 수신시각: 14:23:01" — 이렇게요. CTI가 통역사 역할을 한다고 보면 됩니다.</p>
+
+    <h4 class="ex-h-sub">4. 라우팅 지시</h4>
+    <p class="ex-body">IVR에서 고객 정보를 받으면, CTI가 "이 콜은 어느 상담사에게 연결할지" PBX에게 지시합니다. VIP 고객은 VIP 전담 팀으로, 기술 문의는 기술팀으로. 이것이 <span class="ex-strong">지능형 라우팅</span>의 정체입니다.</p>
+
+    <h4 class="ex-h-sub">5. 통계 생성</h4>
+    <p class="ex-body">모든 이벤트 로그를 기반으로 호통계, 상담사 퍼포먼스, 큐 대기시간 같은 각종 통계를 생성합니다. 관리자 대시보드가 실시간으로 돌아가는 것도 CTI가 뒤에서 일하고 있기 때문입니다.</p>
+
+    <p class="ex-pullquote">"CTI는 전화를 대신 거는 것이 아니라, 전화에 의미를 입히는 시스템이다."</p>
+  </section>
+
+  <!-- SECTION 4: IVR -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 4 · IVR</p>
+    <h3 class="ex-h-section">IVR은 단순한 안내음이 아닙니다.</h3>
+
+    <p class="ex-body">IVR(Interactive Voice Response)은 고객이 상담사와 연결되기 전에 만나는 자동응답 시스템입니다. 많은 분들이 IVR을 "안내 멘트 틀어주는 장치"로만 생각하지만, 실제로는 <span class="ex-strong">고객 정보를 조회하고 분류하는 중요한 관문</span>입니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">역할 01</p>
+        <h4 class="ex-h-card">멘트 플레이</h4>
+        <p class="ex-caption" style="margin-top: 12px;">"안녕하십니까, ○○사입니다." 미리 녹음된 음성을 재생합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">역할 02</p>
+        <h4 class="ex-h-card">시나리오 분기</h4>
+        <p class="ex-caption" style="margin-top: 12px;">고객이 누른 번호(DTMF)에 따라 분기합니다. "1번 일반 문의, 2번 결제 문의…"</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">역할 03</p>
+        <h4 class="ex-h-card">기관계 연동</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화번호로 고객 정보를 조회합니다. VIP 여부, 계좌 잔액 등 실시간 확인.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 48px;">기관계 연동 방식의 변화</h4>
+    <p class="ex-body">IVR이 고객 정보를 조회하려면, 기업 내부의 기관계 시스템과 통신해야 합니다. 이 통신 방식이 최근 몇 년 사이 크게 바뀌었습니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>시기</th>
+          <th>방식</th>
+          <th>특징</th>
+          <th>예시</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">과거</span></td>
+          <td><span class="ex-tag">TCP/IP 소켓</span></td>
+          <td>고정된 형식의 "전문(電文)"을 주고받음. 한 번 설정하면 바꾸기 어렵고 유지보수가 복잡.</td>
+          <td>0010HONG001234567890100000…</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">현재</span></td>
+          <td><span class="ex-tag ex-tag--primary">REST API (JSON)</span></td>
+          <td>표준화된 HTTP API 방식. 읽기 쉽고 개발·연동이 훨씬 간편.</td>
+          <td>{"customer": "홍길동", "grade": "VIP"}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="ex-body" style="margin-top: 24px;">겉보기에는 포맷만 바뀐 것 같지만, 실무에서는 <span class="ex-strong">개발 리드타임이 크게 줄고 장애 디버깅이 쉬워졌다</span>는 의미입니다. 최근 구축되는 IVR은 거의 전부 REST API 기반입니다.</p>
+  </section>
+
+  <!-- SECTION 5: 녹취 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 5 · 녹취</p>
+    <h3 class="ex-h-section">녹취는 어떻게 음성을 잡아낼까요?</h3>
+
+    <p class="ex-body">녹취 시스템은 상담 통화를 녹음해 저장합니다. 법적 근거 확보, 품질 관리(QA), 고객과의 분쟁 해결에 필수입니다. 그런데 여기서 한 가지 궁금증이 생깁니다. <span class="ex-strong">"통화 중인 음성을, 어떻게 원본을 건드리지 않고 복사할 수 있을까?"</span></p>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">미러 포트(Mirror Port)란?</p>
+      <p class="ex-callout__text">네트워크 스위치에는 특정 포트의 트래픽을 다른 포트로 <span class="ex-strong">복제(미러링)</span>하는 기능이 있습니다. 녹취 서버는 이 미러 포트에 연결해 음성 패킷(RTP)을 수신합니다. 원본 통화를 방해하지 않고 조용히 복사하는 방식입니다.</p>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 40px;">녹취가 일어나는 순서</h4>
+    <p class="ex-body">상담사가 콜을 받으면, 녹취 시스템은 다섯 단계를 거쳐 음성 파일을 완성합니다.</p>
+
+    <div class="ex-pipeline" style="grid-template-columns: 1fr auto 1fr auto 1fr; margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-step__num">Step 01</p>
+        <h4 class="ex-h-card">CTI 이벤트 수신</h4>
+        <p class="ex-caption" style="margin-top: 12px;">콜 시작·종료 이벤트를 CTI로부터 받아 녹취 시작·종료를 제어합니다.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card">
+        <p class="ex-step__num">Step 02</p>
+        <h4 class="ex-h-card">녹취 시작 판단</h4>
+        <p class="ex-caption" style="margin-top: 12px;">어떤 콜을, 언제부터 녹음할지 룰에 따라 결정합니다.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card">
+        <p class="ex-step__num">Step 03</p>
+        <h4 class="ex-h-card">RTP 패킷 캡처</h4>
+        <p class="ex-caption" style="margin-top: 12px;">스위치 미러포트에서 음성 데이터(RTP 스트림)를 복제해 가져옵니다.</p>
+      </div>
+    </div>
+    <div class="ex-pipeline" style="grid-template-columns: 1fr auto 1fr; margin-top: 20px;">
+      <div class="ex-card">
+        <p class="ex-step__num">Step 04</p>
+        <h4 class="ex-h-card">CTI 데이터 매핑</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화번호, 상담사 ID, 시각 같은 메타데이터를 음성 파일에 결합합니다.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card" style="background: #1d1d1f; color: #f5f5f7;">
+        <p class="ex-step__num" style="color: #86868b;">Step 05</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">녹취 파일 저장</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">고객·상담사 화자를 분리한 스테레오로 저장 — AICC 연동의 핵심.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">한 가지 더</p>
+      <p class="ex-callout__text">AICC나 AI 분석을 하려면 <span class="ex-strong">반드시 스테레오(2채널) 저장</span>이 필요합니다. 고객 음성과 상담사 음성이 한 채널에 섞여 있으면 "누가 말했는지" 구분할 수 없어, STT 정확도와 분석 품질이 크게 떨어지기 때문입니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 6: 통계 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 6 · 통계 체계</p>
+    <h3 class="ex-h-section">콜센터의 성적표는 네 가지로 나뉩니다.</h3>
+
+    <p class="ex-body">IPCC가 쏟아내는 데이터는 어마어마합니다. 그 데이터가 정리되어 나오는 리포트가 바로 통계인데, 콜센터 운영의 나침반 역할을 합니다. 크게 네 가지 종류가 있습니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01 · 호통계</p>
+        <h4 class="ex-h-card">콜과 디지털 채널 전체.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">총 인입 수, 처리 수, 포기 수, 평균 대기 시간(ASA) 등. 채널을 가리지 않고 전체 인입 현황을 보여주는 가장 큰 틀입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02 · 상담사 통계</p>
+        <h4 class="ex-h-card">개인별 퍼포먼스.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">처리 건수, 평균 통화 시간(AHT), 상태값(통화중·대기·이석) 이력. 운영자는 이 지표로 KPI를 관리합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03 · 시간별 통계</p>
+        <h4 class="ex-h-card">15분, 30분, 일, 주, 월, 연.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">"오전 10~11시가 피크타임" 같은 패턴 분석에 쓰입니다. 인력 배치와 스케줄링의 기초 자료입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">04 · 상담 이력</p>
+        <h4 class="ex-h-card">실제 상담 내용 기반.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">호통계보다 더 정확합니다. 고객이 어떤 문의를 했고 어떻게 처리됐는지까지 추적 가능한, 질적 분석의 핵심입니다.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">통합통계란?</p>
+      <p class="ex-callout__text">인프라 통계(CTI) + 상담 이력(상담AP) + 녹취(파일 경로) — 이 세 가지를 연동해 하나의 화면에서 함께 보여주는 고급 기능입니다. <span class="ex-strong">대형 센터일수록 이 통합 뷰가 운영 품질을 결정</span>합니다. "이 콜의 녹취를 듣고 싶다"에서 클릭 한 번에 모든 맥락이 따라오도록 만드는 기능이지요.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 7: PDS (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 7 · PDS</p>
+    <h3 class="ex-h-section">고객이 먼저 거는 것이 아니라, 우리가 겁니다.</h3>
+    <p class="ex-lead" style="max-width: 720px;">PDS(Predictive Dialing System)는 시스템이 자동으로 고객에게 먼저 전화를 거는 솔루션입니다. 상담사가 수동으로 걸지 않고, 리스트만 올려두면 PDS가 발신 타이밍을 잡아 냅니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 48px;">언제 쓰일까요?</h4>
+    <p class="ex-body">가장 흔한 쓰임새는 네 가지입니다. <span class="ex-strong">해피콜</span>(AS 완료 후 만족도 조사), <span class="ex-strong">서베이</span>(여론조사), <span class="ex-strong">알림</span>(연체 안내, 이벤트 공지), 그리고 <span class="ex-strong">텔레마케팅 캠페인</span>입니다. 업종마다 쓰는 맥락이 조금씩 다르지만, "우리가 먼저 연락해야 하는 상황"이라면 거의 다 PDS 영역입니다.</p>
+
+    <h4 class="ex-h-sub">발신 모드 세 가지</h4>
+    <p class="ex-body">PDS의 진짜 개성은 "어떻게 거느냐"에 있습니다. 세 가지 모드가 있고, 각각 성격이 뚜렷합니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-step__num" style="color: #86868b;">Mode 01</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">Preview</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">수동 클릭 방식. 상담사가 고객 정보를 <span style="color: #f5f5f7; font-weight: 600;">미리 확인</span>한 뒤 직접 발신 버튼을 누릅니다. 민감 고객·중요 고객 관리에 적합합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-step__num" style="color: #86868b;">Mode 02</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">Progressive</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">가용 자원 맞춤. 응대 가능한 상담사 수만큼만 발신하는 <span style="color: #f5f5f7; font-weight: 600;">1:1 방식</span>. 안정적이고 포기율이 낮습니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-step__num" style="color: #86868b;">Mode 03</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">Predictive</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">알고리즘 예측. 가용 자원보다 <span style="color: #f5f5f7; font-weight: 600;">초과 발신</span>(예: 120%). 일부 고객이 안 받거나 끊는 것을 예측해 더 많이 겁니다. 고속 소진에 유리합니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">PDS 3대 구성요소</h4>
+    <p class="ex-body">PDS는 크게 세 덩어리로 이루어져 있습니다. 셋 다 반드시 있어야 PDS라고 부를 수 있습니다.</p>
+
+    <ul class="ex-list">
+      <li><span class="ex-strong">콜링 리스트</span> — 발신 대상 고객 DB. 이름, 전화번호, 발신 허용 여부 등이 담긴 엑셀·DB 파일을 업로드합니다.</li>
+      <li><span class="ex-strong">캠페인</span> — 발신 모드, 발신 시간대, 재시도(리트라이) 횟수와 간격 등을 설정하는 규칙 집합입니다.</li>
+      <li><span class="ex-strong">관리 모듈</span> — 캠페인을 실행·중지하고, 실시간 현황을 모니터링하며, 결과 통계를 조회하는 관리자 화면입니다.</li>
+    </ul>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">국내 PDS 시장 현황</p>
+      <p class="ex-callout__text">주요 플레이어들이 대부분 철수하고, 현재는 <span class="ex-strong">샌드박스가 독과점 구조로 시장을 장악</span>하고 있습니다. 신규 구축이든 증설이든, 아웃바운드가 포함된 견적은 샌드박스를 먼저 떠올리는 것이 현장 감각입니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 8: 옴니채널 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 8 · 옴니채널</p>
+    <h3 class="ex-h-section">채널은 많아졌는데, 정말 통합되어 있나요?</h3>
+
+    <p class="ex-body">고객은 더 이상 전화만 쓰지 않습니다. 카카오톡, 채팅, 이메일, SNS, 앱 안의 문의 폼 — 들어오는 채널이 늘었습니다. 문제는 "이걸 운영하는 방식"입니다. 같은 여러 채널이라도 어떻게 엮느냐에 따라 <span class="ex-strong">멀티채널</span>과 <span class="ex-strong">옴니채널</span>로 완전히 다릅니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">멀티채널</p>
+        <h4 class="ex-h-card">채널은 여럿, 운영은 따로.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화는 시스코 시스템, 채팅은 채널톡, SNS는 별도 툴 — 데이터가 서로 연결되지 않습니다. 채널 간 고객 이력 공유 불가, "채팅하다가 전화로"라는 연속 서비스 불가. 다만 구축 난이도가 낮고 저렴합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">옴니채널</p>
+        <h4 class="ex-h-card">채널은 여럿, 모두 하나로 연결.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">카카오톡으로 시작한 문의를 전화로 이어받을 때, 상담사 화면에 채팅 내용이 함께 보입니다. 채널 전환 시 이력이 연속되고, 통합 고객 뷰로 일관된 서비스 품질을 유지합니다. 단, 구축 난이도·비용이 매우 높습니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 48px;">용어 정리 — 콜, 호, 인터랙션</h4>
+    <p class="ex-body">옴니채널을 이야기하려면 단어부터 정리해야 합니다. 제안서에서 헷갈리기 쉬운 세 단어가 있습니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>용어</th>
+          <th>범위</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">콜</span></td>
+          <td>보이스(전화)만 해당</td>
+          <td>가장 좁은 개념. 옛날부터 쓰던 단어입니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">호 (呼)</span></td>
+          <td>보이스 + 디지털 채널 모두</td>
+          <td>채팅, 이메일, SNS까지 아우르는 한국어 공식 용어입니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">인터랙션</span></td>
+          <td>"호"와 동일</td>
+          <td>글로벌 표준 용어. Interaction Recording, Interaction Management 같은 제품명에 쓰입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="ex-pullquote">"제안서에는 '옴니채널 구축'이라고 써도, 실제 완전한 옴니채널을 구현한 사례는 국내에 거의 없다."</p>
+
+    <p class="ex-body">채널 연동의 기술적 복잡도가 매우 높기 때문입니다. 고객 이력 하나를 모든 채널에서 실시간으로 맞추려면, 채널별 시스템의 데이터 구조부터 통일해야 합니다. 대부분의 "옴니채널 프로젝트"는 사실 <span class="ex-strong">멀티채널 + 일부 연동</span>에 가깝습니다. 영업 단계에서는 이 현실을 감안하고 고객사의 눈높이를 맞춰 가는 것이 중요합니다.</p>
+  </section>
+
+  <!-- SECTION 9: SBC / 미디어 게이트웨이 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 9 · SBC · 미디어 게이트웨이</p>
+    <h3 class="ex-h-section">망의 경계에서 일하는 두 장비.</h3>
+    <p class="ex-lead" style="max-width: 720px;">통신망에서 IP 기반 전화를 연결할 때, 경계(Border)에서 음성 신호를 다루는 두 장비가 있습니다. 미디어 게이트웨이와 SBC입니다. 비슷해 보이지만 역할이 다릅니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 56px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">장비 01</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">미디어 게이트웨이</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">TDM → IP 변환. 구식 전화망(TDM)에서 오는 신호를 IP 신호로 변환하는 장치입니다. 역할은 <span style="color: #f5f5f7; font-weight: 600;">단순 변환</span>에 집중되어 있습니다. 어바이어·시스코가 자체 보이스 게이트웨이를 제공합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">장비 02</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">SBC (Session Border Controller)</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">IP → IP (+α). IP와 IP 사이의 경계 제어. 단순 변환을 넘어 <span style="color: #f5f5f7; font-weight: 600;">라우팅·이중화·보안·RTP 스트리밍</span>까지 처리합니다. 국내에서는 브리지텍과 EICN이 주로 SBC를 담당합니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">AI 콜봇 연동의 핵심은 SBC</h4>
+    <p class="ex-body">최근 AI 콜봇(음성 AI)을 IPCC에 연동하는 프로젝트가 많아졌습니다. 이때 <span class="ex-strong">SBC가 가장 중요한 역할</span>을 합니다. 실시간 통화 음성을 AI 엔진에 흘려보내고, AI가 생성한 음성을 다시 통화로 돌려보내는 이 두 흐름이 모두 SBC를 지나갑니다.</p>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">연동 아키텍처 흐름</p>
+      <p class="ex-callout__text"><span class="ex-strong">SBC → 소프트스위치 → 상담AP → 녹취</span>가 메인 라인입니다. 여기서 SBC가 RTP 스트리밍으로 분기해서 <span class="ex-strong">AI 콜봇 ↔ STT·TTS</span>로 보냅니다. 즉 SBC가 두 갈래의 길을 동시에 여는 허브 역할을 합니다.</p>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 40px;">벤더별 RTP 추출 방식</h4>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>벤더</th>
+          <th>방식</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">어바이어 / 시스코</span></td>
+          <td>보이스 게이트웨이에서 RTP 추출</td>
+          <td><span class="ex-tag">SIPREC 표준 프로토콜</span> 사용</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">브리지텍 / EICN</span></td>
+          <td>SBC에서 RTP 추출</td>
+          <td><span class="ex-tag">심맥 방식</span>으로 스트리밍</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">공통</span></td>
+          <td>RTP 패킷을 2채널까지 스트리밍</td>
+          <td>고객·상담사 분리 필수</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="ex-body" style="margin-top: 24px;">"어떤 벤더의 PBX를 쓰느냐"에 따라 AI 콜봇 연동 방식 자체가 달라집니다. 견적 단계에서 벤더 조합을 확정해야 하는 이유가 여기에 있습니다.</p>
+  </section>
+
+  <!-- SECTION 10: 원벤더 vs 멀티벤더 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 10 · 벤더 전략</p>
+    <h3 class="ex-h-section">한 곳에 맡길까, 최고들을 모을까.</h3>
+
+    <p class="ex-body">IPCC를 구축할 때 솔루션을 <span class="ex-strong">어떻게 조합</span>하느냐에 따라 원벤더와 멀티벤더로 나뉩니다. 둘 다 장단이 뚜렷해서, 고객사의 규모·성격에 맞춰 판단해야 합니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">전략 01</p>
+        <h4 class="ex-h-card">원벤더</h4>
+        <p class="ex-caption" style="margin-top: 12px;">한 업체가 <span class="ex-strong">PBX·CTI·IVR·녹취 전부</span>를 제공합니다. 창구가 하나라 유지보수·책임 소재가 명확합니다. 중소형 콜센터와 그룹사에 적합하고, 장애 시 "어디 잘못이냐"는 논쟁이 없습니다. 최근 트렌드 — 점점 확산되고 있습니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">전략 02</p>
+        <h4 class="ex-h-card">멀티벤더</h4>
+        <p class="ex-caption" style="margin-top: 12px;">영역별로 최적 벤더를 조합합니다. PBX는 시스코, CTI는 제네시스, IVR은 브리지텍 — 이렇게 각각 다른 업체를 씁니다. 대형 금융사·공공기관에 잔존하며, 각 영역 최고 솔루션을 선택할 수 있지만, 장애 시 업체 간 책임 공방이 발생할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">주요 벤더 현황 한눈에 보기</h4>
+    <p class="ex-body">국내 IPCC 시장을 이루는 주요 벤더 다섯 곳을 정리했습니다. 각 벤더의 현재 포지션을 이해하면 제안서·견적이 훨씬 명확해집니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>벤더</th>
+          <th>포지션</th>
+          <th>강점 / 현황</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">브리지텍</span></td>
+          <td><span class="ex-tag ex-tag--primary">국산 강자</span></td>
+          <td>금융권 강세. 농협 수주 등 대형 레퍼런스를 확보한 국내 대표 벤더입니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">EICN</span></td>
+          <td><span class="ex-tag">가성비</span></td>
+          <td>소형 사이트에 강점. 상주 지원에 제한이 있어 규모 선택에 주의가 필요합니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">시스코</span></td>
+          <td><span class="ex-tag">안정적</span></td>
+          <td>특정 대형 고객 중심. 네트워크 장비와의 연계가 큰 장점입니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">제네시스</span></td>
+          <td><span class="ex-tag">클라우드 선도</span></td>
+          <td>클라우드 퍼스트 전략. 글로벌 표준을 이끌어 가는 해외 대표 벤더입니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">어바이어</span></td>
+          <td><span class="ex-tag">불확실</span></td>
+          <td>파산 이력이 있고, 향후 로드맵이 불투명합니다. 신규 도입에는 신중한 접근이 필요합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SECTION 11: 견적 구성 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 11 · 견적 구성</p>
+    <h3 class="ex-h-section">견적은 세 가지 유형으로 접근합니다.</h3>
+    <p class="ex-lead" style="max-width: 720px;">영업에서 IPCC 견적을 낼 때, 사업의 성격에 따라 접근 방식이 달라집니다. 세 가지 유형을 머리에 넣어 두면, 고객 요청을 들을 때 바로 프레임을 잡을 수 있습니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 56px;">
+      <div class="ex-card">
+        <p class="ex-step__num" style="color: #86868b;">Type 01</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">신규 구축</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">PBX + CTI + IVR + 녹취 + 상담AP 전체 구매. <span style="color: #f5f5f7; font-weight: 600;">인바운드(수신) 전용인지, 아웃바운드(PDS)도 필요한지</span> 반드시 확인해야 합니다. 필요 시 WFM, 채팅 채널도 추가 검토합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-step__num" style="color: #86868b;">Type 02</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">리텐션 / 증설</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">기존 시스템 유지 + 라이센스 추가. 상담석이 100석에서 150석으로 늘면 CTI 모니터링 라이센스, IVR 포트, 녹취 채널 등을 증설합니다. <span style="color: #f5f5f7; font-weight: 600;">후속 사업으로 가장 안정적</span>인 유형입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-step__num" style="color: #86868b;">Type 03</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">전면 교체 (리플레이스먼트)</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">기존 장비 전체를 걷어내고 새로 구축합니다. <span style="color: #f5f5f7; font-weight: 600;">통신사 회선부터 변경도 가능</span>(투자 유치 포함). 원벤더 솔루션으로의 전환이 최근 트렌드입니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">견적 대화에서 꼭 물어야 할 것</h4>
+    <p class="ex-body">신규·증설·전면교체 중 어떤 유형이든, 초기 대화에서 반드시 확인할 포인트가 있습니다. 이걸 안 물어보면 견적이 통째로 흔들립니다.</p>
+
+    <ul class="ex-list">
+      <li><span class="ex-strong">인바운드만?</span> 아웃바운드(PDS)도 필요합니까? 아웃바운드가 포함되면 캠페인·리스트 관리 모듈까지 추가됩니다.</li>
+      <li><span class="ex-strong">채널은?</span> 전화만입니까, 카카오톡·채팅도 포함합니까? 멀티채널이냐 옴니채널이냐로 난이도가 크게 갈립니다.</li>
+      <li><span class="ex-strong">AI 콜봇 연동?</span> AICC·AI 분석을 붙일 예정입니까? 그렇다면 SBC와 스테레오 녹취가 필수 스펙이 됩니다.</li>
+      <li><span class="ex-strong">원벤더·멀티벤더?</span> 기존 장비가 어떤 조합입니까? 어바이어 잔존 여부에 따라 교체 시나리오가 달라집니다.</li>
+      <li><span class="ex-strong">통신사 회선?</span> 회선까지 손댈 계획입니까? 전면 교체라면 통신사 변경 카드까지 열어 둡니다.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 12: 학습 체크리스트 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 12 · 체크리스트</p>
+    <h3 class="ex-h-section">2차 교육, 이것만은 설명할 수 있어야 합니다.</h3>
+    <p class="ex-body" style="color: #6e6e73;">아래 일곱 가지 질문에 자신 있게 답할 수 있다면, 심화 교육의 목적은 달성된 것입니다. 못 풀리는 항목이 있다면 해당 챕터로 돌아가 한 번 더 읽어 보세요.</p>
+
+    <div style="margin-top: 32px;">
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q1. PBX의 4가지 자원을 모두 설명할 수 있나요?</p>
+        <p class="ex-qa__a">대표번호(큐), 내선번호, IVR 포트, 스킬 그룹. 각각이 견적에서 어떤 항목에 해당하는지까지 연결해서 이야기할 수 있어야 합니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q2. 어바이어 VDN, 시스코 CDN, 제네시스 라우팅 포인트가 같은 개념이라는 것을 아나요?</p>
+        <p class="ex-qa__a">용어만 다를 뿐, 모두 대표번호(큐)를 가리키는 벤더별 명칭입니다. 제안서에서 서로 다른 표현을 보면 같은 것을 말하는 중임을 알아챌 수 있어야 합니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q3. CTI가 16진수 프로토콜을 사람이 읽는 데이터로 변환한다는 것을 이해했나요?</p>
+        <p class="ex-qa__a">PBX의 HEX 신호를 발신번호·수신시각 같은 읽기 좋은 데이터로 바꾸는 것이 CTI의 핵심 역할 중 하나입니다. 여기에서 모든 통계와 라우팅이 출발합니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q4. PDS 3가지 모드(Preview·Progressive·Predictive)의 차이를 설명할 수 있나요?</p>
+        <p class="ex-qa__a">수동 클릭, 1:1 가용 자원 맞춤, 초과 발신 예측. 각각의 사용 상황과 포기율·소진 속도의 트레이드오프까지 함께 말할 수 있어야 합니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q5. 멀티채널과 옴니채널의 핵심 차이를 이해하나요?</p>
+        <p class="ex-qa__a">채널 간 이력 연속성이 있느냐, 없느냐가 결정적 차이입니다. 그리고 국내에 "완전한 옴니채널"이 드물다는 현실 감각까지 갖추는 것이 중요합니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q6. SBC와 미디어 게이트웨이의 역할 차이를 설명할 수 있나요?</p>
+        <p class="ex-qa__a">미디어 게이트웨이는 TDM→IP 단순 변환, SBC는 IP→IP 경계 제어 + 라우팅·이중화·보안·RTP 스트리밍. AI 콜봇 연동에서는 SBC가 핵심입니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">Q7. 원벤더와 멀티벤더, 어떤 상황에 무엇이 적합한지 판단할 수 있나요?</p>
+        <p class="ex-qa__a">중소형·그룹사는 원벤더, 대형 금융사·공공기관은 멀티벤더 잔존. 최근 트렌드가 원벤더로 수렴하고 있다는 흐름까지 함께 설명하면 좋습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING (DARK) -->
+  <section class="ex-section ex-section--dark" style="text-align: center; padding-top: clamp(80px, 10vw, 140px); padding-bottom: clamp(80px, 10vw, 140px);">
+    <p class="ex-eyebrow" style="color: #86868b;">마치며 · One-line Takeaway</p>
+    <p class="ex-quote" style="max-width: 760px; margin: 24px auto 0;">"IPCC는 장비의 합이 아니라, PDS·옴니채널·SBC·벤더·견적이 맞물리는 하나의 생태계다."</p>
+    <p class="ex-caption" style="color: #86868b; margin-top: 32px;">작성일: 2026.01.12 · 출처: IPCC 심화 교육 세미나 (김민식)</p>
+  </section>
+
+</div>
+`;
+
+    LECTURE_CONTENT['ipcc-seminar'] = `
+<style>
+  .ex-apple { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1d1d1f; }
+  .ex-apple .ex-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 16px; }
+  .ex-apple .ex-h-hero { font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; color: #1d1d1f; margin: 0 0 20px; }
+  .ex-apple .ex-h-section { font-size: clamp(28px, 3.6vw, 44px); font-weight: 700; line-height: 1.1; letter-spacing: -0.022em; margin: 0 0 20px; }
+  .ex-apple .ex-h-sub { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; margin: 32px 0 12px; color: #1d1d1f; }
+  .ex-apple .ex-h-card { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.012em; margin: 0 0 10px; }
+  .ex-apple .ex-lead { font-size: clamp(18px, 1.6vw, 22px); font-weight: 400; line-height: 1.45; color: #6e6e73; margin: 0 0 28px; letter-spacing: -0.005em; }
+  .ex-apple .ex-body { font-size: 17px; line-height: 1.7; color: #1d1d1f; margin: 0 0 18px; max-width: 720px; letter-spacing: -0.003em; }
+  .ex-apple .ex-body--muted { color: #6e6e73; }
+  .ex-apple .ex-caption { font-size: 14px; line-height: 1.55; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section { padding: clamp(48px, 7vw, 88px) clamp(24px, 4vw, 48px); border-radius: 22px; margin: 16px 0; }
+  .ex-apple .ex-section--light { background: #f5f5f7; }
+  .ex-apple .ex-section--white { background: #fff; }
+  .ex-apple .ex-section--dark { background: #000; color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-h-section,
+  .ex-apple .ex-section--dark .ex-h-card,
+  .ex-apple .ex-section--dark .ex-h-sub,
+  .ex-apple .ex-section--dark .ex-h-hero { color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-lead { color: #a1a1a6; }
+  .ex-apple .ex-section--dark .ex-body { color: #d2d2d7; }
+  .ex-apple .ex-section--dark .ex-caption { color: #86868b; }
+  .ex-apple .ex-section--dark .ex-eyebrow { color: #86868b; }
+  .ex-apple .ex-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ex-apple .ex-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .ex-apple .ex-card { background: #fff; border-radius: 18px; padding: 28px; }
+  .ex-apple .ex-section--dark .ex-card { background: #1d1d1f; }
+  .ex-apple .ex-section--white .ex-card { background: #f5f5f7; }
+  .ex-apple .ex-num { font-size: clamp(48px, 6vw, 80px); font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #1d1d1f; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-num { color: #f5f5f7; }
+  .ex-apple .ex-divider { height: 1px; background: #d2d2d7; border: none; margin: 32px 0; }
+  .ex-apple .ex-section--dark .ex-divider { background: #424245; }
+
+  /* Blog-style elements */
+  .ex-apple .ex-pullquote { font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; line-height: 1.35; letter-spacing: -0.018em; color: #1d1d1f; margin: 40px 0; padding: 0 0 0 24px; border-left: 3px solid #1d1d1f; max-width: 720px; }
+  .ex-apple .ex-section--dark .ex-pullquote { color: #f5f5f7; border-left-color: #f5f5f7; }
+  .ex-apple .ex-callout { background: #fff; border-radius: 16px; padding: 24px 28px; margin: 28px 0; max-width: 720px; }
+  .ex-apple .ex-section--white .ex-callout { background: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-callout { background: #1d1d1f; }
+  .ex-apple .ex-callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: #6e6e73; text-transform: uppercase; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-callout__label { color: #86868b; }
+  .ex-apple .ex-callout__text { font-size: 16px; line-height: 1.6; color: #1d1d1f; margin: 0; }
+  .ex-apple .ex-section--dark .ex-callout__text { color: #f5f5f7; }
+  .ex-apple .ex-list { list-style: none; padding: 0; margin: 24px 0; max-width: 720px; }
+  .ex-apple .ex-list li { padding: 16px 0; border-bottom: 1px solid #d2d2d7; font-size: 16px; line-height: 1.55; color: #1d1d1f; }
+  .ex-apple .ex-list li:last-child { border-bottom: none; }
+  .ex-apple .ex-section--dark .ex-list li { color: #d2d2d7; border-bottom-color: #424245; }
+
+  /* Table */
+  .ex-apple table.ex-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+  .ex-apple table.ex-table thead th { text-align: left; padding: 16px 12px; color: #6e6e73; font-weight: 500; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; border-bottom: 1px solid #d2d2d7; }
+  .ex-apple table.ex-table tbody td { padding: 20px 12px; border-bottom: 1px solid #e8e8ed; vertical-align: top; color: #1d1d1f; }
+  .ex-apple table.ex-table tbody tr:last-child td { border-bottom: none; }
+  .ex-apple table.ex-table .ex-tag { display: inline-block; padding: 3px 10px; border-radius: 980px; background: #f5f5f7; color: #6e6e73; font-size: 12px; font-weight: 500; }
+  .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
+  .ex-apple .ex-section--dark table.ex-table thead th { color: #86868b; border-bottom-color: #424245; }
+  .ex-apple .ex-section--dark table.ex-table tbody td { color: #d2d2d7; border-bottom-color: #424245; }
+  .ex-apple .ex-section--dark table.ex-table .ex-tag { background: #1d1d1f; color: #a1a1a6; }
+  .ex-apple .ex-section--dark table.ex-table .ex-tag--primary { background: #f5f5f7; color: #1d1d1f; }
+
+  /* Pipeline */
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+
+  /* Timeline (history) */
+  .ex-apple .ex-timeline { position: relative; padding-left: 32px; margin: 40px 0; max-width: 760px; }
+  .ex-apple .ex-timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: #d2d2d7; }
+  .ex-apple .ex-section--dark .ex-timeline::before { background: #424245; }
+  .ex-apple .ex-timeline__item { position: relative; padding: 0 0 36px; }
+  .ex-apple .ex-timeline__item:last-child { padding-bottom: 0; }
+  .ex-apple .ex-timeline__dot { position: absolute; left: -32px; top: 6px; width: 15px; height: 15px; border-radius: 50%; background: #1d1d1f; border: 3px solid #f5f5f7; box-sizing: border-box; }
+  .ex-apple .ex-section--white .ex-timeline__dot { border-color: #fff; }
+  .ex-apple .ex-section--dark .ex-timeline__dot { background: #f5f5f7; border-color: #000; }
+  .ex-apple .ex-timeline__year { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 6px; }
+  .ex-apple .ex-section--dark .ex-timeline__year { color: #86868b; }
+  .ex-apple .ex-timeline__title { font-size: 20px; font-weight: 600; line-height: 1.3; letter-spacing: -0.012em; color: #1d1d1f; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-timeline__title { color: #f5f5f7; }
+  .ex-apple .ex-timeline__body { font-size: 16px; line-height: 1.6; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section--dark .ex-timeline__body { color: #a1a1a6; }
+
+  /* Q&A */
+  .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
+  .ex-apple .ex-qa:first-of-type { border-top: 1px solid #d2d2d7; }
+  .ex-apple .ex-qa__q { font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.012em; color: #1d1d1f; margin: 0 0 10px; }
+  .ex-apple .ex-qa__a { font-size: 16px; line-height: 1.65; color: #6e6e73; margin: 0; }
+
+  /* Closing */
+  .ex-apple .ex-quote { font-size: clamp(24px, 3vw, 40px); font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; color: #f5f5f7; margin: 0; }
+  .ex-apple .ex-strong { color: #1d1d1f; font-weight: 600; }
+  .ex-apple .ex-section--dark .ex-strong { color: #fff; }
+
+  @media (max-width: 768px) {
+    .ex-apple .ex-grid-3, .ex-apple .ex-grid-2 { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline__arrow { transform: rotate(90deg); padding: 8px 0; }
+  }
+</style>
+
+<div class="ex-apple">
+
+  <!-- HERO -->
+  <section class="ex-section ex-section--light" style="padding-top: clamp(72px, 10vw, 140px); padding-bottom: clamp(56px, 7vw, 96px); text-align: left;">
+    <p class="ex-eyebrow">IPCC 팀 세미나</p>
+    <h2 class="ex-h-hero">콜센터의 역사,<br/>한 시간 만에.</h2>
+    <p class="ex-lead" style="max-width: 640px;">키폰부터 AICC까지. 어플라이언스부터 클라우드까지.<br/>업계에 처음 들어온 분도 흐름을 잡을 수 있도록 정리했습니다.</p>
+    <p class="ex-caption" style="margin-top: 32px;">읽는 시간 · 약 10분</p>
+  </section>
+
+  <!-- 들어가며 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">들어가며</p>
+    <h3 class="ex-h-section">왜 콜센터의 역사를 알아야 할까요?</h3>
+
+    <p class="ex-body">"AICC가 핫하다"는 말은 누구나 들어 봤을 겁니다. 그런데 막상 현장에 가 보면 여전히 20년 된 어바이어 장비가 돌아가고, 어떤 곳은 이미 클라우드로 다 넘어갔고, 또 어떤 곳은 그 중간 어딘가에 있습니다. <span class="ex-strong">왜 이렇게 회사마다 환경이 다른지</span>를 이해하려면 콜센터가 어떻게 진화해 왔는지부터 알아야 합니다.</p>
+
+    <p class="ex-body">콜센터는 단순한 전화 교환기에서 출발해, 컴퓨터와 연결되고, 인터넷으로 옮겨 가고, 이제는 AI가 옴니채널을 처리하는 플랫폼이 되었습니다. <span class="ex-strong">각 단계마다 주류 벤더가 바뀌었고, 그 흔적이 지금 시장에 그대로 남아 있습니다.</span> 어바이어가 왜 무너졌는지, 제네시스가 왜 클라우드로 갈아타려 하는지, 시스코가 왜 갑자기 강해졌는지 — 모두 이 흐름 위에서 설명됩니다.</p>
+
+    <p class="ex-pullquote">"지금 시장의 모든 트렌드는, 30년 전 키폰에서 시작된 흐름의 연속이다."</p>
+
+    <p class="ex-body ex-body--muted">이 글에서는 콜센터 발전사부터 어플라이언스 vs 범용 장비, 가상화의 의미, IPCC를 구성하는 7가지 요소, 벤더별 현황, 그리고 지금 시장을 이끄는 핵심 트렌드까지 순서대로 정리합니다.</p>
+  </section>
+
+  <!-- Chapter 1: 발전사 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 1 · 발전사</p>
+    <h3 class="ex-h-section">콜센터는 어떻게 진화해 왔을까요?</h3>
+
+    <p class="ex-body">콜센터의 역사는 크게 다섯 단계로 나눌 수 있습니다. 핵심은 <span class="ex-strong">"전화만 연결" → "전화 + 데이터" → "전화 + 데이터 + AI"</span>로 점점 더 많은 것을 연계하는 방향으로 발전해 왔다는 점입니다.</p>
+
+    <div class="ex-timeline">
+      <div class="ex-timeline__item">
+        <div class="ex-timeline__dot"></div>
+        <p class="ex-timeline__year">1980 ~ 90년대</p>
+        <h4 class="ex-timeline__title">키폰(Key Phone) 시대</h4>
+        <p class="ex-timeline__body">버튼식 전화기로 상담원이 직접 전화를 받아 처리하던 시절입니다. 모든 것이 수동이었고, 연결이 끊기면 기록도 함께 사라졌습니다. 통화 내용은 종이 메모로 남기는 것이 전부였습니다.</p>
+      </div>
+      <div class="ex-timeline__item">
+        <div class="ex-timeline__dot"></div>
+        <p class="ex-timeline__year">1990년대 후반</p>
+        <h4 class="ex-timeline__title">IVR · ARS 도입</h4>
+        <p class="ex-timeline__body">"잔액 조회는 1번, 분실 신고는 2번"으로 익숙한 자동응답 시스템(IVR, Interactive Voice Response)이 등장합니다. 단순 업무를 기계가 대신 처리하기 시작한 첫 단계입니다. 상담원의 업무 부담이 처음으로 줄어든 시점이기도 합니다.</p>
+      </div>
+      <div class="ex-timeline__item">
+        <div class="ex-timeline__dot"></div>
+        <p class="ex-timeline__year">2000년대 초반</p>
+        <h4 class="ex-timeline__title">상담 AP + CTI 통합</h4>
+        <p class="ex-timeline__body">이때부터 전화와 컴퓨터가 손을 잡습니다. CTI(Computer Telephony Integration) 덕분에 고객이 전화하면 상담원 화면에 고객 정보가 자동으로 떠오르는 "팝업" 기능이 가능해졌습니다. 비로소 "데이터 기반 상담"이라는 개념이 자리 잡습니다.</p>
+      </div>
+      <div class="ex-timeline__item">
+        <div class="ex-timeline__dot"></div>
+        <p class="ex-timeline__year">2010년대</p>
+        <h4 class="ex-timeline__title">SIP · IP 전환</h4>
+        <p class="ex-timeline__body">아날로그 전화선(PSTN)에서 인터넷 기반 음성통화(VoIP / SIP)로 옮겨 갑니다. 전용 하드웨어 의존도가 떨어지고 운영 비용이 크게 줄어듭니다. 이 변화가 다음 단계인 클라우드 전환의 기반을 만듭니다.</p>
+      </div>
+      <div class="ex-timeline__item">
+        <div class="ex-timeline__dot"></div>
+        <p class="ex-timeline__year">2020년대 — 현재</p>
+        <h4 class="ex-timeline__title">AI 옴니채널 AICC</h4>
+        <p class="ex-timeline__body">전화 + 채팅 + SNS를 하나의 플랫폼에서 처리하는 시대가 옵니다. AI가 자동응답을 하고, 실시간으로 지식을 추천하고, 통화가 끝나면 요약까지 만들어 줍니다. 이것이 바로 <span class="ex-strong">AICC(AI Contact Center)</span>입니다.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">한 줄 정리</p>
+      <p class="ex-callout__text">콜센터의 역사는 결국 <span class="ex-strong">"사람 손이 하던 일을 기계가, 그다음엔 AI가 대신 처리하게 만든 과정"</span>입니다. 단계마다 주력 벤더와 핵심 기술이 바뀌었고, 그 흔적이 지금 시장에 그대로 남아 있습니다.</p>
+    </div>
+  </section>
+
+  <!-- Chapter 2: 어플라이언스 vs 범용서버 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 2 · 어플라이언스 vs 범용서버</p>
+    <h3 class="ex-h-section">전용장비와 일반서버, 무엇이 다른가요?</h3>
+
+    <p class="ex-body">콜센터 시스템을 구축할 때 가장 먼저 갈리는 선택지가 이것입니다. <span class="ex-strong">특정 제조사의 전용 하드웨어(어플라이언스)를 살 것이냐, 일반 x86 서버 위에 소프트웨어를 올릴 것이냐.</span> 이 선택이 향후 5~10년의 운영 비용과 확장성을 결정합니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">방식 01</p>
+        <h4 class="ex-h-card">어플라이언스 — 전용 하드웨어</h4>
+        <p class="ex-caption" style="margin-top: 12px;">어바이어(Avaya), 시스코(Cisco)로 대표됩니다. 특정 제조사의 전용 장비에 전용 소프트웨어가 통째로 들어 있는 형태입니다. 한번 사면 같은 벤더 장비로만 교체·확장이 가능하고, 가격이 비싸며, 클라우드 전환에도 불리합니다. <span class="ex-strong">현재 추세는 시장 점유율 하락.</span></p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">방식 02</p>
+        <h4 class="ex-h-card">범용서버 — 소프트웨어 기반</h4>
+        <p class="ex-caption" style="margin-top: 12px;">브리지텍, 제네시스(Genesys)가 대표적입니다. 일반 x86 서버에 소프트웨어를 설치해 운영합니다. 비용이 효율적이고 확장이 유연하며, 클라우드 환경과도 자연스럽게 연동됩니다. 벤더 종속성도 낮습니다. <span class="ex-strong">시장의 대세.</span></p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">쉽게 비유하면</p>
+      <p class="ex-callout__text">어플라이언스는 <span class="ex-strong">"특정 브랜드 부품만 쓸 수 있는 전용 가전제품"</span>, 범용서버는 <span class="ex-strong">"일반 PC에 원하는 프로그램을 깔아서 쓰는 방식"</span>입니다. 처음엔 전용 가전이 안정적으로 보이지만, 부품이 단종되거나 회사가 흔들리면 답이 없습니다.</p>
+    </div>
+
+    <p class="ex-pullquote">"어바이어의 파산은 우연이 아니라, 어플라이언스 모델의 한계를 보여 준 사건이었다."</p>
+  </section>
+
+  <!-- Chapter 3: 가상화 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 3 · 가상화 시대</p>
+    <h3 class="ex-h-section">서버 한 대에 여러 개의 가상 컴퓨터.</h3>
+    <p class="ex-lead" style="max-width: 720px;">가상화(Virtualization)는 콜센터 인프라를 근본적으로 바꿨습니다. 같은 일을 더 적은 장비로, 더 적은 비용으로 처리할 수 있게 만든 기술입니다.</p>
+
+    <p class="ex-body" style="margin-top: 56px;">예전에는 IVR 서버 한 대, CTI 서버 한 대, 녹취 서버 한 대처럼 <span class="ex-strong">기능마다 물리 서버를 따로 두는 것</span>이 당연했습니다. 그런데 한번 생각해 보면, 이 서버들은 평소에 5~10%밖에 안 쓰입니다. 비싼 장비를 사 놓고 대부분의 시간 동안 놀리고 있는 셈입니다.</p>
+
+    <p class="ex-body">가상화는 이 낭비를 없애 줍니다. 고성능 서버 한 대에 <span class="ex-strong">VMware 같은 가상화 소프트웨어</span>를 깔면, 그 위에 여러 개의 "가상 머신(VM)"을 올릴 수 있습니다. 마치 한 대의 컴퓨터 안에 여러 대의 컴퓨터가 들어 있는 것처럼 동작합니다. 결과적으로 서버 대수가 줄고, 전기·공간·관리 비용이 동시에 절감됩니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">가상화의 핵심 — 이미지(Image)</h4>
+    <p class="ex-body">가상화의 진짜 강력한 점은 "복제"입니다. 서버 설정 전체를 <span class="ex-strong">파일 하나(이미지)</span>로 저장해 둘 수 있습니다. 새 서버가 필요할 때 이 이미지를 복사해서 바로 실행하면 끝입니다. 컴퓨터 백업본을 그대로 다른 장비에 올리는 것과 같은 개념입니다. 장애 대응도 빨라지고, 테스트 환경 구축도 단숨에 끝납니다.</p>
+
+    <h4 class="ex-h-sub">가상화 vs 클라우드 — 어디가 다를까요?</h4>
+    <p class="ex-body">자주 헷갈리는 부분입니다. 둘 다 "서버를 효율적으로 쓰는 기술"이지만 위치가 다릅니다. <span class="ex-strong">가상화는 우리 사무실(또는 데이터센터) 안에 서버를 두고 직접 운영</span>하는 온프레미스 방식이고, <span class="ex-strong">클라우드는 AWS·Azure 같은 외부 데이터센터를 빌려 쓰는</span> 방식입니다. 보안이 중요한 금융권은 데이터를 외부로 보내지 않으려고 가상화(온프레미스)를 선호하는 경우가 많습니다.</p>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">왜 이게 중요할까요?</p>
+      <p class="ex-callout__text">가상화는 <span class="ex-strong">"클라우드로 가기 전 단계"</span>이기도 합니다. 일단 시스템을 가상 머신 형태로 만들어 두면, 나중에 그 이미지를 그대로 클라우드로 옮길 수 있습니다. 그래서 지금 가상화 위에서 잘 돌아가는 콜센터는 향후 클라우드 전환의 부담이 훨씬 적습니다.</p>
+    </div>
+  </section>
+
+  <!-- Chapter 4: IPCC 7가지 구성요소 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 4 · IPCC 구성요소</p>
+    <h3 class="ex-h-section">IPCC를 이루는 7가지 핵심 요소.</h3>
+
+    <p class="ex-body">IPCC(IP Contact Center)는 단일 제품이 아니라 <span class="ex-strong">여러 시스템이 유기적으로 연결된 복합 솔루션</span>입니다. 각 요소가 어떤 역할을 하는지 알면, 견적서나 제안서를 봤을 때 무엇을 빼고 더해야 할지가 보입니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01</p>
+        <h4 class="ex-h-card">PBX — 교환기</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화 연결을 담당하는 핵심 장비. 고객 전화를 받아 알맞은 상담원에게 연결해 주는 "전화 교환수" 역할을 합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02</p>
+        <h4 class="ex-h-card">CTI — 컴퓨터-전화 통합</h4>
+        <p class="ex-caption" style="margin-top: 12px;">전화와 컴퓨터를 묶어 줍니다. 고객 전화가 들어오면 화면에 고객 정보가 자동으로 뜨고, 상담 데이터가 시스템 간에 오갑니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03</p>
+        <h4 class="ex-h-card">IVR — 자동응답</h4>
+        <p class="ex-caption" style="margin-top: 12px;">"1번 누르세요" 방식의 자동 메뉴. 단순 문의를 자동으로 처리하고, 상담원 연결 전에 본인 인증과 사전 안내를 진행합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">04</p>
+        <h4 class="ex-h-card">녹취 시스템</h4>
+        <p class="ex-caption" style="margin-top: 12px;">통화 내용 전체를 저장합니다. 법적 분쟁 대비, 품질 관리, AI 분석(TA)의 원천 데이터로 쓰입니다. 금융권에서는 필수입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">05</p>
+        <h4 class="ex-h-card">상담 AP — 애플리케이션</h4>
+        <p class="ex-caption" style="margin-top: 12px;">상담원이 실제 보고 쓰는 화면입니다. 고객 정보 조회, 상담 이력 기록, 업무 처리가 모두 여기서 일어납니다. <span class="ex-strong">수정 비용이 가장 큰 영역</span>이기도 합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">06</p>
+        <h4 class="ex-h-card">PDS — 자동발신</h4>
+        <p class="ex-caption" style="margin-top: 12px;">아웃바운드(발신) 콜을 자동화합니다. 고객 목록을 정해진 순서대로 자동으로 발신해 마케팅·수납 업무에 활용됩니다.</p>
+      </div>
+    </div>
+
+    <div class="ex-card" style="margin-top: 20px;">
+      <p class="ex-eyebrow">07</p>
+      <h4 class="ex-h-card">WFM — 인력 관리 시스템 (Workforce Management)</h4>
+      <p class="ex-caption" style="margin-top: 12px;">콜 예측을 기반으로 필요한 상담원 수를 계산하고 스케줄을 자동 배분합니다. <span class="ex-strong">도입 비용이 억 단위</span>라 주로 대형 센터에서 쓰입니다. 중소 센터는 ROI 검토가 필수입니다.</p>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">교환기(PBX)와 CTI, 무엇이 다를까요?</h4>
+    <p class="ex-body">둘 다 "전화" 관련이라 헷갈리기 쉽지만 역할이 전혀 다릅니다. <span class="ex-strong">PBX는 전화 회선을 물리적으로 연결</span>하는 장비이고, <span class="ex-strong">CTI는 그 전화에 데이터를 얹어 지능적으로 처리</span>하는 소프트웨어입니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>비교 항목</th>
+          <th>교환기 (PBX)</th>
+          <th>CTI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">역할</span></td>
+          <td>전화 연결 (물리적 회선)</td>
+          <td>전화 + 컴퓨터 통합 (데이터 연계)</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">라우팅</span></td>
+          <td><span class="ex-tag">소극적 — 단순 분배</span></td>
+          <td><span class="ex-tag ex-tag--primary">적극적 — 조건 기반 지능 분배</span></td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">데이터 전달</span></td>
+          <td>불가</td>
+          <td>고객정보 자동 팝업</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">이력 관리</span></td>
+          <td>없음</td>
+          <td>상담 이력 DB 저장</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">우선순위 처리</span></td>
+          <td>선착순만 가능</td>
+          <td>VIP · 긴급 고객 우선</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Chapter 5: 벤더별 현황 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 5 · 벤더 현황</p>
+    <h3 class="ex-h-section">지금 시장에서 누가 강한가요?</h3>
+    <p class="ex-lead" style="max-width: 720px;">콜센터 벤더 지형은 지난 5년간 격변했습니다. 한때의 1위가 무너지고, 새로운 강자가 떠오르는 중입니다. 다섯 곳을 짚어 봅니다.</p>
+
+    <table class="ex-table" style="margin-top: 48px;">
+      <thead>
+        <tr>
+          <th>벤더</th>
+          <th>현 상태</th>
+          <th>특징</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">어바이어 (Avaya)</span></td>
+          <td><span class="ex-tag">파산</span></td>
+          <td>전용장비 중심의 글로벌 1위였습니다. 그러나 클라우드 전환에 실패하면서 2023년 파산 신청. 레거시 고객의 유지보수 비용이 급등하고 있습니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">제네시스 (Genesys)</span></td>
+          <td><span class="ex-tag">클라우드 퍼스트</span></td>
+          <td>온프레미스 제품 <span class="ex-strong">2028년 단종을 선언</span>했습니다. 클라우드(Genesys Cloud)로 전략을 완전히 전환 중. 기존 온프레미스 고객은 이전 압박을 받고 있습니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">시스코 (Cisco)</span></td>
+          <td><span class="ex-tag ex-tag--primary">상승세</span></td>
+          <td>Webex Contact Center로 클라우드 전환에 성공. 어바이어와 제네시스에서 이탈하는 고객을 흡수하면서 글로벌 점유율을 확대하고 있습니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">브리지텍</span></td>
+          <td><span class="ex-tag ex-tag--primary">국산 강자</span></td>
+          <td><span class="ex-strong">금융권 IVR 시장 압도적 1위</span>. 국내 주요 은행·보험사 레퍼런스를 다수 보유. 범용서버 기반으로 안정적 운영 실적을 쌓아 왔습니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">넥서스 (Nexus)</span></td>
+          <td><span class="ex-tag">경영 위기</span></td>
+          <td>국내 중견 IPCC 벤더. 경영 불안정 이슈가 있어 신규 도입 시 리스크 관리가 필요합니다. 기존 고객사는 유지보수 연속성을 주의 깊게 챙겨야 합니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="ex-pullquote">"클라우드 전환에 성공한 곳은 살아남고, 어플라이언스만 붙들고 있던 곳은 무너졌다."</p>
+  </section>
+
+  <!-- Chapter 6: 핵심 트렌드 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 6 · 시장 트렌드</p>
+    <h3 class="ex-h-section">지금 시장을 이끄는 세 가지 흐름.</h3>
+
+    <p class="ex-body">벤더 지형이 바뀌면서 시장 전체의 흐름도 함께 바뀌고 있습니다. 지금 콜센터 업계에서 일어나는 변화는 결국 <span class="ex-strong">"통합 · 이전 · 연계"</span> 세 단어로 요약됩니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 40px;">하나, 원벤더(One Vendor) 전략</h4>
+    <p class="ex-body">예전에는 PBX는 어바이어, CTI는 A사, 녹취는 B사처럼 <span class="ex-strong">기능마다 다른 벤더 제품을 섞어 쓰는 멀티벤더 방식</span>이 일반적이었습니다. 지금은 한 벤더가 모든 것을 제공하는 원벤더 방식으로 바뀌고 있습니다. 유지보수 비용이 줄어들고, 장애가 났을 때 책임 소재가 명확해지기 때문입니다. 여러 회사를 동시에 부르고 서로 책임을 미루는 일이 사라집니다.</p>
+
+    <h4 class="ex-h-sub">둘, 클라우드 전환</h4>
+    <p class="ex-body">온프레미스 장비는 보통 <span class="ex-strong">5~7년 주기</span>로 교체합니다. 그 시점에 새 장비를 사는 대신 클라우드로 옮기는 결정을 하는 곳이 많아졌습니다. 초기 투자 비용이 줄고, 트래픽에 따라 탄력적으로 확장할 수 있기 때문입니다. 다만 금융권은 보안 규제 때문에 완전 클라우드는 어렵고, <span class="ex-strong">온프레미스와 병행하는 하이브리드</span>가 현실적입니다.</p>
+
+    <h4 class="ex-h-sub">셋, 화자분리(RX / TX) 필수화</h4>
+    <p class="ex-body">AICC 시대의 새로운 요구사항입니다. 통화 음성을 <span class="ex-strong">고객 측(RX)과 상담원 측(TX)으로 분리해서 녹음</span>하는 것이 표준이 되고 있습니다. AI가 누가 무슨 말을 했는지 정확히 분석해야 STT(음성→텍스트), 통화 요약, 감정 분석의 품질이 올라가기 때문입니다. 기존에 한 채널로만 녹음하던 곳은 AICC 도입 전에 화자분리부터 정비해야 합니다.</p>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">한 줄 정리</p>
+      <p class="ex-callout__text"><span class="ex-strong">원벤더로 단순화하고, 클라우드로 옮기고, AI를 위해 화자분리부터 깔아 두는 것</span> — 지금 콜센터 IT 담당자들이 가장 많이 고민하는 세 가지 주제가 정확히 이 순서대로입니다.</p>
+    </div>
+  </section>
+
+  <!-- Chapter 7: 비용 & 실무 팁 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 7 · 비용 · 실무</p>
+    <h3 class="ex-h-section">현장에서 꼭 알아야 할 숫자와 팁.</h3>
+
+    <p class="ex-body">이론은 이쯤 하고, 실제로 일하면서 마주치는 숫자와 함정을 정리합니다. 견적을 검토하거나 제안을 받을 때 기준이 되는 정보입니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div>
+        <p class="ex-num">30~80<span style="font-size:0.4em; font-weight:500; color:#6e6e73;"> 만원/월</span></p>
+        <p class="ex-caption">ASP 렌탈 방식 기준, 상담 1석당 월 비용. 100석 센터라면 월 3,000~8,000만원 수준입니다.</p>
+      </div>
+      <div>
+        <p class="ex-num">억<span style="font-size:0.4em; font-weight:500; color:#6e6e73;"> 단위</span></p>
+        <p class="ex-caption">WFM(인력관리 시스템) 도입 비용. 대형 센터에서나 ROI가 나오므로 중소 센터는 신중한 검토가 필요합니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">실무에서 꼭 챙겨야 할 네 가지</h4>
+    <ul class="ex-list">
+      <li><span class="ex-strong">금융권 구축이라면 브리지텍 검토 필수.</span> IVR 시장에서 압도적 점유율을 가진 만큼, 견적과 호환성 측면에서 빠뜨리면 안 됩니다.</li>
+      <li><span class="ex-strong">IVR 시나리오는 레거시가 많습니다.</span> 변경 작업 전에 현재 시나리오 전수를 파악해야 합니다. 안 그러면 운영 중에 끊기는 메뉴가 나옵니다.</li>
+      <li><span class="ex-strong">상담 AP 수정은 비용이 큽니다.</span> 상담원이 실제 쓰는 화면이라 손대면 작업 범위가 커집니다. 범위와 단가를 사전에 명확히 협의해야 합니다.</li>
+      <li><span class="ex-strong">운영계와 테스트계 구분을 철저히.</span> 실서비스에 영향이 가지 않도록 환경 분리는 절대 양보하면 안 되는 영역입니다.</li>
+    </ul>
+  </section>
+
+  <!-- 마치며 (DARK) -->
+  <section class="ex-section ex-section--dark" style="text-align: center; padding-top: clamp(80px, 10vw, 140px); padding-bottom: clamp(80px, 10vw, 140px);">
+    <p class="ex-eyebrow" style="color: #86868b;">마치며 · One-line Summary</p>
+    <p class="ex-quote" style="max-width: 820px; margin: 24px auto 0;">"전화 연결에서 데이터 연계로, 그리고 AI 자동화로 — 콜센터의 진화는 지금도 계속되고 있다."</p>
+    <p class="ex-caption" style="color: #86868b; margin-top: 32px;">— IPCC 팀 세미나</p>
+  </section>
+
+</div>
+`;
+
+    LECTURE_CONTENT['exaone'] = `
+<style>
+  .ex-apple { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1d1d1f; }
+  .ex-apple .ex-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 16px; }
+  .ex-apple .ex-h-hero { font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; color: #1d1d1f; margin: 0 0 20px; }
+  .ex-apple .ex-h-section { font-size: clamp(28px, 3.6vw, 44px); font-weight: 700; line-height: 1.1; letter-spacing: -0.022em; margin: 0 0 20px; }
+  .ex-apple .ex-h-sub { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; margin: 32px 0 12px; color: #1d1d1f; }
+  .ex-apple .ex-h-card { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.012em; margin: 0 0 10px; }
+  .ex-apple .ex-lead { font-size: clamp(18px, 1.6vw, 22px); font-weight: 400; line-height: 1.45; color: #6e6e73; margin: 0 0 28px; letter-spacing: -0.005em; }
+  .ex-apple .ex-body { font-size: 17px; line-height: 1.7; color: #1d1d1f; margin: 0 0 18px; max-width: 720px; letter-spacing: -0.003em; }
+  .ex-apple .ex-body--muted { color: #6e6e73; }
+  .ex-apple .ex-caption { font-size: 14px; line-height: 1.55; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section { padding: clamp(48px, 7vw, 88px) clamp(24px, 4vw, 48px); border-radius: 22px; margin: 16px 0; }
+  .ex-apple .ex-section--light { background: #f5f5f7; }
+  .ex-apple .ex-section--white { background: #fff; }
+  .ex-apple .ex-section--dark { background: #000; color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-h-section,
+  .ex-apple .ex-section--dark .ex-h-card,
+  .ex-apple .ex-section--dark .ex-h-sub,
+  .ex-apple .ex-section--dark .ex-h-hero { color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-lead { color: #a1a1a6; }
+  .ex-apple .ex-section--dark .ex-body { color: #d2d2d7; }
+  .ex-apple .ex-section--dark .ex-caption { color: #86868b; }
+  .ex-apple .ex-section--dark .ex-eyebrow { color: #86868b; }
+  .ex-apple .ex-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ex-apple .ex-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .ex-apple .ex-card { background: #fff; border-radius: 18px; padding: 28px; }
+  .ex-apple .ex-section--dark .ex-card { background: #1d1d1f; }
+  .ex-apple .ex-section--white .ex-card { background: #f5f5f7; }
+  .ex-apple .ex-num { font-size: clamp(48px, 6vw, 80px); font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #1d1d1f; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-num { color: #f5f5f7; }
+  .ex-apple .ex-divider { height: 1px; background: #d2d2d7; border: none; margin: 32px 0; }
+  .ex-apple .ex-section--dark .ex-divider { background: #424245; }
+
+  /* Blog-style elements */
+  .ex-apple .ex-pullquote { font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; line-height: 1.35; letter-spacing: -0.018em; color: #1d1d1f; margin: 40px 0; padding: 0 0 0 24px; border-left: 3px solid #1d1d1f; max-width: 720px; }
+  .ex-apple .ex-section--dark .ex-pullquote { color: #f5f5f7; border-left-color: #f5f5f7; }
+  .ex-apple .ex-callout { background: #fff; border-radius: 16px; padding: 24px 28px; margin: 28px 0; max-width: 720px; }
+  .ex-apple .ex-section--white .ex-callout { background: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-callout { background: #1d1d1f; }
+  .ex-apple .ex-callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: #6e6e73; text-transform: uppercase; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-callout__label { color: #86868b; }
+  .ex-apple .ex-callout__text { font-size: 16px; line-height: 1.6; color: #1d1d1f; margin: 0; }
+  .ex-apple .ex-section--dark .ex-callout__text { color: #f5f5f7; }
+  .ex-apple .ex-list { list-style: none; padding: 0; margin: 24px 0; max-width: 720px; }
+  .ex-apple .ex-list li { padding: 16px 0; border-bottom: 1px solid #d2d2d7; font-size: 16px; line-height: 1.55; color: #1d1d1f; }
+  .ex-apple .ex-list li:last-child { border-bottom: none; }
+  .ex-apple .ex-section--dark .ex-list li { color: #d2d2d7; border-bottom-color: #424245; }
+
+  /* Table */
+  .ex-apple table.ex-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+  .ex-apple table.ex-table thead th { text-align: left; padding: 16px 12px; color: #6e6e73; font-weight: 500; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; border-bottom: 1px solid #d2d2d7; }
+  .ex-apple table.ex-table tbody td { padding: 20px 12px; border-bottom: 1px solid #e8e8ed; vertical-align: top; color: #1d1d1f; }
+  .ex-apple table.ex-table tbody tr:last-child td { border-bottom: none; }
+  .ex-apple table.ex-table .ex-tag { display: inline-block; padding: 3px 10px; border-radius: 980px; background: #f5f5f7; color: #6e6e73; font-size: 12px; font-weight: 500; }
+  .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
+
+  /* Pipeline */
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+
+  /* Q&A */
+  .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
+  .ex-apple .ex-qa:first-of-type { border-top: 1px solid #d2d2d7; }
+  .ex-apple .ex-qa__q { font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.012em; color: #1d1d1f; margin: 0 0 10px; }
+  .ex-apple .ex-qa__a { font-size: 16px; line-height: 1.65; color: #6e6e73; margin: 0; }
+
+  /* Closing */
+  .ex-apple .ex-quote { font-size: clamp(24px, 3vw, 40px); font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; color: #f5f5f7; margin: 0; }
+  .ex-apple .ex-strong { color: #1d1d1f; font-weight: 600; }
+  .ex-apple .ex-section--dark .ex-strong { color: #fff; }
+
+  @media (max-width: 768px) {
+    .ex-apple .ex-grid-3, .ex-apple .ex-grid-2 { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline__arrow { transform: rotate(90deg); padding: 8px 0; }
+  }
+</style>
+
+<div class="ex-apple">
+
+  <!-- HERO -->
+  <section class="ex-section ex-section--light" style="padding-top: clamp(72px, 10vw, 140px); padding-bottom: clamp(56px, 7vw, 96px); text-align: left;">
+    <p class="ex-eyebrow">LG U+ × LG AI Research</p>
+    <h2 class="ex-h-hero">LG EXAONE.</h2>
+    <p class="ex-lead" style="max-width: 620px;">한국어를 가장 잘 이해하는 엔터프라이즈 AI.<br/>왜 LG U+가 직접 만드는지, 그리고 다른 AI와 무엇이 다른지 차근차근 살펴봅니다.</p>
+    <p class="ex-caption" style="margin-top: 32px;">읽는 시간 · 약 8분</p>
+  </section>
+
+  <!-- SECTION 0: 들어가며 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">들어가며</p>
+    <h3 class="ex-h-section">왜 지금, 한국형 AI 모델인가요?</h3>
+
+    <p class="ex-body">최근 몇 년간 GPT, Claude, Gemini 같은 글로벌 AI 모델이 빠르게 발전했습니다. 그래서 흔히 이런 질문을 받습니다. "이미 좋은 모델이 많은데, 왜 굳이 한국에서 또 만드나요?"</p>
+
+    <p class="ex-body">답은 의외로 간단합니다. <span class="ex-strong">한국 기업, 특히 금융사가 실제로 쓰려고 하면 글로벌 모델은 두 가지 벽에 부딪힙니다.</span> 하나는 한국어 품질이 영어만큼 좋지 않다는 점이고, 다른 하나는 데이터가 외부 클라우드로 나가야 한다는 보안 문제입니다.</p>
+
+    <p class="ex-body">이 두 가지를 동시에 해결하기 위해 만들어진 것이 바로 <span class="ex-strong">LG EXAONE</span>입니다. 그리고 LG 계열사 중에서 이 모델을 함께 만들고 B2B로 팔 수 있는 권리를 가진 곳이 LG유플러스입니다.</p>
+
+    <p class="ex-pullquote">"외산 AI를 빌려 쓰는 회사가 아니라, AI를 직접 만드는 회사."</p>
+
+    <p class="ex-body ex-body--muted">이 글에서는 EXAONE이 무엇인지, 어떤 모델 라인업이 있는지, 어떤 점에서 다른 AI와 다른지, 그리고 실제로 금융권에서 어떻게 쓰이는지를 순서대로 살펴봅니다.</p>
+  </section>
+
+  <!-- SECTION 1: 파트너십 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 1 · 파트너십</p>
+    <h3 class="ex-h-section">LG U+는 그냥 "LG 제품을 쓰는 회사"가 아닙니다.</h3>
+
+    <p class="ex-body">EXAONE 이야기를 시작하기 전에 한 가지 오해를 먼저 풀어야 합니다. 많은 분들이 "LG유플러스가 LG AI연구원의 모델을 가져다 쓰는 것"이라고 생각합니다. 사실은 그보다 훨씬 깊은 관계입니다.</p>
+
+    <p class="ex-body">LG유플러스는 LG 계열사 중 EXAONE의 <span class="ex-strong">B2B 사업화 권리와 기술 공유를 함께 받은 단 하나의 파트너</span>입니다. 풀어 쓰면 이런 의미입니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">01 · 사업 권리</p>
+        <h4 class="ex-h-card">엔터프라이즈에 직접 팔 수 있다.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">EXAONE을 B2B 시장에 정식으로 공급할 수 있는 사업화 권리를 보유합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">02 · 기술 공유</p>
+        <h4 class="ex-h-card">모델 내부에 손을 댈 수 있다.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">단순 API 사용자가 아니라 모델 구조에 접근하고 직접 커스터마이징합니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">03 · E2E 역량</p>
+        <h4 class="ex-h-card">처음부터 끝까지 직접 한다.</h4>
+        <p class="ex-caption" style="margin-top: 12px;">사전학습, 파인튜닝, 배포, 운영 유지보수까지 전 과정을 자체 수행합니다.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">왜 이게 중요할까요?</p>
+      <p class="ex-callout__text">대부분의 AI 솔루션 회사는 OpenAI나 구글의 API를 사서 그 위에 자기 화면을 입히는 수준입니다. 모델이 잘못 답해도 고칠 수 없고, 가격이 오르면 그대로 따라갑니다. <span class="ex-strong">LG U+는 모델 자체를 함께 만들기 때문에 깊은 수준의 튜닝과 가격 통제가 가능합니다.</span></p>
+    </div>
+  </section>
+
+  <!-- SECTION 2: 모델 라인업 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 2 · 모델 라인업</p>
+    <h3 class="ex-h-section">EXAONE은 한 가지가 아닙니다.</h3>
+
+    <p class="ex-body">EXAONE은 단일 모델이 아니라 용도와 시기에 따라 여러 버전이 있는 모델 패밀리입니다. 핵심만 먼저 말씀드리면 <span class="ex-strong">현재 주력은 EXAONE 4.0</span>이고, 그 옆에 더 가벼운 3.5, LG U+가 직접 만든 K-EXAONE, 그리고 곧 나올 4.5가 있습니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>모델</th>
+          <th>파라미터</th>
+          <th>상태</th>
+          <th>특징</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">EXAONE 3.5</span></td>
+          <td><span class="ex-tag">7.8B</span></td>
+          <td><span class="ex-tag">경량 운영</span></td>
+          <td>저사양 환경에서도 빠른 응답이 필요할 때 사용합니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">EXAONE 4.0</span></td>
+          <td><span class="ex-tag ex-tag--primary">32B</span></td>
+          <td><span class="ex-tag ex-tag--primary">현재 주력</span></td>
+          <td>추론 성능이 크게 향상됐고 금융 도메인 최적화가 끝난 모델입니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">K-EXAONE</span></td>
+          <td><span class="ex-tag">독자 개발</span></td>
+          <td><span class="ex-tag">1차 심사 완료</span></td>
+          <td>LG U+가 직접 만든 한국어·통신 도메인 특화 파운데이션 모델.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">EXAONE 4.5</span></td>
+          <td><span class="ex-tag">미공개</span></td>
+          <td><span class="ex-tag">2026.03 예정</span></td>
+          <td>차세대 버전. 4.0과 인프라 스펙이 거의 같아 업그레이드 부담이 적습니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 class="ex-h-sub">한 가지 짚고 넘어갈 점 — 업그레이드 부담</h4>
+    <p class="ex-body">고객사 입장에서 가장 부담스러운 건 "AI 모델을 새 버전으로 바꿀 때마다 GPU 서버를 또 사야 하나?"입니다. EXAONE은 4.0 → 4.5로 가도 <span class="ex-strong">필요한 인프라 스펙이 거의 동일</span>합니다. 한번 구축하면 추가 하드웨어 투자 없이 최신 모델로 갈아탈 수 있습니다.</p>
+  </section>
+
+  <!-- SECTION 3: 핵심 기술 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 3 · 핵심 기술</p>
+    <h3 class="ex-h-section">EXAONE 4.0이 똑똑한 세 가지 이유.</h3>
+    <p class="ex-lead" style="max-width: 720px;">현재 주력 모델 EXAONE 4.0의 강점을 세 가지 키워드로 설명합니다. 모두 금융 도메인에서 실제로 필요한 능력들입니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">1. Reasoning · 단계적으로 생각합니다</h4>
+    <p class="ex-body">"이자 계산해 줘" 같은 단순한 질문에 답하는 건 어떤 AI도 합니다. 하지만 <span class="ex-strong">"이 계약서가 불완전판매에 해당하는지, 약관 어느 조항을 근거로 그렇게 판단하는지"</span>를 답하려면 여러 단계의 논리적 추론이 필요합니다. EXAONE 4.0은 이런 다단계 추론에 강합니다. 법률·금융 문서 분석, 불완전판매 검증 같은 업무가 가능합니다.</p>
+
+    <h4 class="ex-h-sub">2. Agentic AI · 스스로 도구를 고릅니다</h4>
+    <p class="ex-body">에이전트형 AI란, AI가 답만 만들어내는 게 아니라 <span class="ex-strong">"이 질문에 답하려면 어떤 도구를 써야 하지?"를 스스로 판단해서 실행</span>하는 방식입니다. 예를 들어 고객 정보를 조회해야 한다면 CRM API를 호출하고, 약관을 찾아야 한다면 문서 검색을 실행합니다. EXAONE 4.0은 MCP(Model Context Protocol)와 Tool Calling을 지원해 이런 에이전트 동작이 가능합니다.</p>
+
+    <h4 class="ex-h-sub">3. Long Context · 긴 문서도 한 번에 봅니다</h4>
+    <p class="ex-body">기존 모델은 짧은 문장만 한 번에 처리할 수 있어, 긴 통화 내용이나 두꺼운 계약서를 잘라서 줘야 했습니다. 그러면 맥락이 끊깁니다. EXAONE 4.0은 입력 윈도우(Input Window)가 크게 확장되어 <span class="ex-strong">콜 로그 전체나 계약서 전문을 한 번에 입력</span>할 수 있습니다. 맥락 손실 없이 분석합니다.</p>
+
+    <p class="ex-pullquote">"단순한 챗봇이 아니라, 추론하고, 도구를 쓰고, 긴 맥락을 이해하는 — 진짜 업무 수준의 AI."</p>
+  </section>
+
+  <!-- SECTION 4: 강점 (다른 AI와 비교) -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 4 · 차별점</p>
+    <h3 class="ex-h-section">GPT나 Claude로는 못하는 세 가지.</h3>
+
+    <p class="ex-body">"좋다는 건 알겠는데, ChatGPT나 Claude를 그냥 쓰면 안 되나요?"라는 질문을 자주 받습니다. 결론부터 말씀드리면 <span class="ex-strong">국내 금융·공공 분야에서는 그냥 쓸 수 없습니다.</span> 이유가 세 가지 있습니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 40px;">하나, 한국어 품질의 한계</h4>
+    <p class="ex-body">GPT, Claude는 영어 데이터를 압도적으로 많이 학습한 모델입니다. 영어로 쓰면 똑똑한데, 한국어로 같은 질문을 하면 어색한 번역체가 나오거나 한국 특유의 존댓말·금융 용어를 잘못 씁니다. EXAONE은 한국어 코퍼스를 대규모로 학습해 <span class="ex-strong">한국어 자체를 모국어처럼 다루는 모델</span>입니다.</p>
+
+    <h4 class="ex-h-sub">둘, 폐쇄망에서 작동하지 않음</h4>
+    <p class="ex-body">ChatGPT 계열은 모두 OpenAI 서버에 데이터를 보내야 답을 받습니다. 즉 <span class="ex-strong">고객의 개인정보, 계약 내용, 통화 녹취가 외부 클라우드로 나간다는 뜻</span>입니다. 금융 보안 규제(전자금융감독규정, 망분리 의무)는 이를 허용하지 않습니다. EXAONE은 인터넷이 끊긴 내부 폐쇄망에 통째로 설치해 운영할 수 있습니다.</p>
+
+    <h4 class="ex-h-sub">셋, 처음부터 직접 만들었음</h4>
+    <p class="ex-body">시중의 많은 "한국형 AI"는 사실 오픈소스 모델(LLaMA 등)을 가져와 위에 한국어 데이터로 파인튜닝한 것입니다. EXAONE은 다릅니다. <span class="ex-strong">사전학습부터 처음(scratch)부터 LG가 직접 만든 모델</span>이라, 모델 내부 구조를 완전히 이해하고 제어할 수 있습니다. 이게 왜 중요하냐면, 특정 도메인(예: 금융 약관)에 맞게 사전학습 단계부터 데이터를 끼워 넣을 수 있기 때문입니다.</p>
+  </section>
+
+  <!-- SECTION 5: 파이프라인 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 5 · 도메인 적용</p>
+    <h3 class="ex-h-section">금융사에 맞추는 두 단계 과정.</h3>
+
+    <p class="ex-body">아무리 좋은 AI 모델도 "범용 모델"을 그대로 금융 고객센터에 쓸 수는 없습니다. 약관 용어, 상품명, 내부 규정 같은 <span class="ex-strong">고객사 고유의 언어를 모르기 때문</span>입니다. EXAONE은 두 단계 파이프라인을 거쳐 도메인에 맞춥니다.</p>
+
+    <div class="ex-pipeline">
+      <div class="ex-card">
+        <p class="ex-step__num">Step 01</p>
+        <h4 class="ex-h-card">사전학습</h4>
+        <p class="ex-caption" style="margin-top: 12px;">오픈 데이터에 금융 도메인 증강 데이터를 더해 "금융을 아는" 기반 모델을 만듭니다.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card">
+        <p class="ex-step__num">Step 02</p>
+        <h4 class="ex-h-card">파인튜닝</h4>
+        <p class="ex-caption" style="margin-top: 12px;">고객사 약관, 상품명, 내부 규정으로 학습시켜 "그 회사 전용" 모델로 완성합니다.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card" style="background: #1d1d1f; color: #f5f5f7;">
+        <p class="ex-step__num" style="color: #86868b;">Deploy</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">배포 운영</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">폐쇄망에 설치, 실시간 운영, 지속 유지보수까지 LG U+가 직접 수행합니다.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">쉽게 비유하면</p>
+      <p class="ex-callout__text"><span class="ex-strong">Step 1은 "금융학과 졸업"</span>이라고 보면 됩니다. 일반 상식 위에 금융 지식을 깔아 둡니다. <span class="ex-strong">Step 2는 "신입사원 온보딩"</span>입니다. 우리 회사 약관, 상품, 규정을 따로 가르칩니다. 이렇게 두 단계를 거쳐야 비로소 그 회사에서 쓸 수 있는 AI가 됩니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 6: 실전 운영 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 6 · 실전 검증</p>
+    <h3 class="ex-h-section">실제로 얼마나 큰 규모를 다루나요?</h3>
+    <p class="ex-lead" style="max-width: 720px;">"좋아 보이는 데모"와 "실제 운영"은 다릅니다. EXAONE은 이미 LG U+ 자체 컨택센터에서 검증된 규모를 처리하고 있습니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 56px;">
+      <div>
+        <p class="ex-num">10만<span style="font-size:0.5em; font-weight:500; color:#86868b;"> 건/일</span></p>
+        <p class="ex-caption" style="color: #a1a1a6;">고객센터 일일 처리량 운영 경험. 실제 트래픽 기준입니다.</p>
+      </div>
+      <div>
+        <p class="ex-num">5만<span style="font-size:0.5em; font-weight:500; color:#86868b;"> 건/일</span></p>
+        <p class="ex-caption" style="color: #a1a1a6;">실시간 샘플 분석. 지연 없이 응답해야 하는 영역입니다.</p>
+      </div>
+    </div>
+
+    <hr class="ex-divider" style="margin-top: 56px;"/>
+
+    <h4 class="ex-h-sub">고객사 환경에 맞춰 GPU를 고릅니다</h4>
+    <p class="ex-body">모든 고객사가 최신 GPU를 살 수 있는 건 아닙니다. EXAONE은 환경에 따라 <span class="ex-strong">세 가지 인프라 옵션</span>을 제공합니다.</p>
+
+    <ul class="ex-list">
+      <li><span class="ex-strong">H100 GPU</span> — 최고 성능. 대규모 추론이 필요한 대형 컨택센터에 적합합니다.</li>
+      <li><span class="ex-strong">A100 GPU</span> — 가장 보편적인 선택. 안정적 운영에 최적화되어 있습니다.</li>
+      <li><span class="ex-strong">양자화 경량화</span> — GPU 사양이 낮은 환경에서도 EXAONE을 돌릴 수 있도록 모델을 작게 압축한 버전입니다.</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 7: Q&A -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 7 · 자주 묻는 질문</p>
+    <h3 class="ex-h-section">현장에서 가장 많이 받는 세 가지 질문.</h3>
+    <p class="ex-body" style="color: #6e6e73;">실제 고객 미팅에서 거의 빠짐없이 나오는 질문들입니다. 답변 톤까지 그대로 옮겨 둡니다.</p>
+
+    <div style="margin-top: 32px;">
+      <div class="ex-qa">
+        <p class="ex-qa__q">금융권 레퍼런스가 있나요?</p>
+        <p class="ex-qa__a">비공개로 협업이 진행 중입니다. 금융권은 특성상 레퍼런스 공개가 제한적이지만, 실제 금융사와 PoC(개념검증)와 파일럿 운영 경험을 다수 보유하고 있습니다. NDA 체결 후 구체적인 사례를 공유해 드리고 있습니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">기존 TA(Text Analytics)를 LLM으로 대체할 수 있나요?</p>
+        <p class="ex-qa__a">충분히 가능합니다. 기존 TA는 키워드와 패턴 매칭 방식이라 "이 단어가 들어가면 불완전판매" 같은 단순 규칙만 잡습니다. EXAONE은 문맥과 의도를 이해하기 때문에, 불완전판매 검증·감정 분석·상담 품질 평가 같은 고급 분석을 자연어 이해 기반으로 수행합니다.</p>
+      </div>
+      <div class="ex-qa">
+        <p class="ex-qa__q">구현 프로세스는 어떻게 진행되나요?</p>
+        <p class="ex-qa__a">기술 구현보다 먼저 "AI를 어디에 어떻게 쓸 것인가"라는 비즈니스 프로세스 설계에 시간을 씁니다. 고객사 업무 흐름을 분석하고 AI가 개입할 포인트를 정의한 뒤, 처음부터 전체를 바꾸지 않고 효과가 큰 Quick Win부터 단계적으로 구현합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING (DARK) -->
+  <section class="ex-section ex-section--dark" style="text-align: center; padding-top: clamp(80px, 10vw, 140px); padding-bottom: clamp(80px, 10vw, 140px);">
+    <p class="ex-eyebrow" style="color: #86868b;">마치며 · One-line Positioning</p>
+    <p class="ex-quote" style="max-width: 760px; margin: 24px auto 0;">"한국어를 가장 잘 이해하고, 금융 폐쇄망에서 완전히 작동하며, 처음부터 직접 만든 — 국내 엔터프라이즈 AI의 유일한 선택지."</p>
+    <p class="ex-caption" style="color: #86868b; margin-top: 32px;">— LG U+ × LG AI Research</p>
+  </section>
+
+</div>
+`;
+
+    LECTURE_CONTENT['advisor'] = `
+<style>
+  .ex-apple { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1d1d1f; }
+  .ex-apple .ex-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 16px; }
+  .ex-apple .ex-h-hero { font-size: clamp(40px, 6vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; color: #1d1d1f; margin: 0 0 20px; }
+  .ex-apple .ex-h-section { font-size: clamp(28px, 3.6vw, 44px); font-weight: 700; line-height: 1.1; letter-spacing: -0.022em; margin: 0 0 20px; }
+  .ex-apple .ex-h-sub { font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; margin: 32px 0 12px; color: #1d1d1f; }
+  .ex-apple .ex-h-card { font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -0.012em; margin: 0 0 10px; }
+  .ex-apple .ex-lead { font-size: clamp(18px, 1.6vw, 22px); font-weight: 400; line-height: 1.45; color: #6e6e73; margin: 0 0 28px; letter-spacing: -0.005em; }
+  .ex-apple .ex-body { font-size: 17px; line-height: 1.7; color: #1d1d1f; margin: 0 0 18px; max-width: 720px; letter-spacing: -0.003em; }
+  .ex-apple .ex-body--muted { color: #6e6e73; }
+  .ex-apple .ex-caption { font-size: 14px; line-height: 1.55; color: #6e6e73; margin: 0; }
+  .ex-apple .ex-section { padding: clamp(48px, 7vw, 88px) clamp(24px, 4vw, 48px); border-radius: 22px; margin: 16px 0; }
+  .ex-apple .ex-section--light { background: #f5f5f7; }
+  .ex-apple .ex-section--white { background: #fff; }
+  .ex-apple .ex-section--dark { background: #000; color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-h-section,
+  .ex-apple .ex-section--dark .ex-h-card,
+  .ex-apple .ex-section--dark .ex-h-sub,
+  .ex-apple .ex-section--dark .ex-h-hero { color: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-lead { color: #a1a1a6; }
+  .ex-apple .ex-section--dark .ex-body { color: #d2d2d7; }
+  .ex-apple .ex-section--dark .ex-caption { color: #86868b; }
+  .ex-apple .ex-section--dark .ex-eyebrow { color: #86868b; }
+  .ex-apple .ex-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .ex-apple .ex-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .ex-apple .ex-card { background: #fff; border-radius: 18px; padding: 28px; }
+  .ex-apple .ex-section--dark .ex-card { background: #1d1d1f; }
+  .ex-apple .ex-section--white .ex-card { background: #f5f5f7; }
+  .ex-apple .ex-num { font-size: clamp(48px, 6vw, 80px); font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: #1d1d1f; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-num { color: #f5f5f7; }
+  .ex-apple .ex-divider { height: 1px; background: #d2d2d7; border: none; margin: 32px 0; }
+  .ex-apple .ex-section--dark .ex-divider { background: #424245; }
+
+  .ex-apple .ex-pullquote { font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; line-height: 1.35; letter-spacing: -0.018em; color: #1d1d1f; margin: 40px 0; padding: 0 0 0 24px; border-left: 3px solid #1d1d1f; max-width: 720px; }
+  .ex-apple .ex-section--dark .ex-pullquote { color: #f5f5f7; border-left-color: #f5f5f7; }
+  .ex-apple .ex-callout { background: #fff; border-radius: 16px; padding: 24px 28px; margin: 28px 0; max-width: 720px; }
+  .ex-apple .ex-section--white .ex-callout { background: #f5f5f7; }
+  .ex-apple .ex-section--dark .ex-callout { background: #1d1d1f; }
+  .ex-apple .ex-callout__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: #6e6e73; text-transform: uppercase; margin: 0 0 8px; }
+  .ex-apple .ex-section--dark .ex-callout__label { color: #86868b; }
+  .ex-apple .ex-callout__text { font-size: 16px; line-height: 1.6; color: #1d1d1f; margin: 0; }
+  .ex-apple .ex-section--dark .ex-callout__text { color: #f5f5f7; }
+  .ex-apple .ex-list { list-style: none; padding: 0; margin: 24px 0; max-width: 720px; }
+  .ex-apple .ex-list li { padding: 16px 0; border-bottom: 1px solid #d2d2d7; font-size: 16px; line-height: 1.55; color: #1d1d1f; }
+  .ex-apple .ex-list li:last-child { border-bottom: none; }
+  .ex-apple .ex-section--dark .ex-list li { color: #d2d2d7; border-bottom-color: #424245; }
+
+  .ex-apple table.ex-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+  .ex-apple table.ex-table thead th { text-align: left; padding: 16px 12px; color: #6e6e73; font-weight: 500; font-size: 13px; letter-spacing: 0.02em; text-transform: uppercase; border-bottom: 1px solid #d2d2d7; }
+  .ex-apple table.ex-table tbody td { padding: 20px 12px; border-bottom: 1px solid #e8e8ed; vertical-align: top; color: #1d1d1f; }
+  .ex-apple table.ex-table tbody tr:last-child td { border-bottom: none; }
+  .ex-apple table.ex-table .ex-tag { display: inline-block; padding: 3px 10px; border-radius: 980px; background: #f5f5f7; color: #6e6e73; font-size: 12px; font-weight: 500; }
+  .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
+
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+
+  .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
+  .ex-apple .ex-qa:first-of-type { border-top: 1px solid #d2d2d7; }
+  .ex-apple .ex-qa__q { font-size: 20px; font-weight: 600; line-height: 1.35; letter-spacing: -0.012em; color: #1d1d1f; margin: 0 0 10px; }
+  .ex-apple .ex-qa__a { font-size: 16px; line-height: 1.65; color: #6e6e73; margin: 0; }
+
+  .ex-apple .ex-quote { font-size: clamp(24px, 3vw, 40px); font-weight: 600; line-height: 1.3; letter-spacing: -0.02em; color: #f5f5f7; margin: 0; }
+  .ex-apple .ex-strong { color: #1d1d1f; font-weight: 600; }
+  .ex-apple .ex-section--dark .ex-strong { color: #fff; }
+
+  @media (max-width: 768px) {
+    .ex-apple .ex-grid-3, .ex-apple .ex-grid-2 { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline { grid-template-columns: 1fr; }
+    .ex-apple .ex-pipeline__arrow { transform: rotate(90deg); padding: 8px 0; }
+  }
+</style>
+
+<div class="ex-apple">
+
+  <!-- HERO -->
+  <section class="ex-section ex-section--light" style="padding-top: clamp(72px, 10vw, 140px); padding-bottom: clamp(56px, 7vw, 96px); text-align: left;">
+    <p class="ex-eyebrow">LG U+ AICC Solution</p>
+    <h2 class="ex-h-hero">상담 어드바이저.</h2>
+    <p class="ex-lead" style="max-width: 640px;">4,500명 고객센터를 20년간 직접 운영해 본 회사가 만든 AICC.<br/>직접 써본 사람만 알 수 있는 디테일을 전부 담았습니다.</p>
+    <p class="ex-caption" style="margin-top: 32px;">읽는 시간 · 약 9분</p>
+  </section>
+
+  <!-- SECTION 0: 들어가며 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">들어가며</p>
+    <h3 class="ex-h-section">왜 LG유플러스가 만드는 AICC가 다를까요?</h3>
+
+    <p class="ex-body">AICC(AI Contact Center) 솔루션을 만드는 회사는 많습니다. 그런데 한 가지 공통점이 있습니다. <span class="ex-strong">대부분의 회사는 만들기만 하고, 자기들이 직접 쓰지는 않습니다.</span> 그래서 화면은 그럴듯한데 막상 상담원이 써 보면 "현장을 모르는 사람이 만들었구나" 싶은 부분이 자꾸 나옵니다.</p>
+
+    <p class="ex-body">LG유플러스는 다릅니다. <span class="ex-strong">4,500명 규모의 고객센터를 20년 넘게 직접 운영</span>해 왔습니다. 매년 3,300만 건의 콜을 처리하면서 상담원이 어디서 답답해하는지, 매니저가 어떤 보고서를 원하는지, 고객이 어디서 화를 내는지를 몸으로 알고 있습니다.</p>
+
+    <p class="ex-body">이 글에서는 그 경험이 솔루션에 어떻게 녹아 있는지를 살펴봅니다. AI 콜봇, 실시간 STT 지식추천, 상담 후처리 자동화, 오토QA — 네 가지 축이 어떻게 맞물려 돌아가는지를 차근차근 풀어 드립니다.</p>
+
+    <p class="ex-pullquote">"만들기만 하는 회사가 아니라, 직접 쓰면서 만드는 회사."</p>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">왜 이게 차별점일까요?</p>
+      <p class="ex-callout__text">기획자가 책상에서 상상으로 만든 기능과, 실제 상담원의 고충(VOE · Voice of Employee)을 듣고 만든 기능은 다릅니다. LG U+ 상담 어드바이저는 <span class="ex-strong">"써 보니 진짜 필요했던 것"</span>들을 모은 솔루션입니다.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 1: 운영 규모 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 1 · 운영 규모</p>
+    <h3 class="ex-h-section">숫자로 보는 LG U+ 컨택센터.</h3>
+
+    <p class="ex-body">"고객센터를 직접 운영한다"는 말이 얼마나 큰 규모인지 감이 잘 안 옵니다. 숫자로 풀어 봅니다.</p>
+
+    <div class="ex-grid-3" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-num">4,500<span style="font-size:0.4em; font-weight:500; color:#6e6e73;"> 명</span></p>
+        <h4 class="ex-h-card" style="margin-top: 12px;">상담원이 매일 일합니다</h4>
+        <p class="ex-caption" style="margin-top: 8px;">대형 컨택센터 운영의 표준 케이스. 상담원이 무엇을 어려워하는지를 바로 옆에서 봅니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-num">20<span style="font-size:0.4em; font-weight:500; color:#6e6e73;"> 년+</span></p>
+        <h4 class="ex-h-card" style="margin-top: 12px;">직접 운영 경력</h4>
+        <p class="ex-caption" style="margin-top: 8px;">수많은 시행착오와 운영 노하우가 솔루션 안에 그대로 들어가 있습니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-num">3,300<span style="font-size:0.4em; font-weight:500; color:#6e6e73;"> 만 콜/년</span></p>
+        <h4 class="ex-h-card" style="margin-top: 12px;">연간 처리량</h4>
+        <p class="ex-caption" style="margin-top: 8px;">AI 모델을 학습시킬 수 있는 압도적 규모의 도메인 데이터.</p>
+      </div>
+    </div>
+
+    <div class="ex-callout">
+      <p class="ex-callout__label">쉽게 비유하면</p>
+      <p class="ex-callout__text">자동차를 한 번도 운전해 본 적 없는 사람이 디자인한 차와, 20년간 매일 운전한 사람이 디자인한 차는 다를 수밖에 없습니다. 핸들 위치, 시트 각도, 버튼 배치 같은 디테일에서 갈립니다. <span class="ex-strong">LG U+ AICC는 후자에 가깝습니다.</span></p>
+    </div>
+  </section>
+
+  <!-- SECTION 2: 솔루션 라인업 -->
+  <section class="ex-section ex-section--white">
+    <p class="ex-eyebrow">Chapter 2 · 솔루션 라인업</p>
+    <h3 class="ex-h-section">한눈에 보는 AICC 3종 세트.</h3>
+
+    <p class="ex-body">LG U+의 AICC 솔루션은 크게 세 가지로 나뉩니다. 고객의 문의가 들어와서 처리되고, 사후 평가까지 이어지는 <span class="ex-strong">컨택센터의 전 과정을 AI로 덮는</span> 구조입니다.</p>
+
+    <table class="ex-table">
+      <thead>
+        <tr>
+          <th>솔루션</th>
+          <th>역할</th>
+          <th>대표 지표</th>
+          <th>핵심 가치</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ex-strong">AI 콜봇 · 챗봇</span></td>
+          <td>상담원 연결 전 단계</td>
+          <td><span class="ex-tag">800만 건/년 자동 처리</span></td>
+          <td>24시간 무인 응대로 단순 문의를 사람 손이 닿기 전에 끝냅니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">상담 어드바이저</span></td>
+          <td>상담원 옆에서 어시스트</td>
+          <td><span class="ex-tag ex-tag--primary">상담시간 20% 단축</span></td>
+          <td>실시간 STT, 지식 추천, 자동 요약, 코드 추천을 한 번에 제공합니다.</td>
+        </tr>
+        <tr>
+          <td><span class="ex-strong">오토 QA</span></td>
+          <td>상담 종료 후 품질 평가</td>
+          <td><span class="ex-tag">전수조사 100%</span></td>
+          <td>샘플이 아니라 전체 통화를 자동 평가하고 1시간 내 코칭 리포트를 보냅니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 class="ex-h-sub">세 솔루션이 따로 노는 게 아닙니다</h4>
+    <p class="ex-body">중요한 건 이 셋이 분리된 제품이 아니라 <span class="ex-strong">하나의 데이터 흐름으로 연결</span>되어 있다는 점입니다. 콜봇에서 처리하지 못한 문의가 어드바이저로 넘어가고, 그 통화가 다시 오토QA로 평가되며, 거기서 발견된 오답이 다음 날 콜봇 학습에 반영됩니다. 이 글의 후반부에서 그 루프를 자세히 살펴봅니다.</p>
+  </section>
+
+  <!-- SECTION 3: AI 콜봇 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <p class="ex-eyebrow">Chapter 3 · AI 콜봇</p>
+    <h3 class="ex-h-section">상담원 손이 닿기 전에, 먼저 처리합니다.</h3>
+    <p class="ex-lead" style="max-width: 720px;">고객센터의 가장 큰 비용은 사람입니다. 그래서 단순 문의는 사람을 거치지 않고 자동으로 끝내는 게 가장 효과적입니다. AI 콜봇과 챗봇이 그 역할을 합니다.</p>
+
+    <h4 class="ex-h-sub" style="margin-top: 56px;">연간 800만 건을 자동으로 처리합니다</h4>
+    <p class="ex-body">LG U+는 자체 컨택센터에서 <span class="ex-strong">연간 800만 건의 문의를 콜봇·챗봇으로 자동 처리</span>하고 있습니다. 요금 조회, 청구서 재발송, 단순 변경 같은 정형화된 업무는 굳이 사람이 받을 필요가 없습니다. 24시간 쉬지 않고 받습니다.</p>
+
+    <h4 class="ex-h-sub">"콜봇이 답답해서 결국 상담원으로 넘어가는 경험" — 이걸 줄이는 게 핵심입니다</h4>
+    <p class="ex-body">대부분의 콜봇이 가진 함정이 있습니다. 고객이 말하는 의도를 못 알아듣고 같은 질문을 반복하다가 결국 "상담원 연결"로 넘어가는 흐름입니다. <span class="ex-strong">의도 분류 정확도 95%</span> — 이 숫자가 중요한 이유가 여기에 있습니다. 고객이 무엇을 원하는지 정확히 파악해야, 그 다음 단계가 매끄럽습니다.</p>
+
+    <p class="ex-pullquote">"콜봇의 진짜 KPI는 통화량이 아니라, 고객이 짜증내지 않고 원하는 답을 받았는가입니다."</p>
+  </section>
+
+  <!-- SECTION 4: 실시간 STT & 지식 추천 -->
+  <section class="ex-section ex-section--light">
+    <p class="ex-eyebrow">Chapter 4 · 실시간 어시스트</p>
+    <h3 class="ex-h-section">상담원 옆에 앉은 AI 동료.</h3>
+
+    <p class="ex-body">콜봇에서 해결되지 않은 문의는 결국 사람 상담원에게 넘어갑니다. 이때 상담 어드바이저가 <span class="ex-strong">상담원 옆에서 실시간으로 도와주는 AI 동료</span> 역할을 합니다. 핵심 흐름은 다음과 같습니다.</p>
+
+    <div class="ex-pipeline">
+      <div class="ex-card">
+        <p class="ex-step__num">Step 01 · 음성</p>
+        <h4 class="ex-h-card">고객 음성 → STT</h4>
+        <p class="ex-caption" style="margin-top: 12px;">자체 STT 엔진이 통화 음성을 실시간 텍스트로 변환합니다. CRR(인식률) 97% 수준.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card">
+        <p class="ex-step__num">Step 02 · 이해</p>
+        <h4 class="ex-h-card">문맥 이해 → RAG 검색</h4>
+        <p class="ex-caption" style="margin-top: 12px;">키워드가 아니라 맥락으로 의도를 파악하고, 매뉴얼에서 답을 찾아옵니다.</p>
+      </div>
+      <div class="ex-pipeline__arrow">→</div>
+      <div class="ex-card" style="background: #1d1d1f; color: #f5f5f7;">
+        <p class="ex-step__num" style="color: #86868b;">Step 03 · 추천</p>
+        <h4 class="ex-h-card" style="color: #f5f5f7;">상담원 화면에 자동 표시</h4>
+        <p class="ex-caption" style="margin-top: 12px; color: #a1a1a6;">상담원이 검색하지 않아도, 필요한 정보가 화면에 떠 있습니다.</p>
+      </div>
+    </div>
+
+    <h4 class="ex-h-sub" style="margin-top: 48px;">STT 정확도 — 들어가는 순간이 아니라, 결국 도달하는 지점이 중요합니다</h4>
+    <p class="ex-body">STT는 처음 도입하면 보통 90% 초반에서 시작합니다. 고객사 도메인 용어를 모르기 때문입니다. LG U+는 <span class="ex-strong">독자 STT 엔진과 도메인 특화 피드백 루프</span>를 통해 가능한 한 짧은 시간 내에 CRR 97% 이상까지 끌어올립니다. 통신·금융 등 분야별 전문 용어를 지속 학습합니다.</p>
+
+    <h4 class="ex-h-sub">"키워드"가 아니라 "맥락"으로 찾습니다 — RAG 방식</h4>
+    <p class="ex-body">기존 KMS(지식관리시스템)는 상담원이 키워드를 직접 입력해야 합니다. 그래서 같은 내용을 두고도 누구는 찾고 누구는 못 찾습니다. RAG 방식은 다릅니다. <span class="ex-strong">고객이 한 말 자체에서 의도를 추론해 매뉴얼을 자동 검색</span>합니다. 상담원은 검색하지 않습니다. 화면에 떠 있는 답을 보고 안내만 하면 됩니다.</p>
+
+    <div class="ex-grid-2" style="margin-top: 32px;">
+      <div class="ex-card">
+        <p class="ex-eyebrow">레벨별 개인화</p>
+        <h4 class="ex-h-card">신입에게는 자세히, 베테랑에게는 핵심만</h4>
+        <p class="ex-caption" style="margin-top: 12px;">신입 상담원에게는 단계별 가이드를 처음부터 끝까지 보여주고, 숙련 상담원에게는 정말 필요한 핵심 정보만 띄웁니다. 불필요한 정보로 베테랑의 집중을 깨뜨리지 않는 설계입니다.</p>
+      </div>
+      <div class="ex-card">
+        <p class="ex-eyebrow">비용 최적화</p>
+        <h4 class="ex-h-card">"클릭할 때만" LLM 요약을 돌립니다</h4>
+        <p class="ex-caption" style="margin-top: 12px;">모든 통화를 자동 요약하면 LLM 토큰 비용이 폭발합니다. 상담원이 요약 버튼을 클릭하는 순간에만 LLM이 작동하도록 설계해 운영비를 크게 낮췄습니다. 직접 운영해 본 회사답게 비용까지 챙겼습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 5: 상담 후처리 자동화 -->
+  <section class="ex-section ex-section--white">
+    <div class="ex-container">
+      <p class="ex-eyebrow">Chapter 5 — After-call Work</p>
+      <h2 class="ex-h-section">상담이 끝난 뒤, AI가 마무리합니다.</h2>
+      <p class="ex-lead">상담사가 통화 후 키보드와 마우스를 잡고 있는 시간을 줄이는 것. 그게 진짜 생산성입니다.</p>
+
+      <p class="ex-body">상담 한 통이 끝나면, 상담사는 보통 1~3분 동안 화면을 두드립니다. 무슨 얘기를 했고, 어떤 조치를 했고, 어떤 코드로 분류해야 하는지를 손으로 적습니다. 이 시간을 후처리(After-call Work)라고 부르고, 4,500명 규모의 센터에서는 이게 곧 전체 생산성을 결정하는 변수가 됩니다.</p>
+
+      <div class="ex-callout">
+        <p class="ex-strong">쉽게 비유하면 — 식당에서 손님이 나간 뒤 테이블을 치우는 시간입니다.</p>
+        <p class="ex-body">아무리 서빙이 빨라도 테이블 정리에 5분이 걸리면, 다음 손님은 5분을 기다려야 합니다. 후처리 자동화는 이 정리 시간을 AI가 대신해 주는 일입니다.</p>
+      </div>
+
+      <div class="ex-grid-2" style="margin-top:48px;">
+        <div class="ex-card">
+          <p class="ex-tag ex-tag--primary">자동 요약</p>
+          <h3 class="ex-h-card">3가지 항목으로 자동 정리</h3>
+          <p class="ex-body">통화 전체를 듣고, 작업자가 무엇을 했고 / 고객이 무엇을 원했고 / 어떻게 처리되었는지 — 세 줄로 요약합니다. 상담사는 검토하고 저장만 누르면 됩니다.</p>
+          <ul class="ex-list">
+            <li><span class="ex-strong">작업자</span> — 상담원이 수행한 조치사항</li>
+            <li><span class="ex-strong">고객요청</span> — 고객이 원하는 것</li>
+            <li><span class="ex-strong">처리내용</span> — 최종 처리 결과 및 후속 조치</li>
+          </ul>
+        </div>
+        <div class="ex-card">
+          <p class="ex-tag ex-tag--primary">코드 자동 태깅</p>
+          <h3 class="ex-h-card">대 → 중 → 소 3단계 분류</h3>
+          <p class="ex-body">상담 분류 코드는 보통 수백 개입니다. 사람이 매번 정확하게 고르기 어렵죠. AI가 통화 내용을 보고 대분류(요금) → 중분류(청구오류) → 소분류(중복청구)까지 자동으로 태깅합니다.</p>
+          <p class="ex-body ex-body--muted">정확도 99% — 사람이 직접 입력할 때 흔히 발생하던 오타·오분류·임의 입력이 사라집니다.</p>
+        </div>
+      </div>
+
+      <div class="ex-pullquote" style="margin-top:48px;">
+        후처리 시간이 사라지면, 그 시간만큼 더 많은 고객을 받을 수 있습니다.<br/>
+        같은 인력으로 더 많은 콜을 처리하는 것 — 그게 AI가 만드는 진짜 효율입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 6: 학습 루프 + STT 로드맵 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <div class="ex-container">
+      <p class="ex-eyebrow">Chapter 6 — Daily Feedback Loop</p>
+      <h2 class="ex-h-section">매일 학습합니다. 매일 좋아집니다.</h2>
+      <p class="ex-lead">AI가 똑똑해지는 건 모델이 좋아서가 아닙니다. 매일 쌓이는 데이터로 매일 학습하기 때문입니다.</p>
+
+      <p class="ex-body">상담 AI가 처음부터 완벽할 수는 없습니다. 처음 도입하면 어느 정도 틀립니다. 중요한 건 — 틀린 것을 다음 날 바로잡는 체계가 있느냐입니다. LG U+의 데일리 피드백 루프는 매일 전일 데이터를 수집하고, 당일 학습하고, 익일 운영에 반영합니다. 24시간 안에 모델이 한 번씩 좋아지는 구조입니다.</p>
+
+      <div class="ex-pipeline" style="margin-top:56px;">
+        <div class="ex-step">
+          <div class="ex-step__num">D-1</div>
+          <h3 class="ex-h-card">전일 — 데이터 수집</h3>
+          <p class="ex-body">전일 상담된 모든 통화·텍스트를 모읍니다. 오답, 무응답, 오분류를 자동 식별합니다.</p>
+        </div>
+        <div class="ex-step">
+          <div class="ex-step__num">D</div>
+          <h3 class="ex-h-card">당일 — 모델 학습</h3>
+          <p class="ex-body">자동 라벨링 + 전문가 검수를 거쳐 모델을 재학습합니다. 셀프 리볼빙 기술이 의도를 재매핑합니다.</p>
+        </div>
+        <div class="ex-step">
+          <div class="ex-step__num">D+1</div>
+          <h3 class="ex-h-card">익일 — 운영 반영</h3>
+          <p class="ex-body">개선된 모델이 다음 날 상담사 화면에 즉시 적용됩니다. 어제의 오답이 오늘의 정답이 됩니다.</p>
+        </div>
+      </div>
+
+      <div class="ex-divider"></div>
+
+      <p class="ex-eyebrow">Performance — 핵심 지표</p>
+      <h3 class="ex-h-sub">매일 조금씩, 결국엔 압도적으로.</h3>
+      <p class="ex-body">한 번에 도약하지 않습니다. 1%씩 매일 좋아집니다. 그게 1년이 되면 이런 숫자가 됩니다.</p>
+
+      <div class="ex-grid-3" style="margin-top:40px;">
+        <div class="ex-card">
+          <div class="ex-num">95%</div>
+          <p class="ex-body">의도 분류 정확도 — 고객의 말을 듣고 무엇을 원하는지 파악</p>
+        </div>
+        <div class="ex-card">
+          <div class="ex-num">99%</div>
+          <p class="ex-body">분류 코드 태깅 정확도 — 상담 후처리 자동 분류</p>
+        </div>
+        <div class="ex-card">
+          <div class="ex-num">95%+</div>
+          <p class="ex-body">STT 인식률 (CRR) — 도메인 튜닝 후 97% 이상까지 도달</p>
+        </div>
+      </div>
+
+      <div class="ex-callout" style="margin-top:48px;">
+        <p class="ex-strong">STT 로드맵 — 도메인에 맞춰 자라는 엔진</p>
+        <p class="ex-body">도입 초기에는 90% 초반에서 시작합니다. LG U+ 독자 STT 엔진과 도메인 특화 피드백 루프를 통해 최단 시간 안에 CRR 97% 이상으로 끌어올립니다. 금융·통신 같은 산업별 전문용어, 그리고 \'네\' 같은 짧은 긍정 응답까지 — 화자 분리와 음향 모델 튜닝으로 누락 0을 목표로 합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 7: 오토QA -->
+  <section class="ex-section ex-section--light">
+    <div class="ex-container">
+      <p class="ex-eyebrow">Chapter 7 — Auto QA</p>
+      <h2 class="ex-h-section">평가가 일이 아니라, 코칭이 됩니다.</h2>
+      <p class="ex-lead">예전엔 QA 1명이 상담사 20명을 봤습니다. 이제는 AI가 100%를 봅니다.</p>
+
+      <p class="ex-body">콜센터의 품질관리(QA)는 오랫동안 샘플링이었습니다. 전체 통화 중 일부만 골라 사람이 듣고, 평가표를 채우고, 며칠 뒤에 피드백이 돌아왔죠. 그러는 사이 상담사는 같은 실수를 반복했고, 평가자의 주관도 종종 끼어들었습니다. 오토QA는 이 구조를 바꿉니다. 모든 통화를, 일관된 24가지 항목으로, 1시간 안에 채점합니다.</p>
+
+      <table class="ex-table" style="margin-top:48px;">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>기존 수동 QA</th>
+            <th>오토 QA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>커버리지</td>
+            <td>QA 1명당 상담사 약 20명, 일부 샘플</td>
+            <td>전체 상담사 100% 자동 평가</td>
+          </tr>
+          <tr>
+            <td>평가 기준</td>
+            <td>평가자 주관 개입 가능</td>
+            <td>24가지 항목 일관 적용</td>
+          </tr>
+          <tr>
+            <td>피드백 속도</td>
+            <td>며칠 ~ 일주일</td>
+            <td>1시간 이내 코칭 리포트</td>
+          </tr>
+          <tr>
+            <td>활용 방향</td>
+            <td>점수 통보 중심</td>
+            <td>감점 사유·개선안·트렌드까지 자동 제시</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="ex-divider"></div>
+
+      <p class="ex-eyebrow">Coaching Report — 자동 생성</p>
+      <h3 class="ex-h-sub">점수만 주지 않습니다. 다음에 뭘 해야 할지 알려줍니다.</h3>
+
+      <ul class="ex-list">
+        <li><span class="ex-strong">감점 요소 명시</span> — 어떤 부분에서 점수가 깎였는지 구간별로 표시</li>
+        <li><span class="ex-strong">개선안 자동 제시</span> — 다음 상담에서 어떻게 응대하면 좋을지 구체적으로 안내</li>
+        <li><span class="ex-strong">1시간 이내 전달</span> — 당일 상담에 대한 즉각 피드백, 기억이 생생할 때 코칭</li>
+        <li><span class="ex-strong">개인별 트렌드</span> — 상담사별 성장 곡선을 추적해 강점·약점을 시각화</li>
+      </ul>
+
+      <div class="ex-pullquote" style="margin-top:40px;">
+        "QA 담당자는 더 이상 채점자가 아닙니다.<br/>
+        AI가 채점한 결과를 가지고 — 진짜 코칭에 시간을 쓸 수 있게 됩니다."
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 8: 적용 효과 (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <div class="ex-container">
+      <p class="ex-eyebrow">Chapter 8 — Real Impact</p>
+      <h2 class="ex-h-section">숫자로 본 변화.</h2>
+      <p class="ex-lead">4,500명 센터에서 직접 운영하며 만든 결과입니다.</p>
+
+      <div class="ex-grid-2" style="margin-top:56px;">
+        <div class="ex-card">
+          <div class="ex-num">20%↓</div>
+          <h3 class="ex-h-card">상담 후처리 시간 단축</h3>
+          <p class="ex-body">자동 요약·코드 태깅으로 ACW(After-call Work) 시간이 줄어듭니다. 같은 인력으로 더 많은 콜을 받습니다.</p>
+        </div>
+        <div class="ex-card">
+          <div class="ex-num">100%</div>
+          <h3 class="ex-h-card">전 상담 자동 평가</h3>
+          <p class="ex-body">샘플링이 아닌 전수 평가. 모든 상담사가 매일 객관적인 코칭 리포트를 받습니다.</p>
+        </div>
+        <div class="ex-card">
+          <div class="ex-num">800만+</div>
+          <h3 class="ex-h-card">건의 학습 데이터</h3>
+          <p class="ex-body">실제 상담에서 누적된 데이터로 학습된 AI. 합성 데이터가 아닌 진짜 현장의 언어를 이해합니다.</p>
+        </div>
+        <div class="ex-card">
+          <div class="ex-num">1시간</div>
+          <h3 class="ex-h-card">이내 코칭 리포트</h3>
+          <p class="ex-body">상담이 끝난 그 날, 그 자리에서 피드백. 기억이 생생할 때 개선이 일어납니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chapter 9: Q&A -->
+  <section class="ex-section ex-section--white">
+    <div class="ex-container">
+      <p class="ex-eyebrow">Chapter 9 — FAQ</p>
+      <h2 class="ex-h-section">현장에서 자주 받는 질문.</h2>
+      <p class="ex-lead">도입 전, 가장 많이 망설이게 되는 네 가지 — 그리고 우리의 답.</p>
+
+      <div class="ex-qa">
+        <p class="ex-qa__q">기존 KMS(지식관리시스템)와 연동 가능한가요?</p>
+        <p class="ex-qa__a">네, RAG 시스템으로 전환하여 연동합니다. LG U+는 자체 문서 파서와 임베딩 기술을 보유하고 있어 PDF·HWP·Excel 등 다양한 형식의 기존 매뉴얼을 벡터화하여 검색 가능한 형태로 전환합니다. 기존 KMS를 버릴 필요 없이, 더 똑똑한 검색 레이어로 감싸는 방식입니다.</p>
+      </div>
+
+      <div class="ex-qa">
+        <p class="ex-qa__q">STT 품질이 걱정됩니다. 실제로 잘 되나요?</p>
+        <p class="ex-qa__a">초기 도입 시 90% 초반에서 시작합니다. 하지만 LG U+ 독자 STT 엔진과 도메인 특화 피드백 루프를 통해 최단 시간 내 CRR 97% 이상까지 끌어올립니다. 금융·통신 등 도메인 전문용어도 매일 학습합니다. 시간이 지날수록 좋아지는 구조 — 그게 핵심입니다.</p>
+      </div>
+
+      <div class="ex-qa">
+        <p class="ex-qa__q">AI 자동 학습(Self-revolving)이 가능한가요?</p>
+        <p class="ex-qa__a">네, 오분류 데이터를 자동 수집해 의도를 재파악·재매핑하는 \'셀프 리볼빙\' 기술이 구현되어 있습니다. 학습 인프라(GPU) 환경이 마련되면 고객사 내부에서 지속적인 자동 학습 체계까지 구축해 드립니다. 한 번 도입으로 끝나는 시스템이 아니라, 계속 자라는 시스템입니다.</p>
+      </div>
+
+      <div class="ex-qa">
+        <p class="ex-qa__q">짧은 긍정 응답("네")도 인식이 되나요?</p>
+        <p class="ex-qa__a">상담사 97%·고객 3% 비율의 극단적 대화 환경에서도 음향 모델 강도 조정과 화자 분리 기술로 누락 없는 인식이 가능합니다. 민원 이슈 방지를 위해 누락 0을 목표로 튜닝합니다. 짧은 응답 하나가 분쟁의 시작이 될 수 있다는 걸 — 4,500명을 운영하며 배웠습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING (DARK) -->
+  <section class="ex-section ex-section--dark">
+    <div class="ex-container" style="text-align:center;">
+      <p class="ex-eyebrow">Closing</p>
+      <p class="ex-quote">"4,500명을 20년간 직접 운영해 본 회사가 만든 —<br/>진짜 현장을 아는 AICC."</p>
+      <p class="ex-caption" style="margin-top:32px;">출처 · LG U+ 상담 어드바이저 교육 세미나</p>
+    </div>
+  </section>
+
+</div>
+`;
+
+
+    // ── Show Detail ──
+    function showDetail(id) {
+      const lecture = LECTURES.find(l => l.id === id);
+      if (!lecture) return;
+
+      document.getElementById('listView').classList.add('hidden');
+      const detailView = document.getElementById('detailView');
+      detailView.classList.add('active');
+
+      document.getElementById('detailHeader').innerHTML = `
+    <span class="detail-header__badge" style="background:${lecture.color};">${lecture.badge}</span>
+    <h1 class="detail-header__title">${lecture.title}</h1>
+    <p class="detail-header__subtitle">${lecture.subtitle}</p>
+    <div style="display:flex; gap:20px; margin-top:16px; font-size:13px; color:#86868b;">
+      <span style="display:flex; align-items:center; gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">calendar_today</span> ${lecture.date}
+      </span>
+      <span style="display:flex; align-items:center; gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">schedule</span> ${lecture.duration}
+      </span>
+      <span style="display:flex; align-items:center; gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">person</span> ${lecture.instructor}
+      </span>
+    </div>
+  `;
+      document.getElementById('detailContent').innerHTML = LECTURE_CONTENT[id] || '<p>콘텐츠 준비 중입니다.</p>';
+      window.scrollTo(0, 0);
+    }
+
+    // ── Show List ──
+    function showList() {
+      document.getElementById('detailView').classList.remove('active');
+      document.getElementById('listView').classList.remove('hidden');
+    }
+
+    // ── Init ──
+    renderCards();
+  </script>
+</body>
+
+</html>

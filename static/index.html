@@ -15,12 +15,12 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#002859',
-                        'primary-container': '#003d82',
-                        secondary: '#b50062',
-                        'secondary-container': '#e2007c',
-                        'secondary-fixed': '#ffd9e2',
-                        'primary-fixed': '#d7e2ff',
+                        primary: '#0071e3',
+                        'primary-container': '#0077ed',
+                        secondary: '#002859',
+                        'secondary-container': '#003d82',
+                        'secondary-fixed': '#d7e2ff',
+                        'primary-fixed': '#e8f0fe',
                         surface: '#f7fafd',
                         'surface-container-low': '#f1f4f7',
                         'surface-container-high': '#e5e8eb',
@@ -56,7 +56,7 @@
             transform: translateX(4px);
         }
         .feature-card:hover .feature-icon {
-            background-color: #b50062 !important;
+            background-color: #0071e3 !important;
             color: white !important;
         }
         .quick-link {
@@ -130,7 +130,7 @@
             <section class="mb-8 animate-fade-in-up">
                 <div class="flex items-center gap-3 mb-3">
                     <h2 class="text-4xl font-extrabold font-manrope text-on-surface">
-                        환영합니다, <span class="text-secondary">사업담당</span>님
+                        환영합니다, <span class="text-secondary" id="hero-username">사업담당</span>님
                     </h2>
                     <span class="bg-secondary-fixed px-3 py-1 rounded-full text-sm font-bold text-secondary">Stage 1 MVP</span>
                 </div>
@@ -184,31 +184,22 @@
                 </div>
 
                 <!-- Card 2: Quick Start (col-span-5) -->
-                <div class="md:col-span-5 bg-primary text-white rounded-2xl p-6 shadow-lg relative overflow-hidden animate-fade-in-up animate-delay-3">
-                    <div class="flex items-center gap-2 mb-5">
-                        <span class="material-symbols-outlined text-white/80">analytics</span>
-                        <h3 class="text-lg font-bold font-manrope">빠른 시작</h3>
-                    </div>
+                <div class="md:col-span-5 bg-white rounded-2xl p-6 shadow-sm border border-[#d2d2d7]/40 relative overflow-hidden animate-fade-in-up animate-delay-3">
+                    <h3 class="text-lg font-bold text-[#1d1d1f] mb-5">빠른 시작</h3>
                     <div class="space-y-3">
-                        <a href="/simulation" class="quick-link flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                            <span class="text-lg">🎭</span>
-                            <span class="text-sm font-medium">새 롤플레이</span>
-                            <span class="material-symbols-outlined text-white/50 ml-auto text-base">chevron_right</span>
+                        <a href="/simulation" class="flex items-center gap-3 bg-[#f5f5f7] hover:bg-[#e5e5ea] rounded-xl p-3 transition">
+                            <span class="text-sm font-medium text-[#1d1d1f]">새 롤플레이</span>
+                            <span class="material-symbols-outlined text-[#86868b] ml-auto text-base">chevron_right</span>
                         </a>
-                        <a href="/quiz" class="quick-link flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                            <span class="text-lg">🎯</span>
-                            <span class="text-sm font-medium">퀴즈 풀기</span>
-                            <span class="material-symbols-outlined text-white/50 ml-auto text-base">chevron_right</span>
+                        <a href="/quiz" class="flex items-center gap-3 bg-[#f5f5f7] hover:bg-[#e5e5ea] rounded-xl p-3 transition">
+                            <span class="text-sm font-medium text-[#1d1d1f]">퀴즈 풀기</span>
+                            <span class="material-symbols-outlined text-[#86868b] ml-auto text-base">chevron_right</span>
                         </a>
-                        <a href="/dictionary" class="quick-link flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                            <span class="text-lg">📖</span>
-                            <span class="text-sm font-medium">용어 검색</span>
-                            <span class="material-symbols-outlined text-white/50 ml-auto text-base">chevron_right</span>
+                        <a href="/dictionary" class="flex items-center gap-3 bg-[#f5f5f7] hover:bg-[#e5e5ea] rounded-xl p-3 transition">
+                            <span class="text-sm font-medium text-[#1d1d1f]">용어 검색</span>
+                            <span class="material-symbols-outlined text-[#86868b] ml-auto text-base">chevron_right</span>
                         </a>
                     </div>
-                    <!-- Decorative -->
-                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full"></div>
-                    <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full"></div>
                 </div>
             </section>
 
@@ -248,23 +239,34 @@
     </main>
 
     <script>
-        // Load stats from localStorage
-        function loadStats() {
-            const roleplayCount = localStorage.getItem('roleplay_count') || '0';
-            const quizAccuracy = localStorage.getItem('quiz_accuracy') || '0';
-            const termsLearned = localStorage.getItem('terms_learned') || '0';
-            const streakDays = localStorage.getItem('streak_days') || '0';
+        // Load stats from server API
+        async function loadStats() {
+            try {
+                const res = await authFetch('/api/my-stats');
+                if (res.ok) {
+                    const d = await res.json();
+                    document.getElementById('stat-roleplay').innerHTML = `${d.roleplay_count}<span class="text-base font-bold">회</span>`;
+                    document.getElementById('stat-quiz').innerHTML = `${d.quiz_accuracy}<span class="text-base font-bold">%</span>`;
+                    document.getElementById('stat-terms').innerHTML = `${d.terms_learned}<span class="text-base font-bold">개</span>`;
+                    document.getElementById('stat-streak').innerHTML = `${d.streak_days}<span class="text-base font-bold">일</span>`;
+                }
+            } catch (e) {
+                // API 실패 시 기본값 유지
+            }
+        }
 
-            document.getElementById('stat-roleplay').innerHTML = `${roleplayCount}<span class="text-base font-bold">회</span>`;
-            document.getElementById('stat-quiz').innerHTML = `${quizAccuracy}<span class="text-base font-bold">%</span>`;
-            document.getElementById('stat-terms').innerHTML = `${termsLearned}<span class="text-base font-bold">개</span>`;
-            document.getElementById('stat-streak').innerHTML = `${streakDays}<span class="text-base font-bold">일</span>`;
+        // Set dynamic user name
+        function setUserName() {
+            const user = window.getCurrentUser ? window.getCurrentUser() : null;
+            if (user && user.name) {
+                document.getElementById('hero-username').textContent = user.name + ' ' + (user.position || '');
+            }
         }
 
         // Check DB status
         async function checkDbStatus() {
             try {
-                const response = await fetch('/api/db-status');
+                const response = await authFetch('/api/db-status');
                 if (response.ok) {
                     const data = await response.json();
                     if (!data.ready) {
@@ -284,7 +286,7 @@
             btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">progress_activity</span> 구축 중...';
 
             try {
-                const response = await fetch('/api/build-db', { method: 'POST' });
+                const response = await authFetch('/api/build-db', { method: 'POST' });
                 if (response.ok) {
                     btn.innerHTML = '<span class="material-symbols-outlined text-base">check</span> 완료';
                     btn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
@@ -304,9 +306,12 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            setUserName();
             loadStats();
             checkDbStatus();
         });
+        // 토큰 검증 후 사용자 정보 갱신 시 이름 업데이트
+        window.addEventListener('user-updated', setUserName);
     </script>
 </body>
 </html>
