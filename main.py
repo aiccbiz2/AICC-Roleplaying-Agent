@@ -213,6 +213,7 @@ class FeedbackRequest(BaseModel):
     history: list[dict]
     scenario_title: str
     persona_level: str
+    scenario_key: str | None = None
     mode: str = "free_text"
     answer_history: list[dict] | None = None
 
@@ -281,7 +282,11 @@ async def api_login(req: LoginRequest, request: Request):
 # ── Page Routes ──
 @app.get("/login")
 async def page_login():
-    return FileResponse("static/hero.html")
+    return FileResponse("static/hero.html", headers={
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    })
 
 @app.get("/")
 async def page_dashboard():
@@ -289,7 +294,11 @@ async def page_dashboard():
 
 @app.get("/simulation")
 async def page_simulation():
-    return FileResponse("static/simulation.html")
+    return FileResponse("static/simulation.html", headers={
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    })
 
 @app.get("/quiz")
 async def page_quiz():
@@ -305,7 +314,7 @@ async def page_lectures():
 
 @app.get("/history")
 async def page_history():
-    return FileResponse("static/history.html")
+    return FileResponse("static/history.html", headers={"Cache-Control": "no-store"})
 
 @app.get("/admin")
 async def page_admin():
@@ -334,9 +343,8 @@ async def api_access_log(req: AccessLogRequest, request: Request, user: dict = D
 # ── API: Scenarios & Personas ──
 @app.get("/api/scenarios")
 async def get_scenarios(user: dict = Depends(get_current_user)):
-    import roleplay
-    importlib.reload(roleplay)
-    return roleplay.SCENARIOS
+    from roleplay import SCENARIOS
+    return SCENARIOS
 
 @app.get("/api/personas")
 async def get_personas(user: dict = Depends(get_current_user)):
@@ -439,9 +447,12 @@ async def roleplay_hint(req: HintRequest, user: dict = Depends(get_current_user)
 @app.post("/api/roleplay/feedback")
 async def roleplay_feedback(req: FeedbackRequest, user: dict = Depends(get_current_user)):
     from feedback import analyze_roleplay_async
+    from roleplay import SCENARIOS
+    scenario_data = SCENARIOS.get(req.scenario_key or "", {}) if req.scenario_key else {}
     result = await analyze_roleplay_async(
         req.history, req.scenario_title, req.persona_level,
         mode=req.mode, answer_history=req.answer_history,
+        scenario_data=scenario_data,
     )
     return result
 

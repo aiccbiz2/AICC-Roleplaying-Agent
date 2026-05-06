@@ -337,10 +337,9 @@ def get_user_quiz_records(user_id: str) -> list[dict]:
 
 def get_user_dashboard_stats(user_id: str) -> dict:
     conn = _connect()
-    # 주간 롤플레이 완료 수
+    # 전체 롤플레이 완료 수
     row = conn.execute(
-        """SELECT COUNT(*) as cnt FROM roleplay_sessions
-           WHERE user_id = ? AND ended_at >= datetime('now', '+9 hours', '-7 days')""",
+        "SELECT COUNT(*) as cnt FROM roleplay_sessions WHERE user_id = ?",
         (user_id,),
     ).fetchone()
     roleplay_count = row["cnt"] if row else 0

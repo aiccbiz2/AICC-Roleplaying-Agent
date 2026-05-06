@@ -59,6 +59,107 @@
     .chat-area::-webkit-scrollbar-thumb { background: #c3c6d2; border-radius: 3px; }
     .chat-area::-webkit-scrollbar-thumb:hover { background: #737782; }
 
+    /* ── Simulation Terminal Theme ── */
+    #phase-playing { background: #f5f5f7; }
+
+    /* Terminal chrome bar */
+    .sim-terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: #e8e8ed;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      flex: 0 0 auto;
+    }
+    .sim-terminal-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sim-terminal-dot.red    { background: #ff5f57; }
+    .sim-terminal-dot.yellow { background: #febc2e; }
+    .sim-terminal-dot.green  { background: #28c840; }
+    .sim-terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: #8e8e93;
+      letter-spacing: 0.01em;
+    }
+    .sim-terminal-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: #ff9500;
+      background: rgba(255,149,0,0.12);
+      border: 1px solid rgba(255,149,0,0.3);
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+
+    /* Info bar reskin */
+    #phase-playing .z-10.bg-white {
+      background: #f0f0f5 !important;
+      border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+    }
+
+    /* Chat area background */
+    #chat-area {
+      background: #f5f5f7;
+      gap: 16px !important;
+    }
+
+    /* Bubble reskin — AI (customer) */
+    .sim-bubble-ai {
+      background: #ffffff !important;
+      color: #1d1d1f !important;
+      border-radius: 16px !important;
+      border-bottom-left-radius: 4px !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+      text-align: left !important;
+    }
+
+    /* Bubble reskin — ME (user) */
+    .sim-bubble-me {
+      background: #0071e3 !important;
+      color: #ffffff !important;
+      border-radius: 16px !important;
+      border-bottom-right-radius: 4px !important;
+      text-align: left !important;
+    }
+
+    /* Avatar reskin */
+    .sim-avatar-ai {
+      background: #d1d1d6 !important;
+      color: #3a3a3c !important;
+      border-radius: 50% !important;
+    }
+    .sim-avatar-me {
+      background: #0071e3 !important;
+    }
+
+    /* Typing indicator reskin */
+    .sim-typing-bubble {
+      background: #ffffff !important;
+      border-radius: 16px !important;
+      border-bottom-left-radius: 4px !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    }
+    .sim-typing-bubble .typing-dot {
+      background: #aeaeb2 !important;
+    }
+
+    /* Input area */
+    #chat-input {
+      background: #ffffff !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      border-radius: 20px !important;
+    }
+    #chat-input:focus {
+      border-color: #0071e3 !important;
+    }
+
     /* Glass effect */
     .glass {
       background: rgba(255, 255, 255, 0.72);
@@ -207,19 +308,37 @@
       font-size: 80px;
       color: #d1d1d6;
     }
+    .scenario-card__bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.04);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      flex-shrink: 0;
+    }
+    .scenario-card__dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .scenario-card__dot.r { background: #ff5f57; }
+    .scenario-card__dot.y { background: #febc2e; }
+    .scenario-card__dot.g { background: #28c840; }
 
     /* Persona card */
     .persona-card {
-      transition: all 0.2s ease;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
       cursor: pointer;
     }
     .persona-card:hover {
-      border-color: #e8f0fe;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.09);
     }
     .persona-card.selected {
       border-color: #0071e3;
-      background: linear-gradient(135deg, #fff, #e8f0fe);
-      box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
+      box-shadow: 0 0 0 2px rgba(0,113,227,0.2), 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
     }
 
     /* Nav items */
@@ -458,6 +577,21 @@
     @media (max-width: 1023px) {
       #phase-playing { left: 0 !important; }
     }
+
+    /* 롤플레이 중 전체화면 모드 */
+    body.playing-mode #appHeader,
+    body.playing-mode #appSidebar,
+    body.playing-mode > nav,
+    body.playing-mode > aside,
+    body.playing-mode .sidebar,
+    body.playing-mode [id*="sidebar"],
+    body.playing-mode [class*="sidebar"] {
+      display: none !important;
+    }
+    body.playing-mode #phase-playing {
+      top: 0 !important;
+      left: 0 !important;
+    }
   </style>
 </head>
 
@@ -477,7 +611,6 @@
       <div class="mb-8">
         <p class="text-[#86868b] text-xs font-semibold tracking-widest uppercase mb-2">Customer Meeting Simulation</p>
         <h2 class="font-headline font-extrabold text-3xl text-[#1d1d1f] mb-2">고객 미팅 롤플레이</h2>
-        <p class="text-on-surface-variant text-sm">당신 = LG U+ AI사업2팀 사업담당 | AI = AICC 도입 검토 고객</p>
       </div>
 
       <!-- Loading indicator -->
@@ -526,6 +659,15 @@
     <!-- ========== PHASE 2: PLAYING (CHAT) ========== -->
     <section id="phase-playing" class="hidden flex flex-col" style="position: fixed; top: 4rem; left: 16rem; right: 0; bottom: 0; overflow: hidden; z-index: 5;">
 
+      <!-- Terminal Chrome Bar -->
+      <div class="sim-terminal-bar">
+        <span class="sim-terminal-dot red"></span>
+        <span class="sim-terminal-dot yellow"></span>
+        <span class="sim-terminal-dot green"></span>
+        <span class="sim-terminal-title" id="sim-terminal-title">AICC Roleplay · 시뮬레이션</span>
+        <span class="sim-terminal-badge">● REC</span>
+      </div>
+
       <!-- Top Info Bar (항상 상단 고정) -->
       <div class="z-10 bg-white border-b border-outline-variant/20 px-6 py-3 flex items-center justify-between" style="flex: 0 0 auto;">
         <div class="flex items-center gap-4">
@@ -536,7 +678,7 @@
               <span class="mx-1 text-outline-variant">|</span>
               <span id="play-persona-level"></span>
               <span class="mx-1 text-outline-variant">|</span>
-              대화 <span id="play-turn-count" class="font-semibold text-primary">0</span>턴
+              대화 <span id="play-turn-count" class="font-semibold" style="color:#1d1d1f;">0</span>턴
             </p>
           </div>
         </div>
@@ -559,59 +701,63 @@
       </div>
 
       <!-- Briefing Overlay (시작 전 상황 브리핑) -->
-      <div id="briefing-overlay" class="hidden" style="position:absolute;inset:0;z-index:20;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:2rem;">
-        <div class="w-full max-w-xl">
-          <div class="bg-white rounded-2xl shadow-lg border border-outline-variant/30 overflow-hidden">
-            <!-- Header -->
-            <div class="px-6 py-5 border-b border-outline-variant/20" style="background:linear-gradient(135deg,#f0f4ff,#e8f0fe);">
-              <div class="flex items-center gap-3 mb-2">
-                <span class="material-symbols-outlined text-primary" style="font-size:28px;">assignment</span>
-                <h3 class="font-headline font-extrabold text-lg text-on-surface">미팅 브리핑</h3>
-              </div>
-              <p class="text-xs text-on-surface-variant">롤플레이 시작 전 상황을 확인하세요</p>
+      <div id="briefing-overlay" class="hidden" style="position:absolute;inset:0;z-index:20;background:rgba(249,249,251,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:2.5rem 1.5rem;">
+        <div style="width:100%;max-width:600px;padding-bottom:2rem;">
+
+          <!-- 타이틀 -->
+          <div style="margin-bottom:2rem;">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#86868b;margin-bottom:6px;">Pre-Meeting Briefing</p>
+            <h2 id="briefing-title" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;line-height:1.2;margin:0;"></h2>
+          </div>
+
+          <!-- 역할 카드 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;">
+            <div style="background:white;border-radius:14px;padding:14px 16px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#86868b;margin:0 0 5px;">나의 역할</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:13px;font-weight:600;color:#1d1d1f;margin:0;">LG유플러스 AI사업2팀</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:13px;color:#434751;margin:0;">사업담당자</p>
             </div>
-            <!-- Body -->
-            <div class="px-6 py-5 space-y-4">
-              <!-- 당신의 역할 -->
-              <div class="flex items-start gap-3">
-                <span class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background-color:#007AFF;">ME</span>
-                <div>
-                  <p class="text-[10px] font-semibold text-outline uppercase tracking-wider mb-0.5">당신의 역할</p>
-                  <p class="text-sm font-semibold text-on-surface">LG유플러스 AI사업2팀 사업담당자</p>
-                </div>
-              </div>
-              <!-- 상대방 -->
-              <div class="flex items-start gap-3">
-                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                  <span class="material-symbols-outlined text-gray-500" style="font-size:16px;">person</span>
-                </div>
-                <div>
-                  <p class="text-[10px] font-semibold text-outline uppercase tracking-wider mb-0.5">상대방 (AI)</p>
-                  <p id="briefing-customer-role" class="text-sm font-semibold text-on-surface"></p>
-                </div>
-              </div>
-              <!-- 미팅 상황 -->
-              <div class="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100">
-                <p class="text-[10px] font-semibold text-blue-700 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                  <span class="material-symbols-outlined" style="font-size:14px;">info</span>
-                  미팅 상황
-                </p>
-                <p id="briefing-situation" class="text-sm text-blue-900 leading-relaxed"></p>
-              </div>
-              <!-- 출처 -->
-              <div class="flex items-center gap-2 text-xs text-on-surface-variant">
-                <span class="material-symbols-outlined" style="font-size:14px;">source</span>
-                <span id="briefing-source"></span>
-              </div>
-            </div>
-            <!-- Footer -->
-            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface">
-              <button id="btn-start-chat" onclick="dismissBriefing()" class="w-full btn-gradient text-white font-bold py-3.5 rounded-full text-sm flex items-center justify-center gap-2">
-                <span class="material-symbols-outlined" style="font-size:20px;">chat</span>
-                대화 시작
-              </button>
+            <div style="background:white;border-radius:14px;padding:14px 16px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#86868b;margin:0 0 5px;">상대방 (AI)</p>
+              <p id="briefing-customer-role" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:13px;font-weight:600;color:#1d1d1f;margin:0;"></p>
+              <p id="briefing-source-inline" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:11px;color:#86868b;margin:0;"></p>
             </div>
           </div>
+
+          <!-- 미팅 배경 -->
+          <div style="background:white;border-radius:16px;padding:18px 20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span class="material-symbols-outlined" style="font-size:17px;color:#434751;">calendar_today</span>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f;margin:0;">미팅 배경 및 목적</p>
+            </div>
+            <p id="briefing-situation" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:14px;line-height:1.65;color:#1d1d1f;margin:0;"></p>
+          </div>
+
+          <!-- 고객 관심사 -->
+          <div style="background:white;border-radius:16px;padding:18px 20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 1px 4px rgba(0,0,0,0.05);margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span class="material-symbols-outlined" style="font-size:17px;color:#8e44ad;">help_outline</span>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f;margin:0;">고객이 궁금해하는 사항</p>
+            </div>
+            <ul id="briefing-questions" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;"></ul>
+          </div>
+
+          <!-- 핵심 주의사항 -->
+          <div id="briefing-traps-section" style="background:#fffbf0;border-radius:16px;padding:18px 20px;border:1px solid rgba(255,179,0,0.2);box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:1.5rem;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span class="material-symbols-outlined" style="font-size:17px;color:#b45309;">warning_amber</span>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f;margin:0;">답변 시 주의할 포인트</p>
+            </div>
+            <ul id="briefing-traps" style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;"></ul>
+          </div>
+
+          <!-- 시작 버튼 -->
+          <button id="btn-start-chat" onclick="dismissBriefing()"
+            style="width:100%;background:#0071e3;color:white;border:none;border-radius:980px;padding:15px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:15px;font-weight:600;letter-spacing:-0.01em;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"
+            onmouseover="this.style.background='#0077ed'" onmouseout="this.style.background='#0071e3'">
+            <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+            대화 시작
+          </button>
         </div>
       </div>
 
@@ -624,10 +770,13 @@
       </div>
 
       <!-- Dynamic Hint Bar (중급 mode) - 입력창 바로 위 -->
-      <div id="hint-bar" class="hidden px-6 py-3 flex-shrink-0 border-t border-outline-variant/10 bg-amber-50/60">
-        <div class="flex items-start gap-2">
-          <span class="material-symbols-outlined text-amber-600 flex-shrink-0 mt-0.5" style="font-size:18px;">lightbulb</span>
-          <div id="hint-content" class="text-xs text-on-surface-variant leading-relaxed">
+      <div id="hint-bar" class="hidden flex-shrink-0" style="padding:10px 24px 6px;border-top:1px solid rgba(0,0,0,0.06);background:#fafafa;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+            <span class="material-symbols-outlined" style="font-size:14px;color:#86868b;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20;">lightbulb</span>
+            <span style="font-size:11px;font-weight:600;color:#86868b;letter-spacing:0.03em;white-space:nowrap;">키워드 힌트</span>
+          </div>
+          <div id="hint-content" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
             <!-- Populated by JS -->
           </div>
         </div>
@@ -729,7 +878,7 @@
           <div id="feedback-terms-correct" class="fb-tags"></div>
           <div id="feedback-terms-missed" class="fb-tags" style="margin-top:10px;"></div>
           <div id="feedback-term-tip" class="fb-tip hidden">
-            <span class="material-symbols-outlined" style="font-size:18px;color:#0071e3;flex-shrink:0;">lightbulb</span>
+            <span class="material-symbols-outlined" style="font-size:18px;color:#434751;flex-shrink:0;">lightbulb</span>
             <span id="feedback-term-tip-text"></span>
           </div>
         </div>
@@ -855,6 +1004,17 @@
       $phasePlaying.classList.toggle('hidden', phase !== 'playing');
       $phasePlaying.style.display = phase === 'playing' ? 'flex' : 'none';
       $phaseFeedback.classList.toggle('hidden', phase !== 'feedback');
+
+      // 전체화면 모드: 롤플레이 중 헤더·사이드바 숨김
+      const isPlaying = phase === 'playing';
+      const header = document.getElementById('appHeader');
+      const sidebar = document.getElementById('appSidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      if (header)  header.style.display  = isPlaying ? 'none' : '';
+      if (sidebar) sidebar.style.display = isPlaying ? 'none' : '';
+      if (sidebarOverlay) sidebarOverlay.style.display = isPlaying ? 'none' : '';
+      $phasePlaying.style.top  = isPlaying ? '0' : '';
+      $phasePlaying.style.left = isPlaying ? '0' : '';
     }
 
     // ── Init: Load data ──
@@ -877,9 +1037,9 @@
         document.getElementById('setup-loading').innerHTML = `
           <div class="text-center">
             <span class="material-symbols-outlined text-error mb-2" style="font-size:40px;">error</span>
-            <p class="text-error text-sm font-semibold">데이터를 불러올 수 없습니다.</p>
-            <p class="text-outline text-xs mt-1">서버가 실행 중인지 확인해주세요.</p>
-            <button onclick="init()" class="mt-4 text-primary text-sm font-semibold hover:underline">다시 시도</button>
+            <p class="text-error text-sm font-semibold">시나리오를 불러오지 못했습니다.</p>
+            <p class="text-outline text-xs mt-1">잠시 후 다시 시도해주세요. 문제가 계속되면 관리자에게 문의하세요.</p>
+            <button onclick="init()" style="color:#1d1d1f;font-size:14px;font-weight:600;background:none;border:none;cursor:pointer;text-decoration:underline;">↺ 다시 시도</button>
           </div>`;
       }
     }
@@ -896,28 +1056,66 @@
       const personaGrid = document.getElementById('persona-grid');
       personaGrid.innerHTML = '';
 
-      const personaEnglish = { '초급': 'Beginner', '중급': 'Intermediate', '고급': 'Advanced' };
-      const personaStars = { '초급': 1, '중급': 3, '고급': 5 };
-      const personaDesc  = {
-        '초급': '객관식 — 선택지에서 골라 답변. 처음 시작하기 좋습니다.',
-        '중급': '서술형 — 힌트와 함께 자유 응답. 키워드를 참고해 연습하세요.',
-        '고급': '서술형 — 힌트 없이 실전처럼 도전. 꼼꼼한 실무자를 상대합니다.',
+      const personaMeta = {
+        '초급': {
+          eng: 'Beginner',
+          level: '초급',
+          mode: '객관식',
+          difficulty: 1,
+          accentColor: '#1a7f4b',
+          bgColor: '#f0fdf4',
+          tags: ['객관식 4지선다', '힌트 없음'],
+          desc: '선택지에서 골라 답변하는 방식으로 AICC 도메인 지식을 점검합니다.',
+        },
+        '중급': {
+          eng: 'Intermediate',
+          level: '중급',
+          mode: '서술형',
+          difficulty: 3,
+          accentColor: '#0071e3',
+          bgColor: '#e8f0fe',
+          tags: ['자유 서술형', '키워드 힌트 제공'],
+          desc: '힌트 키워드를 참고해 자유롭게 답변을 구성하는 중간 난이도입니다.',
+        },
+        '고급': {
+          eng: 'Advanced',
+          level: '고급',
+          mode: '서술형',
+          difficulty: 5,
+          accentColor: '#b45309',
+          bgColor: '#fef3c7',
+          tags: ['자유 서술형', '힌트 없음 · 실전'],
+          desc: '힌트 없이 실제 고객 미팅처럼 대응합니다. 꼼꼼한 실무자를 상대합니다.',
+        },
       };
 
       for (const [key, pers] of Object.entries(personas)) {
-        const stars = personaStars[key] || 3;
-        const engName = personaEnglish[key] || key;
-        const desc  = personaDesc[key]  || '';
-        const starsStr = '<span class="text-amber-400 text-xs">' + '&#9733;'.repeat(stars) + '</span>' + '<span class="text-outline-variant/40 text-xs">' + '&#9733;'.repeat(5 - stars) + '</span>';
+        const m = personaMeta[key] || { eng: key, level: key, mode: '', difficulty: 3, accentColor: '#0071e3', bgColor: '#e8f0fe', tags: [], desc: '' };
+
+        const diffDots = Array.from({ length: 5 }, (_, i) =>
+          `<span style="width:7px;height:7px;border-radius:50%;background:${i < m.difficulty ? m.accentColor : 'rgba(0,0,0,0.1)'};display:inline-block;margin-right:3px;"></span>`
+        ).join('');
 
         const card = document.createElement('div');
-        card.className = 'persona-card bg-white rounded-2xl p-5 border border-outline-variant/30 text-center';
+        card.className = 'persona-card bg-white rounded-2xl border border-outline-variant/30';
         card.dataset.key = key;
+        card.style.cssText = 'overflow:hidden;cursor:pointer;transition:all 0.22s ease;';
         card.innerHTML = `
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.02em; color:#1d1d1f; margin-bottom:4px;">${engName}</div>
-          <h4 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif; font-size:13px; font-weight:500; color:#6e6e73; margin-bottom:6px;">${pers.label}</h4>
-          <div class="mb-2">${starsStr}</div>
-          <p class="text-xs text-on-surface-variant leading-relaxed">${desc}</p>
+          <div style="padding:22px 22px 20px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+              <div>
+                <p style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:${m.accentColor};margin:0 0 4px;">${m.level} · ${m.mode}</p>
+                <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0;">${m.eng}</p>
+              </div>
+              <div style="display:flex;gap:3px;padding-top:4px;">
+                ${Array.from({length:5},(_,i)=>`<span style="width:7px;height:7px;border-radius:50%;background:${i<m.difficulty?m.accentColor:'rgba(0,0,0,0.08);'};display:inline-block;"></span>`).join('')}
+              </div>
+            </div>
+            <p style="font-size:13px;color:#6e6e73;line-height:1.55;margin:0 0 14px;">${m.desc}</p>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;">
+              ${m.tags.map(t=>`<span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:980px;background:${m.bgColor};color:${m.accentColor};">${t}</span>`).join('')}
+            </div>
+          </div>
         `;
         card.addEventListener('click', () => selectPersona(key));
         personaGrid.appendChild(card);
@@ -987,6 +1185,11 @@
           const imgPos = scen.card_image_position || 'center';
 
           card.innerHTML = `
+            <div class="scenario-card__bar">
+              <span class="scenario-card__dot r"></span>
+              <span class="scenario-card__dot y"></span>
+              <span class="scenario-card__dot g"></span>
+            </div>
             <div class="scenario-card__content">
               <div class="scenario-card__label" style="color:${labelColor};">${stageLabel}</div>
               <div class="scenario-card__title">${scen.title}</div>
@@ -1094,6 +1297,9 @@
         document.getElementById('play-scenario-title').textContent = scen.title;
         document.getElementById('play-customer-role').textContent = scen.customer_role;
         document.getElementById('play-persona-level').textContent = pers.label;
+        // Update terminal title
+        const termTitle = document.getElementById('sim-terminal-title');
+        if (termTitle) termTitle.textContent = `AICC Roleplay · ${scen.title} — ${scen.customer_role}`;
         document.getElementById('play-turn-count').textContent = '0';
 
         // Cue Card — 중급(show_hints=true)일 때 응답 키워드 큐카드 표시
@@ -1101,7 +1307,7 @@
         if (showHints) {
           hintBar.classList.remove('hidden');
           document.getElementById('hint-content').innerHTML =
-            '<span class="text-outline italic">응답 키워드를 생성 중입니다...</span>';
+            '<span style="font-size:12px;color:#86868b;font-style:italic;">키워드 생성 중...</span>';
           // 비동기로 opening에 대한 힌트 가져오기 (UI 블로킹 안 함)
           fetchHintForMessage(data.opening);
         } else {
@@ -1136,7 +1342,10 @@
         clearLocalStorageBackup();
         if (autoSaveInterval) clearInterval(autoSaveInterval);
         autoSaveInterval = setInterval(() => {
-          if (chatHistory.length > 1) saveToLocalStorage();
+          if (chatHistory.length > 1) {
+            saveToLocalStorage();
+            saveSessionSilent(); // DB 자동저장 (30초마다)
+          }
         }, 30000);
 
         renderChat();
@@ -1152,15 +1361,79 @@
         btn.disabled = false;
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:22px;">play_arrow</span>롤플레이 시작';
       }
+
+      // 전체화면: finally 이후 보장 적용
+      if (phase === 'playing') {
+        requestAnimationFrame(() => {
+          const _h = document.getElementById('appHeader');
+          const _s = document.getElementById('appSidebar');
+          const _o = document.getElementById('sidebarOverlay');
+          if (_h) _h.style.display = 'none';
+          if (_s) _s.style.display = 'none';
+          if (_o) _o.style.display = 'none';
+          $phasePlaying.style.top  = '0';
+          $phasePlaying.style.left = '0';
+        });
+      }
     }
 
     // ── Briefing ──
     function showBriefing(scen) {
       const overlay = document.getElementById('briefing-overlay');
-      document.getElementById('briefing-customer-role').textContent = scen.customer_role;
-      document.getElementById('briefing-situation').textContent = scen.situation;
-      document.getElementById('briefing-source').textContent = scen.source || '';
 
+      // 타이틀
+      const titleEl = document.getElementById('briefing-title');
+      if (titleEl) titleEl.textContent = scen.title || '';
+
+      // 역할
+      document.getElementById('briefing-customer-role').textContent = scen.customer_role || '';
+
+      // 출처 (인라인)
+      const srcInline = document.getElementById('briefing-source-inline');
+      if (srcInline) srcInline.textContent = scen.source || '';
+
+      // 미팅 배경 (situation_full 우선, 없으면 situation)
+      const situationEl = document.getElementById('briefing-situation');
+      if (situationEl) situationEl.textContent = scen.situation_full || scen.situation || '';
+
+      // 고객 관심사 (key_questions 앞 5개)
+      const qList = document.getElementById('briefing-questions');
+      if (qList) {
+        qList.innerHTML = '';
+        const questions = Array.isArray(scen.key_questions) ? scen.key_questions.slice(0, 5) : [];
+        questions.forEach(function(q) {
+          const li = document.createElement('li');
+          li.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
+          li.innerHTML = '<span style="flex-shrink:0;width:18px;height:18px;border-radius:50%;background:#f0e6ff;display:flex;align-items:center;justify-content:center;margin-top:1px;">'
+            + '<span class="material-symbols-outlined" style="font-size:11px;color:#8e44ad;">question_mark</span></span>'
+            + '<span style="font-family:-apple-system,BlinkMacSystemFont,\'SF Pro Text\',sans-serif;font-size:13px;color:#1d1d1f;line-height:1.5;">' + escapeHTML(q) + '</span>';
+          qList.appendChild(li);
+        });
+      }
+
+      // 주의사항 (traps)
+      const trapsList = document.getElementById('briefing-traps');
+      const trapsSection = document.getElementById('briefing-traps-section');
+      if (trapsList) {
+        trapsList.innerHTML = '';
+        const traps = Array.isArray(scen.traps) ? scen.traps : [];
+        if (traps.length === 0 && trapsSection) {
+          trapsSection.style.display = 'none';
+        } else {
+          if (trapsSection) trapsSection.style.display = '';
+          traps.forEach(function(t) {
+            const li = document.createElement('li');
+            li.style.cssText = 'display:flex;align-items:flex-start;gap:8px;';
+            li.innerHTML = '<span style="flex-shrink:0;width:18px;height:18px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;margin-top:1px;">'
+              + '<span class="material-symbols-outlined" style="font-size:11px;color:#b45309;">priority_high</span></span>'
+              + '<span style="font-family:-apple-system,BlinkMacSystemFont,\'SF Pro Text\',sans-serif;font-size:13px;color:#78350f;line-height:1.5;">' + escapeHTML(t) + '</span>';
+            trapsList.appendChild(li);
+          });
+        }
+      }
+
+      // 스크롤 맨 위로
+      overlay.scrollTop = 0;
       overlay.classList.remove('hidden');
       overlay.style.display = 'flex';
     }
@@ -1200,39 +1473,32 @@
 
       // Avatar
       const avatar = document.createElement('div');
+      avatar.className = 'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold';
       if (isAI) {
-        avatar.className = 'w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0';
-        avatar.innerHTML = '<span class="material-symbols-outlined text-gray-500" style="font-size:20px;">person</span>';
+        avatar.className += ' sim-avatar-ai';
+        avatar.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;color:#636366;">person</span>';
       } else {
-        avatar.className = 'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white';
-        avatar.style.backgroundColor = '#007AFF';
+        avatar.className += ' sim-avatar-me text-white';
         avatar.textContent = 'ME';
       }
 
       // Content
       const content = document.createElement('div');
-      content.className = `max-w-[70%] ${isAI ? '' : 'flex flex-col items-end'}`;
+      content.className = `max-w-[72%] flex flex-col gap-1 ${isAI ? '' : 'items-end'}`;
 
       // Name
       const name = document.createElement('p');
-      name.className = `text-[10px] font-semibold uppercase tracking-wider mb-1 ${isAI ? 'text-gray-500' : 'text-blue-500'}`;
-      name.textContent = isAI ? (scen ? scen.customer_role : 'AI Customer') : 'ME';
+      name.className = 'text-[10px] font-semibold text-[#8e8e93] px-1';
+      name.textContent = isAI ? (scen ? scen.customer_role : 'AI Customer') : 'LG U+ AI사업2팀';
 
-      // Bubble (iMessage style)
+      // Bubble
       const bubble = document.createElement('div');
-      if (isAI) {
-        bubble.className = 'rounded-2xl rounded-tl-none px-5 py-3.5 text-sm text-gray-900 leading-relaxed';
-        bubble.style.backgroundColor = '#E9E9EB';
-      } else {
-        bubble.className = 'rounded-2xl rounded-tr-none px-5 py-3.5 text-sm text-white leading-relaxed';
-        bubble.style.backgroundColor = '#007AFF';
-      }
+      bubble.className = `px-4 py-3 text-sm leading-relaxed ${isAI ? 'sim-bubble-ai' : 'sim-bubble-me'}`;
       bubble.textContent = msg.content;
       bubble.style.whiteSpace = 'pre-wrap';
 
       content.appendChild(name);
       content.appendChild(bubble);
-
       wrapper.appendChild(avatar);
       wrapper.appendChild(content);
       return wrapper;
@@ -1256,26 +1522,48 @@
       chatHistory.push({ role: 'user', content: text });
       input.value = '';
       input.style.height = 'auto';
-      renderChat();
 
       // Disable input
       isWaitingForAI = true;
       input.disabled = true;
       document.getElementById('btn-send').disabled = true;
 
-      // Show typing indicator
+      // Show ME typing indicator on right side briefly
       const chatArea = document.getElementById('chat-area');
+      const meTypingEl = document.createElement('div');
+      meTypingEl.id = 'me-typing-indicator';
+      meTypingEl.className = 'flex gap-3 fade-in-up flex-row-reverse';
+      meTypingEl.innerHTML = `
+        <div class="w-9 h-9 rounded-full sim-avatar-me flex items-center justify-center flex-shrink-0 text-xs font-bold text-white">ME</div>
+        <div class="flex flex-col gap-1 items-end">
+          <p class="text-[10px] font-semibold text-[#8e8e93] px-1">LG U+ AI사업2팀</p>
+          <div class="px-4 py-3 sim-bubble-me flex gap-1 items-center" style="border-radius:16px;border-bottom-right-radius:4px;">
+            <span class="typing-dot" style="background:rgba(255,255,255,0.8)!important;"></span>
+            <span class="typing-dot" style="background:rgba(255,255,255,0.8)!important;"></span>
+            <span class="typing-dot" style="background:rgba(255,255,255,0.8)!important;"></span>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(meTypingEl);
+      scrollChatToBottom();
+
+      // After brief delay, replace with actual message bubble
+      await new Promise(resolve => setTimeout(resolve, 900));
+      meTypingEl.remove();
+      renderChat();
+
+      // Show AI typing indicator on left
       const typingEl = document.createElement('div');
       typingEl.id = 'typing-indicator';
       typingEl.className = 'flex gap-3 fade-in-up';
       const scen = scenarios[selectedScenario];
       typingEl.innerHTML = `
-        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-gray-500" style="font-size:20px;">person</span>
+        <div class="w-9 h-9 rounded-full sim-avatar-ai flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined" style="font-size:18px;color:#636366;">person</span>
         </div>
-        <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider mb-1 text-gray-500">${scen ? scen.customer_role : 'AI'}</p>
-          <div class="rounded-2xl rounded-tl-none px-5 py-4" style="background-color:#E9E9EB;">
+        <div class="flex flex-col gap-1">
+          <p class="text-[10px] font-semibold text-[#8e8e93] px-1">${scen ? scen.customer_role : 'AI'}</p>
+          <div class="px-4 py-3 sim-typing-bubble flex gap-1 items-center">
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
             <span class="typing-dot"></span>
@@ -1301,6 +1589,9 @@
         }
         chatHistory.push({ role: 'assistant', content: cleanAiResponse(data.response) });
 
+        // AI 응답 직후 DB 자동저장 (피드백 없어도 이력 보존)
+        saveSessionSilent();
+
         // 객관식이면 새 선택지 업데이트
         if (currentMode === 'multiple_choice' && data.choices) {
           currentChoices = data.choices;
@@ -1309,7 +1600,7 @@
         // 중급 키워드 큐카드 — 비동기로 별도 호출 (UI 블로킹 없음)
         if (showHints && data.response) {
           document.getElementById('hint-content').innerHTML =
-            '<span class="text-outline italic">응답 키워드를 생성 중입니다...</span>';
+            '<span style="font-size:12px;color:#86868b;font-style:italic;">키워드 생성 중...</span>';
           fetchHintForMessage(data.response);
         }
 
@@ -1530,7 +1821,6 @@
       // 정답 답변을 채팅에 추가
       const correctAnswer = currentChoices[currentCorrectIndex];
       chatHistory.push({ role: 'user', content: correctAnswer });
-      renderChat();
 
       // UI 정리
       document.getElementById('btn-next-turn').classList.add('hidden');
@@ -1540,18 +1830,44 @@
       isWaitingForAI = true;
 
       const chatArea = document.getElementById('chat-area');
+      const scen = scenarios[selectedScenario];
+
+      // ME 오른쪽 타이핑 인디케이터 먼저
+      const meTypingEl2 = document.createElement('div');
+      meTypingEl2.id = 'me-typing-indicator';
+      meTypingEl2.className = 'flex gap-3 fade-in-up flex-row-reverse';
+      meTypingEl2.innerHTML = `
+        <div class="w-9 h-9 rounded-full sim-avatar-me flex items-center justify-center flex-shrink-0 text-xs font-bold text-white">ME</div>
+        <div class="flex flex-col gap-1 items-end">
+          <p class="text-[10px] font-semibold text-[#8e8e93] px-1">LG U+ AI사업2팀</p>
+          <div class="px-4 py-3 sim-bubble-me flex gap-1 items-center" style="border-radius:16px;border-bottom-right-radius:4px;">
+            <span class="typing-dot" style="background:rgba(255,255,255,0.8)!important;"></span>
+            <span class="typing-dot" style="background:rgba(255,255,255,0.8)!important;"></span>
+            <span class="typing-dot" style="background:rgba(255,255,255,0.8)!important;"></span>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(meTypingEl2);
+      scrollChatToBottom();
+
+      await new Promise(resolve => setTimeout(resolve, 900));
+      meTypingEl2.remove();
+      renderChat();
+
+      // AI 왼쪽 타이핑 인디케이터
       const typingEl = document.createElement('div');
       typingEl.id = 'typing-indicator';
       typingEl.className = 'flex gap-3 fade-in-up';
-      const scen = scenarios[selectedScenario];
       typingEl.innerHTML = `
-        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-gray-500" style="font-size:20px;">person</span>
+        <div class="w-9 h-9 rounded-full sim-avatar-ai flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined" style="font-size:18px;color:#636366;">person</span>
         </div>
-        <div>
-          <p class="text-[10px] font-semibold uppercase tracking-wider mb-1 text-gray-500">${scen ? scen.customer_role : 'AI'}</p>
-          <div class="rounded-2xl rounded-tl-none px-5 py-4" style="background-color:#E9E9EB;">
-            <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+        <div class="flex flex-col gap-1">
+          <p class="text-[10px] font-semibold text-[#8e8e93] px-1">${scen ? scen.customer_role : 'AI'}</p>
+          <div class="px-4 py-3 sim-typing-bubble flex gap-1 items-center">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
           </div>
         </div>
       `;
@@ -1659,6 +1975,38 @@
       saveToLocalStorage();
     }
 
+    // 조용한 DB 자동저장 (UI 피드백 없음, 에러 무시)
+    async function saveSessionSilent() {
+      if (!selectedScenario || chatHistory.length < 2) return;
+      try {
+        const scen = scenarios[selectedScenario];
+        const durationSec = roleplayStartedAt
+          ? Math.round((Date.now() - new Date(roleplayStartedAt).getTime()) / 1000)
+          : null;
+        const turnCount = chatHistory.filter(m => m.role === 'user').length;
+        if (savedSessionId) {
+          await authFetch('/api/history/roleplay/' + savedSessionId, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversation: chatHistory, turn_count: turnCount, duration_seconds: durationSec }),
+          });
+        } else {
+          const res = await authFetch('/api/history/roleplay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenario_key: selectedScenario, scenario_title: scen.title,
+              persona_level: selectedPersona, overall_grade: null,
+              conversation: chatHistory, feedback: null,
+              turn_count: turnCount, started_at: roleplayStartedAt, duration_seconds: durationSec,
+            }),
+          });
+          const d = await res.json();
+          savedSessionId = d.id;
+        }
+      } catch (e) { /* 자동저장 실패 무시 */ }
+    }
+
     function saveToLocalStorage() {
       try {
         const backup = {
@@ -1700,7 +2048,6 @@
       const container = document.getElementById('hint-content');
       if (!bar || !container) return;
 
-      // 백워드 호환: 문자열이 들어오면 배열로 변환
       if (typeof keywords === 'string') {
         keywords = keywords ? [keywords] : [];
       }
@@ -1710,17 +2057,31 @@
       }
 
       bar.classList.remove('hidden');
-      const badges = keywords.slice(0, 4).map(kw =>
-        `<span class="inline-block px-2.5 py-1 mr-1.5 mb-1 rounded-full bg-amber-100 text-amber-800 text-[11px] font-semibold border border-amber-300">${escapeHTML(kw)}</span>`
+
+      // 세련된 pill 태그 렌더링
+      container.innerHTML = keywords.slice(0, 5).map(kw =>
+        `<span style="
+          display:inline-flex;align-items:center;
+          padding:5px 12px;
+          border-radius:980px;
+          background:#fff;
+          border:1px solid rgba(0,0,0,0.12);
+          font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
+          font-size:12px;font-weight:500;
+          color:#1d1d1f;
+          box-shadow:0 1px 3px rgba(0,0,0,0.06);
+          white-space:nowrap;
+          cursor:default;
+        ">${escapeHTML(kw)}</span>`
       ).join('');
 
-      container.innerHTML = `
-        <div class="flex items-center gap-1.5 mb-1.5">
-          <span class="font-bold text-amber-700 text-[11px]">응답 키워드 큐카드</span>
-          <span class="text-[10px] text-amber-600/80">위 키워드를 활용해 답변을 구성해보세요</span>
-        </div>
-        <div class="flex flex-wrap">${badges}</div>
-      `;
+      // 힌트 표시 후 채팅 스크롤을 맨 아래로 재조정
+      const chatArea = document.getElementById('chat-area');
+      if (chatArea) {
+        requestAnimationFrame(() => {
+          chatArea.scrollTop = chatArea.scrollHeight;
+        });
+      }
     }
 
     // ── End Roleplay ──
@@ -1745,6 +2106,7 @@
           body: JSON.stringify({
             history: chatHistory,
             scenario_title: scen.title,
+            scenario_key: selectedScenario,
             persona_level: selectedPersona,
             mode: currentMode,
             answer_history: currentMode === 'multiple_choice' ? answerHistory : null,
@@ -1803,7 +2165,7 @@
           <div class="text-center">
             <span class="material-symbols-outlined text-error mb-2" style="font-size:40px;">error</span>
             <p class="text-error text-sm font-semibold">피드백 생성에 실패했습니다.</p>
-            <button onclick="endRoleplay()" class="mt-4 text-primary text-sm font-semibold hover:underline">다시 시도</button>
+            <button onclick="endRoleplay()" style="color:#1d1d1f;font-size:14px;font-weight:600;background:none;border:none;cursor:pointer;text-decoration:underline;">다시 시도</button>
           </div>`;
       }
     }
@@ -1893,6 +2255,78 @@
         // ── Standard mode (중급/고급) ──
         document.getElementById('feedback-terms-card').style.display = '';
         document.getElementById('feedback-moments-grid').style.display = '';
+
+        // ── 질문 커버리지 ──
+        const qcov = feedback.question_coverage || {};
+        const coveredQs = qcov.covered || [];
+        const missedQs = qcov.missed || [];
+        const coverageRate = qcov.coverage_rate || '';
+        let coverageHtml = '';
+        if (coverageRate) {
+          coverageHtml += `<div style="font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:10px;">질문 커버리지: <span style="color:#0071e3;">${escapeHTML(coverageRate)}</span></div>`;
+        }
+        if (missedQs.length > 0) {
+          coverageHtml += `<p style="font-size:12px;font-weight:600;color:#ff3b30;text-transform:uppercase;letter-spacing:0.04em;margin:0 0 6px;">답변하지 못한 질문</p>`;
+          coverageHtml += missedQs.map(q => `<div class="fb-item" style="border-left-color:#ff3b30;">❌ ${escapeHTML(q)}</div>`).join('');
+        }
+        if (coveredQs.length > 0) {
+          coverageHtml += `<p style="font-size:12px;font-weight:600;color:#1a7f4b;text-transform:uppercase;letter-spacing:0.04em;margin:8px 0 6px;">다룬 질문</p>`;
+          coverageHtml += coveredQs.map(q => `<div class="fb-item" style="border-left-color:#30d158;">✅ ${escapeHTML(q)}</div>`).join('');
+        }
+        if (coverageHtml) {
+          const coverageEl = document.getElementById('feedback-strengths').parentElement;
+          const coverageCard = document.createElement('div');
+          coverageCard.className = 'fb-card';
+          coverageCard.innerHTML = `<h3 class="fb-card__title">📋 질문 대응 현황</h3>${coverageHtml}`;
+          coverageCard.style.marginBottom = '10px';
+          document.getElementById('feedback-content').insertBefore(coverageCard, document.querySelector('#feedback-content .fb-card'));
+        }
+
+        // ── Auto-Q 분석 ──
+        const autoQ = feedback.auto_q_analysis || [];
+        if (autoQ.length > 0) {
+          const autoQCard = document.createElement('div');
+          autoQCard.className = 'fb-card';
+          autoQCard.style.marginBottom = '10px';
+          const statusColor = { '충분히 답변': '#1a7f4b', '부분적 답변': '#b45309', '미답변': '#ff3b30' };
+          autoQCard.innerHTML = `<h3 class="fb-card__title">🔍 Auto-Q 상세 분석</h3>` +
+            autoQ.map(item => `
+              <div style="border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:14px 16px;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                  <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:980px;background:${statusColor[item.status]||'#86868b'}20;color:${statusColor[item.status]||'#86868b'};">${escapeHTML(item.status||'')}</span>
+                  <p style="font-size:14px;font-weight:600;color:#1d1d1f;margin:0;">${escapeHTML(item.question||'')}</p>
+                </div>
+                ${item.what_was_said && item.what_was_said !== '언급 없음' ? `<p style="font-size:13px;color:#434751;margin:0 0 6px;"><span style="font-weight:600;">내 답변:</span> ${escapeHTML(item.what_was_said)}</p>` : ''}
+                ${item.ideal_answer ? `<p style="font-size:13px;color:#0071e3;margin:0 0 6px;"><span style="font-weight:600;">이상적 답변:</span> ${escapeHTML(item.ideal_answer)}</p>` : ''}
+                ${item.gap && item.gap !== '없음' ? `<p style="font-size:13px;color:#ff3b30;margin:0;"><span style="font-weight:600;">부족한 점:</span> ${escapeHTML(item.gap)}</p>` : ''}
+              </div>`).join('');
+          const firstCard = document.querySelector('#feedback-content .fb-card');
+          if (firstCard && firstCard.parentElement) {
+            firstCard.parentElement.insertBefore(autoQCard, firstCard.nextSibling);
+          }
+        }
+
+        // ── 함정 대응 ──
+        const trapHandling = feedback.trap_handling || [];
+        if (trapHandling.length > 0) {
+          const trapCard = document.createElement('div');
+          trapCard.className = 'fb-card';
+          trapCard.style.marginBottom = '10px';
+          trapCard.innerHTML = `<h3 class="fb-card__title">⚠️ 함정 대응 분석</h3>` +
+            trapHandling.map(t => `
+              <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+                <span style="flex-shrink:0;font-size:16px;">${t.handled ? '✅' : '❌'}</span>
+                <div>
+                  <p style="font-size:13px;font-weight:600;color:#1d1d1f;margin:0 0 4px;">${escapeHTML(t.trap||'')}</p>
+                  ${t.how && t.how !== '대응 없음' ? `<p style="font-size:12px;color:#434751;margin:0 0 3px;"><b>대응:</b> ${escapeHTML(t.how)}</p>` : ''}
+                  ${t.ideal ? `<p style="font-size:12px;color:#0071e3;margin:0;"><b>이상적 대응:</b> ${escapeHTML(t.ideal)}</p>` : ''}
+                </div>
+              </div>`).join('');
+          const expertEl = document.getElementById('feedback-expert-section');
+          if (expertEl && expertEl.parentElement) {
+            expertEl.parentElement.insertBefore(trapCard, expertEl);
+          }
+        }
 
         // Strengths
         document.getElementById('feedback-strengths').innerHTML =

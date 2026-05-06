@@ -41,7 +41,7 @@
 
   // ── Sidebar HTML ──
   const adminMenuItem = userRole === 'admin'
-    ? `<a href="/admin" class="sidebar-nav-item ${currentPath === '/admin' ? 'active' : ''}">Admin</a>`
+    ? `<a href="/admin" class="sidebar-nav-item ${currentPath === '/admin' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">admin_panel_settings</span>Admin</a>`
     : '';
 
   const sidebarHTML = `
@@ -70,14 +70,21 @@
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 px-0 space-y-0.5">
-        <a href="/" class="sidebar-nav-item ${currentPath === '/' ? 'active' : ''}">Dashboard</a>
-        <a href="/simulation" class="sidebar-nav-item ${currentPath === '/simulation' ? 'active' : ''}">Simulation</a>
-        <a href="/quiz" class="sidebar-nav-item ${currentPath === '/quiz' ? 'active' : ''}">Quiz</a>
-        <a href="/dictionary" class="sidebar-nav-item ${currentPath === '/dictionary' ? 'active' : ''}">Dictionary</a>
-        <a href="/lectures" class="sidebar-nav-item ${currentPath === '/lectures' ? 'active' : ''}">Lectures</a>
-        <a href="/history" class="sidebar-nav-item ${currentPath === '/history' ? 'active' : ''}">History</a>
-        ${adminMenuItem}
+      <nav class="flex-1 px-0">
+        <!-- Learn -->
+        <div class="nav-section-label">Learn</div>
+        <a href="/simulation" class="sidebar-nav-item ${currentPath === '/simulation' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">smart_toy</span>Simulation</a>
+        <a href="/quiz" class="sidebar-nav-item ${currentPath === '/quiz' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">quiz</span>Quiz</a>
+        <a href="/dictionary" class="sidebar-nav-item ${currentPath === '/dictionary' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">menu_book</span>Dictionary</a>
+        <a href="/lectures" class="sidebar-nav-item ${currentPath === '/lectures' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">play_circle</span>Lectures</a>
+
+        <!-- Track -->
+        <div class="nav-section-label" style="margin-top:12px;">Track</div>
+        <a href="/" class="sidebar-nav-item ${currentPath === '/' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">grid_view</span>Dashboard</a>
+        <a href="/history" class="sidebar-nav-item ${currentPath === '/history' ? 'active' : ''}"><span class="material-symbols-outlined nav-icon">history</span>History</a>
+
+        <!-- Admin (role-gated, bottom separator) -->
+        ${adminMenuItem ? `<div class="nav-section-divider"></div>${adminMenuItem}` : ''}
       </nav>
 
       <!-- Footer -->
@@ -115,7 +122,7 @@
         <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="메뉴 열기">
           <span class="material-symbols-outlined" style="font-size:24px;">menu</span>
         </button>
-        <h1 style="font-family:'Manrope',sans-serif; font-weight:800; font-size:1.125rem; color:#0071e3;">${pageTitle}</h1>
+        <h1 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif; font-weight:700; font-size:1.05rem; letter-spacing:-0.02em; color:#1d1d1f;">${pageTitle}</h1>
       </div>
       <div class="flex items-center gap-3">
         ${userDisplay}

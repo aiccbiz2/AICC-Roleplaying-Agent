@@ -4,606 +4,484 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quiz | AI Roleplay Agent</title>
-
-  <!-- Shared CSS -->
   <link rel="stylesheet" href="/static/shared.css" />
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#0071e3',
-            'primary-container': '#0077ed',
-            secondary: '#0071e3',
-            'secondary-fixed': '#e8f0fe',
-            surface: '#f7fafd',
-            'surface-container-low': '#f1f4f7',
-            'surface-container-high': '#e5e8eb',
-            'surface-container-lowest': '#ffffff',
-            'on-surface': '#181c1e',
-            'on-surface-variant': '#434751',
-            outline: '#737782',
-            'outline-variant': '#c3c6d2',
-            tertiary: '#002f2c',
-            'tertiary-fixed': '#72f7ed',
-            error: '#ba1a1a',
-            'error-container': '#ffdad6',
-          },
-          fontFamily: {
-            headline: ['Manrope', 'sans-serif'],
-            body: ['Inter', 'sans-serif'],
-          },
-        },
-      },
-    };
-  </script>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap"
-    rel="stylesheet"
-  />
-
-  <!-- Material Symbols -->
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
-  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
 
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f7fafd;
-    }
-    .font-headline {
-      font-family: 'Manrope', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      -webkit-font-smoothing: antialiased;
     }
     .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    }
-    .glass-header {
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-    }
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #c3c6d2; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #737782; }
-    /* Transition for option buttons */
-    .option-btn {
-      transition: all 0.2s ease;
-    }
-    .option-btn:hover:not(.answered) {
-      background-color: #e8f0fe;
-    }
-    .option-btn.selected:not(.answered) {
-      border-color: #0071e3;
-      background-color: #e8f0fe;
-    }
-    .option-btn.selected:not(.answered) .letter-badge {
-      background-color: #0071e3;
-      color: #ffffff;
-    }
-    /* Progress bar */
-    .progress-dot {
-      transition: all 0.3s ease;
-    }
-    .progress-dot.correct {
-      background-color: #002f2c;
-      border-color: #002f2c;
-    }
-    .progress-dot.wrong {
-      background-color: #ba1a1a;
-      border-color: #ba1a1a;
-    }
-    .progress-dot.current {
-      border-color: #0071e3;
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
-    }
-    /* Result card animation */
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .result-card {
-      animation: slideUp 0.4s ease-out;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
     }
 
-    /* ── Quiz Category Grid ── */
-    .quiz-category-section {
-      width: 100%;
+    /* ── Apple segment control ── */
+    .seg-ctrl {
+      display: inline-flex;
+      background: rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
     }
-    .quiz-category-section__title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 32px;
+    .seg-btn {
+      padding: 7px 22px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: #3a3a3c;
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s;
+      letter-spacing: -0.01em;
+    }
+    .seg-btn.active {
+      background: #fff;
       color: #1d1d1f;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
-    .quiz-category-section__subtitle {
-      font-size: 15px;
-      color: #6e6e73;
-      margin-bottom: 28px;
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
 
-    /* Grid layout — all cards visible */
+    /* ── Category grid ── */
     .quiz-category-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      padding: 4px;
+      gap: 14px;
     }
-    @media (max-width: 1024px) { .quiz-category-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1100px) { .quiz-category-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 768px)  { .quiz-category-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px)  { .quiz-category-grid { grid-template-columns: 1fr; } }
 
+    /* ── Category card — Apple.com card style ── */
     .quiz-category-card {
       border-radius: 18px;
+      background: #fff;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      background: #f5f5f7;
-      user-select: none;
-      min-height: 280px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+      min-height: 260px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
     .quiz-category-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.11);
     }
-
-    /* Top half — text content */
     .quiz-category-card__body {
-      padding: 22px 22px 16px;
+      padding: 20px 20px 14px;
       display: flex;
       flex-direction: column;
-      flex: 1;
+      flex: 0 0 auto;
     }
     .quiz-category-card__label {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      padding: 3px 10px;
-      border-radius: 9999px;
-      align-self: flex-start;
-      margin-bottom: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      background: rgba(0,0,0,0.06);
-      color: #6e6e73;
+      color: #86868b;
+      margin-bottom: 8px;
     }
     .quiz-category-card__title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
       line-height: 1.25;
       color: #1d1d1f;
-      margin-bottom: 6px;
-      letter-spacing: -0.01em;
+      margin-bottom: 5px;
+      letter-spacing: -0.02em;
     }
     .quiz-category-card__desc {
-      font-size: 13px;
-      color: #6e6e73;
+      font-size: 12px;
+      color: #86868b;
       line-height: 1.5;
     }
     .quiz-category-card__action {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       font-size: 12px;
       font-weight: 600;
-      color: #0071e3;
-      margin-top: auto;
-      padding-top: 10px;
+      color: #434751;
+      margin-top: 10px;
     }
-    .quiz-category-card__action .material-symbols-outlined {
-      font-size: 14px;
-    }
+    .quiz-category-card__action .material-symbols-outlined { font-size: 13px; }
 
-    /* Bottom 60% — image area */
+    /* Image area */
     .quiz-category-card__image {
-      height: 60%;
-      min-height: 160px;
+      flex: 1;
+      min-height: 130px;
       background-size: cover;
       background-position: center;
-      background-color: rgba(0,0,0,0.03);
+      background-color: #f5f5f7;
       position: relative;
     }
-    /* Gradient fade from content to image */
     .quiz-category-card__image::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 24px;
-      background: linear-gradient(to bottom, #f5f5f7, transparent);
+      height: 20px;
+      background: linear-gradient(to bottom, #fff, transparent);
       pointer-events: none;
     }
-    /* Fallback icon when no image */
     .quiz-category-card__image-icon {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 56px; height: 56px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.9;
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
     }
     .quiz-category-card__image-icon .material-symbols-outlined {
-      font-size: 28px;
+      font-size: 26px; color: #fff;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* ── Progress dots ── */
+    .progress-dot {
+      transition: all 0.25s ease;
+    }
+    .progress-dot.correct  { background: #1a7f4b; border-color: #1a7f4b; color: #fff; }
+    .progress-dot.wrong    { background: #ff3b30; border-color: #ff3b30; color: #fff; }
+    .progress-dot.current  { border-color: #0071e3; box-shadow: 0 0 0 3px rgba(0,113,227,0.18); }
+
+    /* ── Option buttons ── */
+    .option-btn {
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .option-btn:hover:not(.answered) {
+      background: #f0f0f5;
+    }
+    .option-btn.selected:not(.answered) {
+      border-color: #0071e3 !important;
+      background: #e8f0fe;
+    }
+    .option-btn.selected:not(.answered) .letter-badge {
+      background: #0071e3;
       color: #fff;
     }
 
-    /* Difficulty selector */
-    .quiz-difficulty-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 12px;
+    /* ── Apple pill button ── */
+    .apple-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 11px 24px;
+      border-radius: 980px;
+      font-family: inherit;
+      font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+      cursor: pointer; border: none; text-decoration: none;
+      transition: opacity 0.2s;
     }
-    .quiz-difficulty-chip {
-      padding: 8px 20px;
-      border-radius: 9999px;
-      font-size: 14px;
-      font-weight: 600;
-      border: 1.5px solid #d1d5db;
-      background: #ffffff;
-      color: #6e6e73;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    .apple-btn:hover { opacity: 0.82; }
+    .apple-btn-blue  { background: #0071e3; color: #fff; }
+    .apple-btn-dark  { background: #1d1d1f; color: #fff; }
+    .apple-btn-ghost {
+      background: transparent;
+      color: #3a3a3c;
+      border: 1.5px solid rgba(0,0,0,0.15);
     }
-    .quiz-difficulty-chip:hover {
-      border-color: #9ca3af;
-      color: #1d1d1f;
+    .apple-btn-ghost:hover { background: rgba(0,0,0,0.04); opacity: 1; }
+
+    /* ── Feedback ── */
+    .fb-correct {
+      background: #f0fdf4;
+      border-left: 4px solid #30d158;
+      border-radius: 14px;
+      padding: 18px 20px;
     }
-    .quiz-difficulty-chip.active {
-      border-color: #0071e3;
-      background: #0071e3;
-      color: #ffffff;
+    .fb-wrong {
+      background: #fff5f5;
+      border-left: 4px solid #ff3b30;
+      border-radius: 14px;
+      padding: 18px 20px;
     }
 
+    /* ── Result screen ── */
+    .result-card { animation: slideUp 0.4s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d2d2d7; border-radius: 3px; }
   </style>
 </head>
-<body class="bg-surface text-on-surface min-h-screen">
+<body class="min-h-screen">
 
-  <!-- Shared sidebar & header injected by shared.js -->
   <script src="/static/shared.js"></script>
 
-  <!-- ====== MAIN CONTENT ====== -->
-  <main class="app-main min-h-[calc(100vh-4rem)]">
-    <div id="mainContainer" class="mx-auto px-6 py-8">
+  <main class="app-main" style="min-height:calc(100vh - 4rem);">
+    <div id="mainContainer" style="padding:36px 40px 60px;">
 
-      <!-- ====== SCREEN 1: INITIAL (Category/Difficulty Selection) ====== -->
+      <!-- ══════════════════════════════════════
+           SCREEN 1: Category + Difficulty Setup
+      ══════════════════════════════════════ -->
       <div id="setupScreen">
-        <div class="quiz-category-section">
-          <!-- Header -->
-          <div class="mb-2">
-            <h2 class="quiz-category-section__title">AICC 도메인 퀴즈</h2>
-            <p class="quiz-category-section__subtitle">카테고리를 선택하고 퀴즈를 시작하세요. 10문제가 출제됩니다.</p>
-          </div>
 
-          <!-- Difficulty Chips -->
-          <div class="quiz-difficulty-bar mb-6">
-            <span class="text-sm text-on-surface-variant font-medium mr-2">난이도</span>
-            <button class="quiz-difficulty-chip" data-difficulty="초급" onclick="selectDifficulty('초급', this)">초급</button>
-            <button class="quiz-difficulty-chip active" data-difficulty="중급" onclick="selectDifficulty('중급', this)">중급</button>
-            <button class="quiz-difficulty-chip" data-difficulty="고급" onclick="selectDifficulty('고급', this)">고급</button>
-          </div>
+        <!-- Hero -->
+        <div style="margin-bottom:28px;">
+          <p style="font-size:12px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#86868b;margin:0 0 8px;">AICC Domain Quiz</p>
+          <h1 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;letter-spacing:-0.04em;color:#1d1d1f;line-height:1.1;margin:0 0 8px;">카테고리를 선택하세요</h1>
+          <p style="font-size:15px;color:#6e6e73;margin:0;">카테고리를 고르면 해당 영역 10문제가 출제됩니다.</p>
+        </div>
 
-          <!-- Hidden selects (keep for JS compatibility) -->
-          <select id="categorySelect" class="hidden"><option value="">전체 (랜덤 출제)</option></select>
-          <select id="difficultySelect" class="hidden">
-            <option value="초급">초급</option>
-            <option value="중급" selected>중급</option>
-            <option value="고급">고급</option>
-          </select>
-
-          <!-- Category Cards Grid -->
-          <div id="categoryCardsGrid" class="quiz-category-grid">
-            <!-- Cards rendered by JS -->
+        <!-- Difficulty — Apple segment control -->
+        <div style="margin-bottom:28px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:13px;font-weight:500;color:#6e6e73;">난이도</span>
+          <div class="seg-ctrl">
+            <button class="seg-btn" data-difficulty="초급" onclick="selectDifficulty('초급', this)">초급</button>
+            <button class="seg-btn active" data-difficulty="중급" onclick="selectDifficulty('중급', this)">중급</button>
+            <button class="seg-btn" data-difficulty="고급" onclick="selectDifficulty('고급', this)">고급</button>
           </div>
         </div>
+
+        <!-- Hidden selects (JS compatibility) -->
+        <select id="categorySelect" class="hidden"><option value="">전체 (랜덤 출제)</option></select>
+        <select id="difficultySelect" class="hidden">
+          <option value="초급">초급</option>
+          <option value="중급" selected>중급</option>
+          <option value="고급">고급</option>
+        </select>
+
+        <!-- Category cards -->
+        <div id="categoryCardsGrid" class="quiz-category-grid"></div>
       </div>
 
-      <!-- ====== SCREEN 2: QUIZ IN PROGRESS ====== -->
-      <div id="quizScreen" class="hidden">
+      <!-- ══════════════════════════════════════
+           SCREEN 2: Quiz In Progress
+      ══════════════════════════════════════ -->
+      <div id="quizScreen" class="hidden" style="max-width:760px;margin:0 auto;">
 
-        <!-- Top Bar: Progress + Score -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-          <!-- Progress indicator -->
-          <div class="flex-1">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-sm font-semibold text-on-surface" id="progressLabel">문제 1 / 10</span>
-            </div>
-            <div class="flex items-center gap-1.5" id="progressDots"></div>
+        <!-- Progress bar + score -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <p style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0 0 8px;" id="progressLabel">문제 1 / 10</p>
+            <div style="display:flex;gap:6px;" id="progressDots"></div>
           </div>
-
-          <!-- Score -->
-          <div class="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/50 shadow-sm">
-            <span class="material-symbols-outlined text-primary text-xl">scoreboard</span>
-            <span id="scoreText" class="text-sm font-semibold text-on-surface">0 / 0</span>
+          <div style="display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#434751;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;">scoreboard</span>
+            <span id="scoreText" style="font-size:14px;font-weight:600;color:#1d1d1f;">0 / 0</span>
           </div>
         </div>
 
-        <!-- Loading State -->
-        <div id="loadingState" class="hidden flex flex-col items-center justify-center py-24">
-          <div class="animate-spin w-10 h-10 border-4 border-outline-variant border-t-primary rounded-full mb-4"></div>
-          <p class="text-on-surface-variant text-sm">문제를 불러오는 중...</p>
+        <!-- Loading -->
+        <div id="loadingState" class="hidden" style="text-align:center;padding:80px 0;">
+          <div style="width:36px;height:36px;border:3px solid #e5e5ea;border-top-color:#0071e3;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+          <p style="font-size:14px;color:#86868b;">문제를 불러오는 중...</p>
         </div>
 
-        <!-- Quiz Card -->
-        <div id="quizCard" class="hidden">
-          <div class="relative bg-surface-container-lowest rounded-3xl p-8 md:p-12 shadow-sm overflow-hidden">
-            <!-- Decorative blur -->
-            <div class="absolute -top-20 -right-20 w-60 h-60 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- Quiz card -->
+        <div id="quizCard" class="hidden" style="background:#fff;border-radius:22px;padding:36px 40px;box-shadow:0 2px 12px rgba(0,0,0,0.07);">
 
-            <!-- Category & Difficulty badge -->
-            <div class="flex items-center gap-2 mb-6">
-              <span
-                id="quizCategoryBadge"
-                class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-low text-xs font-medium text-on-surface-variant"
-              ></span>
-              <span
-                id="quizDifficultyBadge"
-                class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-xs font-semibold text-primary"
-              ></span>
-            </div>
-
-            <!-- Question -->
-            <div class="flex items-start gap-4 mb-8">
-              <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center">
-                <span class="material-symbols-outlined text-secondary text-xl">help</span>
-              </div>
-              <h2 id="questionText" class="font-headline font-bold text-xl md:text-2xl text-on-surface leading-relaxed"></h2>
-            </div>
-
-            <!-- Options -->
-            <div id="optionsContainer" class="flex flex-col gap-3 mb-8"></div>
-
-            <!-- Submit Button -->
-            <div id="submitArea" class="flex justify-center">
-              <button
-                id="submitBtn"
-                onclick="checkAnswer()"
-                disabled
-                class="px-10 py-4 bg-primary text-white rounded-full font-bold text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
-              >
-                정답 확인
-              </button>
-            </div>
-
-            <!-- Feedback Area -->
-            <div id="feedbackArea" class="hidden mt-8"></div>
-
-            <!-- Next Question Button (shown after answering) -->
-            <div id="nextArea" class="hidden flex justify-center mt-6">
-              <button
-                id="nextBtn"
-                onclick="showNextQuestion()"
-                class="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
-              >
-                <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                <span id="nextBtnText">다음 문제</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ====== SCREEN 3: RESULTS ====== -->
-      <div id="resultScreen" class="hidden">
-        <div class="flex flex-col items-center justify-center py-8">
-          <!-- Result Header -->
-          <div class="result-card w-full max-w-2xl bg-surface-container-lowest rounded-3xl p-8 md:p-12 shadow-sm mb-6">
-            <div class="text-center mb-8">
-              <div id="resultIcon" class="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto"></div>
-              <h2 id="resultTitle" class="font-headline font-bold text-2xl text-on-surface mb-2"></h2>
-              <p id="resultSubtitle" class="text-on-surface-variant text-sm"></p>
-            </div>
-
-            <!-- Score Summary -->
-            <div class="grid grid-cols-3 gap-4 mb-8">
-              <div class="text-center p-4 rounded-2xl bg-tertiary/5">
-                <div id="resultCorrect" class="font-headline font-bold text-3xl text-tertiary mb-1"></div>
-                <div class="text-xs text-on-surface-variant">정답</div>
-              </div>
-              <div class="text-center p-4 rounded-2xl bg-error-container/30">
-                <div id="resultWrong" class="font-headline font-bold text-3xl text-error mb-1"></div>
-                <div class="text-xs text-on-surface-variant">오답</div>
-              </div>
-              <div class="text-center p-4 rounded-2xl bg-primary/5">
-                <div id="resultPercent" class="font-headline font-bold text-3xl text-primary mb-1"></div>
-                <div class="text-xs text-on-surface-variant">정답률</div>
-              </div>
-            </div>
-
-            <!-- Per-question review -->
-            <div class="mb-8">
-              <h3 class="font-headline font-bold text-base text-on-surface mb-4">문제별 결과</h3>
-              <div id="resultDetails" class="space-y-3"></div>
-            </div>
+          <!-- Badges -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;">
+            <span id="quizCategoryBadge" style="font-size:11px;font-weight:600;color:#86868b;background:#f5f5f7;padding:4px 12px;border-radius:980px;"></span>
+            <span id="quizDifficultyBadge" style="font-size:11px;font-weight:600;color:#0071e3;background:#e8f0fe;padding:4px 12px;border-radius:980px;"></span>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="flex flex-col sm:flex-row items-center gap-3">
-            <button
-              onclick="goToSetup()"
-              class="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
-            >
-              <span class="material-symbols-outlined text-lg">refresh</span>
-              새 퀴즈 시작
-            </button>
-            <button
-              onclick="reviewWrongAnswers()"
-              id="reviewWrongBtn"
-              class="flex items-center gap-2 px-6 py-3.5 rounded-full border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-low transition-colors"
-            >
-              <span class="material-symbols-outlined text-lg">visibility</span>
-              오답 다시 보기
+          <!-- Question -->
+          <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:28px;">
+            <div style="width:38px;height:38px;border-radius:11px;background:#e8f0fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#434751;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">help</span>
+            </div>
+            <h2 id="questionText" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f;line-height:1.5;margin:0;"></h2>
+          </div>
+
+          <!-- Options -->
+          <div id="optionsContainer" style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;"></div>
+
+          <!-- Submit -->
+          <div id="submitArea" style="display:flex;justify-content:center;">
+            <button id="submitBtn" onclick="checkAnswer()" disabled class="apple-btn apple-btn-blue"
+              style="opacity:0.4;cursor:not-allowed;">정답 확인</button>
+          </div>
+
+          <!-- Feedback -->
+          <div id="feedbackArea" class="hidden" style="margin-top:20px;"></div>
+
+          <!-- Next -->
+          <div id="nextArea" class="hidden" style="display:flex;justify-content:center;margin-top:20px;">
+            <button id="nextBtn" onclick="showNextQuestion()" class="apple-btn apple-btn-dark">
+              <span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;">arrow_forward</span>
+              <span id="nextBtnText">다음 문제</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- ====== SCREEN 4: Wrong Answer Review ====== -->
-      <div id="reviewScreen" class="hidden">
-        <div class="max-w-2xl mx-auto py-8">
-          <div class="flex items-center gap-3 mb-6">
-            <button onclick="showResults()" class="p-2 rounded-xl hover:bg-surface-container-low transition-colors">
-              <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
-            </button>
-            <h2 class="font-headline font-bold text-xl text-on-surface">오답 복습</h2>
+      <!-- ══════════════════════════════════════
+           SCREEN 3: Results
+      ══════════════════════════════════════ -->
+      <div id="resultScreen" class="hidden" style="max-width:640px;margin:0 auto;padding-top:16px;">
+
+        <div class="result-card" style="background:#fff;border-radius:22px;padding:40px;box-shadow:0 2px 12px rgba(0,0,0,0.07);margin-bottom:20px;">
+
+          <!-- Result hero -->
+          <div style="text-align:center;margin-bottom:32px;">
+            <div id="resultIcon" style="width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"></div>
+            <h2 id="resultTitle" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0 0 6px;"></h2>
+            <p id="resultSubtitle" style="font-size:14px;color:#86868b;margin:0;"></p>
           </div>
-          <div id="reviewList" class="space-y-6"></div>
-          <div class="flex justify-center mt-8">
-            <button
-              onclick="goToSetup()"
-              class="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
-            >
-              <span class="material-symbols-outlined text-lg">refresh</span>
-              새 퀴즈 시작
-            </button>
+
+          <!-- Score cells -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:32px;background:#f5f5f7;border-radius:16px;overflow:hidden;">
+            <div style="padding:20px;text-align:center;border-right:1px solid rgba(0,0,0,0.07);">
+              <p id="resultCorrect" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.03em;color:#1a7f4b;margin:0 0 4px;"></p>
+              <p style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0;">정답</p>
+            </div>
+            <div style="padding:20px;text-align:center;border-right:1px solid rgba(0,0,0,0.07);">
+              <p id="resultWrong" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.03em;color:#ff3b30;margin:0 0 4px;"></p>
+              <p style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0;">오답</p>
+            </div>
+            <div style="padding:20px;text-align:center;">
+              <p id="resultPercent" style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0 0 4px;"></p>
+              <p style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0;">정답률</p>
+            </div>
           </div>
+
+          <!-- Per-question review -->
+          <div>
+            <p style="font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#86868b;margin:0 0 12px;">문제별 결과</p>
+            <div id="resultDetails" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="goToSetup()" class="apple-btn apple-btn-blue">
+            <span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;">refresh</span>
+            새 퀴즈 시작
+          </button>
+          <button onclick="reviewWrongAnswers()" id="reviewWrongBtn" class="apple-btn apple-btn-ghost">
+            <span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;">visibility</span>
+            오답 다시 보기
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SCREEN 4: Wrong Answer Review
+      ══════════════════════════════════════ -->
+      <div id="reviewScreen" class="hidden" style="max-width:640px;margin:0 auto;padding-top:8px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+          <button onclick="showResults()" style="width:34px;height:34px;border-radius:50%;background:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+            <span class="material-symbols-outlined" style="font-size:17px;color:#3a3a3c;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;">arrow_back</span>
+          </button>
+          <h2 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0;">오답 복습</h2>
+        </div>
+        <div id="reviewList" style="display:flex;flex-direction:column;gap:14px;"></div>
+        <div style="display:flex;justify-content:center;margin-top:28px;">
+          <button onclick="goToSetup()" class="apple-btn apple-btn-blue">
+            <span class="material-symbols-outlined" style="font-size:16px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;">refresh</span>
+            새 퀴즈 시작
+          </button>
         </div>
       </div>
 
     </div>
   </main>
 
-  <!-- ====== JAVASCRIPT ====== -->
   <script>
-    // ── Constants ──
     const SET_SIZE = 10;
+    let quizSet = [], currentIndex = 0, answered = false, selectedOption = null, results = [];
 
-    // ── State ──
-    let quizSet = [];           // Array of 10 quiz objects
-    let currentIndex = 0;       // 0-based index of current question
-    let answered = false;
-    let selectedOption = null;
-    let results = [];           // Array of { quiz, selectedAnswer, isCorrect }
-
-    // ── DOM Refs ──
-    const categorySelect = document.getElementById('categorySelect');
+    const categorySelect   = document.getElementById('categorySelect');
     const difficultySelect = document.getElementById('difficultySelect');
-
-    const setupScreen = document.getElementById('setupScreen');
-    const quizScreen = document.getElementById('quizScreen');
-    const resultScreen = document.getElementById('resultScreen');
-    const reviewScreen = document.getElementById('reviewScreen');
-
-    const loadingState = document.getElementById('loadingState');
-    const quizCard = document.getElementById('quizCard');
-    const progressLabel = document.getElementById('progressLabel');
-    const progressDots = document.getElementById('progressDots');
-    const scoreText = document.getElementById('scoreText');
-    const questionText = document.getElementById('questionText');
+    const setupScreen      = document.getElementById('setupScreen');
+    const quizScreen       = document.getElementById('quizScreen');
+    const resultScreen     = document.getElementById('resultScreen');
+    const reviewScreen     = document.getElementById('reviewScreen');
+    const loadingState     = document.getElementById('loadingState');
+    const quizCard         = document.getElementById('quizCard');
+    const progressLabel    = document.getElementById('progressLabel');
+    const progressDots     = document.getElementById('progressDots');
+    const scoreText        = document.getElementById('scoreText');
+    const questionText     = document.getElementById('questionText');
     const optionsContainer = document.getElementById('optionsContainer');
-    const submitBtn = document.getElementById('submitBtn');
-    const submitArea = document.getElementById('submitArea');
-    const feedbackArea = document.getElementById('feedbackArea');
-    const nextArea = document.getElementById('nextArea');
-    const nextBtnText = document.getElementById('nextBtnText');
-    const quizCategoryBadge = document.getElementById('quizCategoryBadge');
+    const submitBtn        = document.getElementById('submitBtn');
+    const submitArea       = document.getElementById('submitArea');
+    const feedbackArea     = document.getElementById('feedbackArea');
+    const nextArea         = document.getElementById('nextArea');
+    const nextBtnText      = document.getElementById('nextBtnText');
+    const quizCategoryBadge   = document.getElementById('quizCategoryBadge');
     const quizDifficultyBadge = document.getElementById('quizDifficultyBadge');
 
-    // ── Screen Management ──
     function showScreen(screenId) {
       [setupScreen, quizScreen, resultScreen, reviewScreen].forEach(s => s.classList.add('hidden'));
       document.getElementById(screenId).classList.remove('hidden');
-
-      // Setup screen uses full width; others use max-w-4xl
       const container = document.getElementById('mainContainer');
       if (screenId === 'setupScreen') {
-        container.classList.remove('max-w-4xl');
+        container.style.maxWidth = '';
       } else {
-        container.classList.add('max-w-4xl');
+        container.style.maxWidth = '1100px';
+        container.style.margin = '0 auto';
       }
     }
 
-    // ── Category Meta Data ──
     const quizCategoryMeta = {
-      'IPCC 아키텍처 (PBX, CTI, IVR, 녹취)': { icon: 'dns', color: '#2563eb', desc: 'PBX, CTI, IVR, 녹취 등 IPCC 핵심 구성요소' },
-      '음성기술 (STT, TTS, 화자분리)':       { icon: 'graphic_eq', color: '#7c3aed', desc: 'STT 인식률, TTS 합성, 화자분리 기술' },
-      'AI/LLM (RAG, 콜봇, 챗봇)':           { icon: 'smart_toy', color: '#059669', desc: 'RAG 구축, LLM 활용, 콜봇·챗봇 기술' },
-      '상담운영 (ACD, WFM, QA)':             { icon: 'support_agent', color: '#ea580c', desc: '자동분배, 인력계획, 품질관리 실무' },
-      '도입/구축 (PoC, 레퍼런스, 연동)':       { icon: 'build', color: '#0d9488', desc: 'PoC 프로세스, 시스템 연동, 마이그레이션' },
-      '비용/라이센스':                        { icon: 'payments', color: '#b45309', desc: '라이센싱 모델, 비용 산정, 가격 구조' },
-      'AICC 기능 (상담 어드바이저, 보이스봇)':  { icon: 'record_voice_over', color: '#db2777', desc: '실시간 어드바이저, 보이스봇 활용' },
-      'CTI 핵심':                            { icon: 'phone_in_talk', color: '#4f46e5', desc: 'Computer Telephony Integration 핵심' },
-      'IVR/기관계/녹취':                      { icon: 'mic', color: '#0891b2', desc: 'IVR 시나리오, 기관통신, 녹음 시스템' },
-      '사업 전략 (영업 대응)':                 { icon: 'trending_up', color: '#9333ea', desc: '솔루션 포지셔닝, 경쟁사 대응 전략' },
+      'IPCC 아키텍처 (PBX, CTI, IVR, 녹취)': { icon: 'dns',              color: '#2563eb', desc: 'PBX, CTI, IVR, 녹취 등 IPCC 핵심 구성요소' },
+      '음성기술 (STT, TTS, 화자분리)':        { icon: 'graphic_eq',       color: '#7c3aed', desc: 'STT 인식률, TTS 합성, 화자분리 기술' },
+      'AI/LLM (RAG, 콜봇, 챗봇)':            { icon: 'smart_toy',        color: '#059669', desc: 'RAG 구축, LLM 활용, 콜봇·챗봇 기술' },
+      '상담운영 (ACD, WFM, QA)':              { icon: 'support_agent',    color: '#ea580c', desc: '자동분배, 인력계획, 품질관리 실무' },
+      '도입/구축 (PoC, 레퍼런스, 연동)':        { icon: 'build',            color: '#0d9488', desc: 'PoC 프로세스, 시스템 연동, 마이그레이션' },
+      '비용/라이센스':                         { icon: 'payments',         color: '#b45309', desc: '라이센싱 모델, 비용 산정, 가격 구조' },
+      'AICC 기능 (상담 어드바이저, 보이스봇)':   { icon: 'record_voice_over', color: '#db2777', desc: '실시간 어드바이저, 보이스봇 활용' },
+      'CTI 핵심':                             { icon: 'phone_in_talk',    color: '#4f46e5', desc: 'Computer Telephony Integration 핵심' },
+      'IVR/기관계/녹취':                       { icon: 'mic',              color: '#0891b2', desc: 'IVR 시나리오, 기관통신, 녹음 시스템' },
+      '사업 전략 (영업 대응)':                  { icon: 'trending_up',      color: '#9333ea', desc: '솔루션 포지셔닝, 경쟁사 대응 전략' },
     };
 
-    // ── Difficulty Chip Selector ──
     function selectDifficulty(value, chipEl) {
       difficultySelect.value = value;
-      document.querySelectorAll('.quiz-difficulty-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.seg-btn').forEach(c => c.classList.remove('active'));
       chipEl.classList.add('active');
     }
 
-    // ── Category images ──
     const quizCategoryImages = {
       'IPCC 아키텍처 (PBX, CTI, IVR, 녹취)': '/static/images/quiz/ipcc.png',
-      '음성기술 (STT, TTS, 화자분리)': '/static/images/quiz/stt-tts.png',
-      'AI/LLM (RAG, 콜봇, 챗봇)': '/static/images/quiz/ai-llm-rag.jpeg',
-      '상담운영 (ACD, WFM, QA)': '/static/images/quiz/qa.webp',
-      '도입/구축 (PoC, 레퍼런스, 연동)': '/static/images/quiz/poc.jpeg',
-      '비용/라이센스': '/static/images/quiz/license.webp',
-      'AICC 기능 (상담 어드바이저, 보이스봇)': '/static/images/quiz/aicc.jpg',
-      '사업 전략 (영업 대응)': '/static/images/quiz/strategy.jpeg',
+      '음성기술 (STT, TTS, 화자분리)':        '/static/images/quiz/stt-tts.png',
+      'AI/LLM (RAG, 콜봇, 챗봇)':            '/static/images/quiz/ai-llm-rag.jpeg',
+      '상담운영 (ACD, WFM, QA)':              '/static/images/quiz/qa.webp',
+      '도입/구축 (PoC, 레퍼런스, 연동)':        '/static/images/quiz/poc.jpeg',
+      '비용/라이센스':                         '/static/images/quiz/license.webp',
+      'AICC 기능 (상담 어드바이저, 보이스봇)':   '/static/images/quiz/aicc.jpg',
+      '사업 전략 (영업 대응)':                  '/static/images/quiz/strategy.jpeg',
     };
 
-    // ── Load Categories and Render Cards ──
     async function loadCategories() {
       const grid = document.getElementById('categoryCardsGrid');
       try {
         const res = await authFetch('/api/quiz/categories');
         const categories = await res.json();
-
-        // Populate hidden select for compatibility
-        categories.forEach((cat) => {
+        categories.forEach(cat => {
           const option = document.createElement('option');
-          option.value = cat;
-          option.textContent = cat;
+          option.value = cat; option.textContent = cat;
           categorySelect.appendChild(option);
         });
-
-        // Render category cards
-        categories.forEach((cat) => {
+        categories.forEach(cat => {
           const meta = quizCategoryMeta[cat] || { icon: 'quiz', color: '#6e6e73', desc: cat };
-          const card = createCategoryCard(cat, cat, meta, false);
-          grid.appendChild(card);
+          grid.appendChild(createCategoryCard(cat, cat, meta));
         });
-
-        // Check URL param
         handleUrlCategory();
-      } catch (err) {
-        console.error('Failed to load categories:', err);
-      }
+      } catch (err) { console.error('Failed to load categories:', err); }
     }
 
-    // ── Create a single category card ──
     function createCategoryCard(value, title, meta) {
       const card = document.createElement('div');
       card.className = 'quiz-category-card';
       card.dataset.category = value;
-
       const shortTitle = title.length > 20 ? title.replace(/\s*\(.*\)/, '') : title;
-      const subTitle = title.includes('(') ? title.match(/\(([^)]+)\)/)?.[1] || '' : '';
-      const imgUrl = quizCategoryImages[value] || '';
-
+      const subTitle   = title.includes('(') ? title.match(/\(([^)]+)\)/)?.[1] || '' : '';
+      const imgUrl     = quizCategoryImages[value] || '';
       card.innerHTML = `
         <div class="quiz-category-card__body">
           <span class="quiz-category-card__label">${subTitle || 'QUIZ'}</span>
@@ -618,45 +496,24 @@
           ${!imgUrl ? `<div class="quiz-category-card__image-icon" style="background:${meta.color};">
             <span class="material-symbols-outlined">${meta.icon}</span>
           </div>` : ''}
-        </div>
-      `;
-
-      card.addEventListener('click', () => {
-        categorySelect.value = value;
-        startQuizSet();
-      });
-
+        </div>`;
+      card.addEventListener('click', () => { categorySelect.value = value; startQuizSet(); });
       return card;
     }
 
-    // ── Handle URL ?category= parameter ──
     function handleUrlCategory() {
       const params = new URLSearchParams(window.location.search);
       const urlCategory = params.get('category');
-      if (urlCategory) {
-        categorySelect.value = urlCategory;
-        startQuizSet();
-      }
+      if (urlCategory) { categorySelect.value = urlCategory; startQuizSet(); }
     }
 
-    // ── Start Quiz Set ──
     async function startQuizSet() {
-      // Reset state
-      quizSet = [];
-      currentIndex = 0;
-      results = [];
-      answered = false;
-      selectedOption = null;
-
-      // Switch to quiz screen
+      quizSet = []; currentIndex = 0; results = []; answered = false; selectedOption = null;
       showScreen('quizScreen');
       quizCard.classList.add('hidden');
       loadingState.classList.remove('hidden');
-
-      // Build progress dots
       renderProgressDots();
       updateScoreDisplay();
-
       try {
         const category = categorySelect.value || '';
         const difficulty = difficultySelect.value;
@@ -664,363 +521,260 @@
         if (category) params.set('category', category);
         params.set('difficulty', difficulty);
         params.set('count', SET_SIZE);
-
         const res = await authFetch(`/api/quiz/set?${params.toString()}`);
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
         quizSet = data.quizzes || [];
-
-        if (quizSet.length === 0) {
-          alert('선택한 조건에 맞는 퀴즈가 없습니다. 다른 조건을 선택해주세요.');
-          showScreen('setupScreen');
-          return;
-        }
-
+        if (!quizSet.length) { alert('선택한 조건에 맞는 퀴즈가 없습니다.'); showScreen('setupScreen'); return; }
         showCurrentQuestion();
-      } catch (err) {
-        console.error('Failed to fetch quiz set:', err);
-        alert('퀴즈 로딩에 실패했습니다.');
-        showScreen('setupScreen');
-      }
+      } catch (err) { console.error(err); alert('퀴즈 로딩에 실패했습니다.'); showScreen('setupScreen'); }
     }
 
-    // ── Render Progress Dots ──
     function renderProgressDots() {
       progressDots.innerHTML = '';
       const total = quizSet.length || SET_SIZE;
       for (let i = 0; i < total; i++) {
         const dot = document.createElement('div');
-        dot.className = 'progress-dot w-7 h-7 rounded-full border-2 border-outline-variant flex items-center justify-center text-xs font-bold text-on-surface-variant';
+        dot.className = 'progress-dot';
+        dot.style.cssText = 'width:28px;height:28px;border-radius:50%;border:2px solid #d2d2d7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#86868b;background:#fff;';
         dot.textContent = i + 1;
         if (i === currentIndex) dot.classList.add('current');
         progressDots.appendChild(dot);
       }
     }
 
-    // ── Update Progress Dots State ──
     function updateProgressDots() {
       const dots = progressDots.querySelectorAll('.progress-dot');
       dots.forEach((dot, i) => {
         dot.classList.remove('current', 'correct', 'wrong');
+        dot.style.color = '#86868b'; dot.style.background = '#fff';
         if (i < results.length) {
           dot.classList.add(results[i].isCorrect ? 'correct' : 'wrong');
-          dot.style.color = '#ffffff';
+          dot.style.color = '#fff';
+          dot.style.background = results[i].isCorrect ? '#1a7f4b' : '#ff3b30';
         }
-        if (i === currentIndex && i >= results.length) {
-          dot.classList.add('current');
-        }
+        if (i === currentIndex && i >= results.length) dot.classList.add('current');
       });
     }
 
-    // ── Update Score Display ──
     function updateScoreDisplay() {
       const correct = results.filter(r => r.isCorrect).length;
-      const total = results.length;
-      scoreText.textContent = `${correct} / ${total}`;
+      scoreText.textContent = `${correct} / ${results.length}`;
     }
 
-    // ── Show Current Question ──
     function showCurrentQuestion() {
       loadingState.classList.add('hidden');
       quizCard.classList.remove('hidden');
-      feedbackArea.classList.add('hidden');
-      feedbackArea.innerHTML = '';
+      feedbackArea.classList.add('hidden'); feedbackArea.innerHTML = '';
       nextArea.classList.add('hidden');
       submitArea.classList.remove('hidden');
       submitBtn.disabled = true;
-      answered = false;
-      selectedOption = null;
+      submitBtn.style.opacity = '0.4'; submitBtn.style.cursor = 'not-allowed';
+      answered = false; selectedOption = null;
 
       const quiz = quizSet[currentIndex];
-
-      // Update progress
       progressLabel.textContent = `문제 ${currentIndex + 1} / ${quizSet.length}`;
       updateProgressDots();
-
-      // Badges
-      quizCategoryBadge.textContent = quiz.category || '랜덤';
-      quizDifficultyBadge.textContent = quiz.difficulty || '중급';
-
-      // Question
+      quizCategoryBadge.textContent   = quiz.category   || '랜덤';
+      quizDifficultyBadge.textContent = quiz.difficulty  || '중급';
       questionText.textContent = quiz.question;
 
-      // Options
       optionsContainer.innerHTML = '';
       const letters = ['A', 'B', 'C', 'D'];
-
       quiz.options.forEach((optText, idx) => {
         const letter = letters[idx];
         const displayText = optText.replace(/^[A-D]\.\s*/, '');
-
         const btn = document.createElement('button');
-        btn.className =
-          'option-btn flex items-center gap-4 p-5 rounded-2xl border-2 border-transparent bg-surface-container-low text-left w-full';
+        btn.className = 'option-btn';
+        btn.style.cssText = 'display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;border:1.5px solid #e5e5ea;background:#f9f9fb;text-align:left;width:100%;cursor:pointer;';
         btn.setAttribute('data-index', idx);
         btn.innerHTML = `
-          <div class="letter-badge flex-shrink-0 w-10 h-10 rounded-xl bg-white text-secondary font-bold shadow-sm flex items-center justify-center text-sm">
-            ${letter}
-          </div>
-          <span class="text-on-surface text-sm md:text-base font-medium leading-relaxed">${displayText}</span>
-        `;
-
+          <div class="letter-badge" style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#fff;color:#0071e3;font-weight:700;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;">${letter}</div>
+          <span style="font-size:14px;color:#1d1d1f;font-weight:500;line-height:1.5;">${displayText}</span>`;
         btn.addEventListener('click', () => selectOption(idx, btn));
         optionsContainer.appendChild(btn);
       });
     }
 
-    // ── Select Option ──
     function selectOption(idx, btn) {
       if (answered) return;
-
       selectedOption = idx;
-
-      // Clear all selections
-      document.querySelectorAll('.option-btn').forEach((b) => {
+      document.querySelectorAll('.option-btn').forEach(b => {
         b.classList.remove('selected');
+        b.style.borderColor = '#e5e5ea'; b.style.background = '#f9f9fb';
         const badge = b.querySelector('.letter-badge');
-        badge.classList.remove('bg-secondary', 'text-white');
-        badge.classList.add('bg-white', 'text-secondary');
-        const checkIcon = b.querySelector('.check-icon');
-        if (checkIcon) checkIcon.remove();
+        badge.style.background = '#fff'; badge.style.color = '#0071e3';
+        const check = b.querySelector('.check-icon');
+        if (check) check.remove();
       });
-
-      // Highlight selected
       btn.classList.add('selected');
+      btn.style.borderColor = '#0071e3'; btn.style.background = '#e8f0fe';
       const badge = btn.querySelector('.letter-badge');
-      badge.classList.remove('bg-white', 'text-secondary');
-      badge.classList.add('bg-secondary', 'text-white');
-
-      // Add check icon
+      badge.style.background = '#0071e3'; badge.style.color = '#fff';
       const checkSpan = document.createElement('span');
-      checkSpan.className = 'material-symbols-outlined text-secondary text-xl ml-auto check-icon';
+      checkSpan.className = 'material-symbols-outlined check-icon';
+      checkSpan.style.cssText = 'font-size:18px;color:#0071e3;margin-left:auto;font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 20;';
       checkSpan.textContent = 'check_circle';
       btn.appendChild(checkSpan);
-
-      // Enable submit
       submitBtn.disabled = false;
+      submitBtn.style.opacity = '1'; submitBtn.style.cursor = 'pointer';
     }
 
-    // ── Check Answer ──
     function checkAnswer() {
       if (answered || selectedOption === null) return;
       answered = true;
-
       const quiz = quizSet[currentIndex];
       const correctLetter = quiz.answer.trim().charAt(0).toUpperCase();
       const letters = ['A', 'B', 'C', 'D'];
       const selectedLetter = letters[selectedOption];
       const isCorrect = selectedLetter === correctLetter;
-
-      // Record result
       results.push({ quiz, selectedAnswer: selectedLetter, isCorrect });
-      updateScoreDisplay();
-      updateProgressDots();
-
-      // 퀴즈 이력 저장
+      updateScoreDisplay(); updateProgressDots();
       try {
         authFetch('/api/history/quiz', {
           method: 'POST',
-          body: JSON.stringify({
-            category: quiz.category || '',
-            difficulty: quiz.difficulty || '',
-            question: quiz.question || '',
-            user_answer: selectedLetter,
-            correct_answer: correctLetter,
-            is_correct: isCorrect,
-          }),
-        }).catch(function () { /* ignore */ });
-      } catch (e) { /* ignore */ }
+          body: JSON.stringify({ category: quiz.category || '', difficulty: quiz.difficulty || '', question: quiz.question || '', user_answer: selectedLetter, correct_answer: correctLetter, is_correct: isCorrect }),
+        }).catch(() => {});
+      } catch (e) {}
 
-      // Mark options as answered
-      document.querySelectorAll('.option-btn').forEach((b) => {
-        b.classList.add('answered');
-      });
-
-      // Hide submit, show feedback
+      document.querySelectorAll('.option-btn').forEach(b => b.classList.add('answered'));
       submitArea.classList.add('hidden');
       feedbackArea.classList.remove('hidden');
 
       if (isCorrect) {
         feedbackArea.innerHTML = `
-          <div class="bg-tertiary/5 rounded-3xl p-6 border-l-8 border-tertiary">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="material-symbols-outlined text-tertiary text-2xl">verified_user</span>
-              <span class="font-headline font-bold text-lg text-tertiary">정답입니다!</span>
+          <div class="fb-correct">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#1a7f4b;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;">check_circle</span>
+              <span style="font-size:15px;font-weight:700;color:#1a7f4b;letter-spacing:-0.01em;">정답입니다!</span>
             </div>
-            <p class="text-on-surface-variant text-sm leading-relaxed">${quiz.explanation || ''}</p>
-          </div>
-        `;
+            <p style="font-size:13px;color:#3a3a3c;line-height:1.6;margin:0;">${quiz.explanation || ''}</p>
+          </div>`;
       } else {
         const correctIdx = letters.indexOf(correctLetter);
-        const correctOptionText = correctIdx >= 0 && quiz.options[correctIdx]
-          ? quiz.options[correctIdx].replace(/^[A-D]\.\s*/, '')
-          : correctLetter;
-
+        const correctOptionText = correctIdx >= 0 && quiz.options[correctIdx] ? quiz.options[correctIdx].replace(/^[A-D]\.\s*/, '') : correctLetter;
         feedbackArea.innerHTML = `
-          <div class="bg-error-container/30 rounded-3xl p-6 border-l-8 border-error">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="material-symbols-outlined text-error text-2xl">cancel</span>
-              <span class="font-headline font-bold text-lg text-error">오답입니다. 정답: ${correctLetter}</span>
+          <div class="fb-wrong">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <span class="material-symbols-outlined" style="font-size:20px;color:#ff3b30;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;">cancel</span>
+              <span style="font-size:15px;font-weight:700;color:#ff3b30;letter-spacing:-0.01em;">오답입니다. 정답: ${correctLetter}</span>
             </div>
-            <p class="text-on-surface-variant text-sm leading-relaxed mb-3">
-              <span class="font-semibold text-on-surface">${correctOptionText}</span>
-            </p>
-            <p class="text-on-surface-variant text-sm leading-relaxed">${quiz.explanation || ''}</p>
-          </div>
-        `;
-
-        // Highlight correct option
+            <p style="font-size:13px;font-weight:600;color:#1d1d1f;margin:0 0 6px;">${correctOptionText}</p>
+            <p style="font-size:13px;color:#3a3a3c;line-height:1.6;margin:0;">${quiz.explanation || ''}</p>
+          </div>`;
         const correctBtn = optionsContainer.children[correctIdx];
         if (correctBtn) {
-          correctBtn.classList.remove('bg-surface-container-low', 'border-transparent');
-          correctBtn.classList.add('border-tertiary', 'bg-tertiary/5');
-          const correctBadge = correctBtn.querySelector('.letter-badge');
-          correctBadge.classList.remove('bg-white', 'text-secondary', 'bg-secondary');
-          correctBadge.classList.add('bg-tertiary', 'text-white');
+          correctBtn.style.borderColor = '#1a7f4b'; correctBtn.style.background = '#f0fdf4';
+          const cb = correctBtn.querySelector('.letter-badge');
+          cb.style.background = '#1a7f4b'; cb.style.color = '#fff';
         }
-
-        // Highlight wrong selected option
         const wrongBtn = optionsContainer.children[selectedOption];
-        if (wrongBtn) {
-          wrongBtn.classList.remove('bg-surface-container-low', 'border-transparent');
-          wrongBtn.classList.add('border-error', 'bg-error-container/20');
-        }
+        if (wrongBtn) { wrongBtn.style.borderColor = '#ff3b30'; wrongBtn.style.background = '#fff5f5'; }
       }
-
-      // Show next button
       nextArea.classList.remove('hidden');
       const isLast = currentIndex >= quizSet.length - 1;
       nextBtnText.textContent = isLast ? '결과 확인' : '다음 문제';
     }
 
-    // ── Show Next Question ──
     function showNextQuestion() {
       currentIndex++;
-      if (currentIndex >= quizSet.length) {
-        showResults();
-      } else {
-        showCurrentQuestion();
-      }
+      if (currentIndex >= quizSet.length) showResults();
+      else showCurrentQuestion();
     }
 
-    // ── Show Results ──
     function showResults() {
       showScreen('resultScreen');
-
       const correct = results.filter(r => r.isCorrect).length;
-      const wrong = results.length - correct;
-      const pct = results.length > 0 ? Math.round((correct / results.length) * 100) : 0;
-
-      // Result icon & title
-      const resultIcon = document.getElementById('resultIcon');
-      const resultTitle = document.getElementById('resultTitle');
+      const wrong   = results.length - correct;
+      const pct     = results.length > 0 ? Math.round((correct / results.length) * 100) : 0;
+      const resultIcon     = document.getElementById('resultIcon');
+      const resultTitle    = document.getElementById('resultTitle');
       const resultSubtitle = document.getElementById('resultSubtitle');
-
       if (pct >= 80) {
-        resultIcon.className = 'w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto bg-tertiary/10';
-        resultIcon.innerHTML = '<span class="material-symbols-outlined text-tertiary text-4xl">emoji_events</span>';
+        resultIcon.style.background = '#f0fdf4';
+        resultIcon.innerHTML = '<span class="material-symbols-outlined" style="font-size:36px;color:#1a7f4b;font-variation-settings:\'FILL\' 0,\'wght\' 300,\'GRAD\' 0,\'opsz\' 48;">emoji_events</span>';
         resultTitle.textContent = '훌륭합니다!';
         resultSubtitle.textContent = 'AICC 도메인 전문가 수준입니다.';
       } else if (pct >= 50) {
-        resultIcon.className = 'w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto bg-primary/10';
-        resultIcon.innerHTML = '<span class="material-symbols-outlined text-primary text-4xl">thumb_up</span>';
+        resultIcon.style.background = '#e8f0fe';
+        resultIcon.innerHTML = '<span class="material-symbols-outlined" style="font-size:36px;color:#0071e3;font-variation-settings:\'FILL\' 0,\'wght\' 300,\'GRAD\' 0,\'opsz\' 48;">thumb_up</span>';
         resultTitle.textContent = '좋은 성적입니다!';
         resultSubtitle.textContent = '조금만 더 공부하면 전문가가 될 수 있습니다.';
       } else {
-        resultIcon.className = 'w-20 h-20 rounded-3xl flex items-center justify-center mb-4 mx-auto bg-secondary-fixed/50';
-        resultIcon.innerHTML = '<span class="material-symbols-outlined text-secondary text-4xl">school</span>';
+        resultIcon.style.background = '#f5f5f7';
+        resultIcon.innerHTML = '<span class="material-symbols-outlined" style="font-size:36px;color:#86868b;font-variation-settings:\'FILL\' 0,\'wght\' 300,\'GRAD\' 0,\'opsz\' 48;">school</span>';
         resultTitle.textContent = '더 공부해봐요!';
         resultSubtitle.textContent = '오답을 복습하고 다시 도전해보세요.';
       }
-
-      // Score numbers
       document.getElementById('resultCorrect').textContent = correct;
-      document.getElementById('resultWrong').textContent = wrong;
+      document.getElementById('resultWrong').textContent   = wrong;
       document.getElementById('resultPercent').textContent = `${pct}%`;
-
-      // Per-question details
       const detailsEl = document.getElementById('resultDetails');
       detailsEl.innerHTML = '';
       results.forEach((r, i) => {
-        const icon = r.isCorrect ? 'check_circle' : 'cancel';
-        const iconColor = r.isCorrect ? 'text-tertiary' : 'text-error';
-        const bgColor = r.isCorrect ? 'bg-tertiary/5' : 'bg-error-container/20';
-
+        const ok = r.isCorrect;
         const row = document.createElement('div');
-        row.className = `flex items-start gap-3 p-4 rounded-2xl ${bgColor}`;
+        row.style.cssText = `display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;background:${ok ? '#f0fdf4' : '#fff5f5'};`;
         row.innerHTML = `
-          <span class="material-symbols-outlined ${iconColor} text-xl mt-0.5">${icon}</span>
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-medium text-on-surface mb-1 truncate">Q${i + 1}. ${r.quiz.question}</div>
-            <div class="text-xs text-on-surface-variant">
-              내 답: ${r.selectedAnswer} ${r.isCorrect ? '' : ' / 정답: ' + r.quiz.answer.trim().charAt(0).toUpperCase()}
-            </div>
-          </div>
-        `;
+          <span class="material-symbols-outlined" style="font-size:18px;color:${ok ? '#1a7f4b' : '#ff3b30'};flex-shrink:0;margin-top:1px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;">${ok ? 'check_circle' : 'cancel'}</span>
+          <div style="flex:1;min-width:0;">
+            <p style="font-size:13px;font-weight:500;color:#1d1d1f;margin:0 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Q${i+1}. ${r.quiz.question}</p>
+            <p style="font-size:11px;color:#86868b;margin:0;">내 답: ${r.selectedAnswer}${!ok ? ' / 정답: ' + r.quiz.answer.trim().charAt(0).toUpperCase() : ''}</p>
+          </div>`;
         detailsEl.appendChild(row);
       });
-
-      // Hide review button if no wrong answers
-      document.getElementById('reviewWrongBtn').classList.toggle('hidden', wrong === 0);
+      document.getElementById('reviewWrongBtn').style.display = wrong === 0 ? 'none' : '';
     }
 
-    // ── Review Wrong Answers ──
     function reviewWrongAnswers() {
       showScreen('reviewScreen');
       const reviewList = document.getElementById('reviewList');
       reviewList.innerHTML = '';
-
       const wrongResults = results.filter(r => !r.isCorrect);
-      wrongResults.forEach((r, i) => {
+      wrongResults.forEach((r) => {
         const quiz = r.quiz;
         const letters = ['A', 'B', 'C', 'D'];
         const correctLetter = quiz.answer.trim().charAt(0).toUpperCase();
         const correctIdx = letters.indexOf(correctLetter);
-        const correctOptionText = correctIdx >= 0 && quiz.options[correctIdx]
-          ? quiz.options[correctIdx].replace(/^[A-D]\.\s*/, '')
-          : correctLetter;
-
+        const correctOptionText = correctIdx >= 0 && quiz.options[correctIdx] ? quiz.options[correctIdx].replace(/^[A-D]\.\s*/, '') : correctLetter;
         const card = document.createElement('div');
-        card.className = 'bg-surface-container-lowest rounded-2xl p-6 shadow-sm';
+        card.style.cssText = 'background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);';
         card.innerHTML = `
-          <div class="flex items-center gap-2 mb-3">
-            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-container-low text-xs font-medium text-on-surface-variant">${quiz.category || ''}</span>
-            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-error-container/30 text-xs font-semibold text-error">오답</span>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <span style="font-size:11px;font-weight:600;color:#86868b;background:#f5f5f7;padding:3px 10px;border-radius:980px;">${quiz.category || ''}</span>
+            <span style="font-size:11px;font-weight:600;color:#ff3b30;background:#fff5f5;padding:3px 10px;border-radius:980px;">오답</span>
           </div>
-          <h3 class="font-headline font-bold text-base text-on-surface mb-3">${quiz.question}</h3>
-          <div class="space-y-2 mb-4">
+          <h3 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f;margin:0 0 14px;">${quiz.question}</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
             ${quiz.options.map((opt, idx) => {
               const letter = letters[idx];
               const display = opt.replace(/^[A-D]\.\s*/, '');
-              const isCorrect = letter === correctLetter;
-              const isSelected = letter === r.selectedAnswer;
-              let cls = 'p-3 rounded-xl text-sm';
-              if (isCorrect) cls += ' bg-tertiary/10 border border-tertiary/30 font-semibold text-tertiary';
-              else if (isSelected) cls += ' bg-error-container/20 border border-error/30 text-error line-through';
-              else cls += ' bg-surface-container-low text-on-surface-variant';
-              return `<div class="${cls}">${letter}. ${display}</div>`;
+              const isCorr = letter === correctLetter;
+              const isSel  = letter === r.selectedAnswer;
+              let s = 'padding:10px 14px;border-radius:10px;font-size:13px;';
+              if (isCorr) s += 'background:#f0fdf4;border:1.5px solid #1a7f4b;font-weight:600;color:#1a7f4b;';
+              else if (isSel) s += 'background:#fff5f5;border:1.5px solid #ff3b30;color:#ff3b30;text-decoration:line-through;';
+              else s += 'background:#f5f5f7;color:#86868b;border:1.5px solid transparent;';
+              return `<div style="${s}">${letter}. ${display}</div>`;
             }).join('')}
           </div>
-          <div class="bg-tertiary/5 rounded-xl p-4 border-l-4 border-tertiary">
-            <p class="text-sm text-on-surface-variant leading-relaxed">
-              <span class="font-semibold text-tertiary">정답: ${correctLetter}.</span> ${correctOptionText}<br/>
+          <div style="background:#f5f5f7;border-radius:12px;padding:14px 16px;border-left:4px solid #1a7f4b;">
+            <p style="font-size:13px;color:#1d1d1f;line-height:1.6;margin:0;">
+              <span style="font-weight:700;color:#1a7f4b;">정답: ${correctLetter}.</span> ${correctOptionText}<br/>
               ${quiz.explanation || ''}
             </p>
-          </div>
-        `;
+          </div>`;
         reviewList.appendChild(card);
       });
     }
 
-    // ── Go to Setup Screen ──
-    function goToSetup() {
-      showScreen('setupScreen');
-    }
+    function goToSetup() { showScreen('setupScreen'); }
 
-    // ── Init ──
-    document.addEventListener('DOMContentLoaded', () => {
-      loadCategories();
-    });
+    document.addEventListener('DOMContentLoaded', () => { loadCategories(); });
   </script>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </body>
 </html>

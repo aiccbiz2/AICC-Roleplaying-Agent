@@ -38,3 +38,4 @@ static/videos/
 
 # Claude local config
 .claude/
+.gstack/

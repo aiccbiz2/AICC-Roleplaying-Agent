@@ -83,6 +83,7 @@
       gap: 10px;
       text-decoration: none;
       color: var(--black);
+      min-height: 44px;
     }
 
     .nav-logo-icon {
@@ -107,7 +108,8 @@
     }
 
     .nav-btn {
-      padding: 8px 20px;
+      padding: 10px 20px;
+      min-height: 44px;
       font-size: 14px;
       font-weight: 500;
       font-family: inherit;
@@ -116,8 +118,10 @@
       border: none;
       border-radius: 980px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.2s;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
     }
 
     .nav-btn:hover {
@@ -134,6 +138,10 @@
       overflow: hidden;
     }
 
+    .hero-bg-video {
+      display: block;
+    }
+
     .hero::after {
       content: '';
       position: absolute;
@@ -143,6 +151,7 @@
       height: 200px;
       background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
       pointer-events: none;
+      z-index: 2;
     }
 
     .hero-eyebrow {
@@ -197,7 +206,7 @@
       border: none;
       border-radius: 980px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.2s, transform 0.2s;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
@@ -219,7 +228,7 @@
       border: none;
       border-radius: 980px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: color 0.2s, text-decoration 0.2s;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
@@ -232,24 +241,157 @@
 
     /* Hero media placeholder */
     .hero-media {
-      max-width: 1000px;
-      margin: 60px auto 0;
+      max-width: 860px;
+      margin: 56px auto 0;
       position: relative;
       z-index: 1;
-      border-radius: 20px;
+      border-radius: 16px;
       overflow: hidden;
-      aspect-ratio: 16/9;
-      background: #111;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #f5f5f7;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
     }
 
-    .hero-media img,
-    .hero-media video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    /* ── Terminal chrome (Bright) ── */
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 18px;
+      background: #e8e8ed;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .terminal-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .terminal-dot.red    { background: #ff5f57; }
+    .terminal-dot.yellow { background: #febc2e; }
+    .terminal-dot.green  { background: #28c840; }
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: #8e8e93;
+      letter-spacing: 0.01em;
+    }
+    .terminal-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: #34c759;
+      background: rgba(52,199,89,0.12);
+      border: 1px solid rgba(52,199,89,0.3);
+      border-radius: 20px;
+      padding: 2px 8px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Terminal body ── */
+    .terminal-body {
+      padding: 20px 24px;
+      height: 340px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 14px;
+    }
+
+    /* ── Chat bubbles ── */
+    .t-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .t-row.show { opacity: 1; transform: translateY(0); }
+    .t-row.me   { flex-direction: row-reverse; }
+
+    .t-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .t-row.them .t-avatar { background: #d1d1d6; color: #3a3a3c; }
+    .t-row.me   .t-avatar { background: #0071e3; color: #fff; }
+
+    .t-bubble-wrap { display: flex; flex-direction: column; gap: 3px; max-width: 75%; }
+    .t-row.me .t-bubble-wrap { align-items: flex-end; }
+
+    .t-name {
+      font-size: 10px;
+      color: #8e8e93;
+      padding: 0 4px;
+      font-family: -apple-system, system-ui, sans-serif;
+    }
+
+    .t-bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      line-height: 1.55;
+      font-family: -apple-system, system-ui, sans-serif;
+      font-size: 13.5px;
+      word-break: keep-all;
+      text-align: left;
+    }
+    .t-row.them .t-bubble {
+      background: #ffffff;
+      color: #1d1d1f;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .t-row.me .t-bubble {
+      background: #0071e3;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .t-bubble .kw {
+      color: #0071e3;
+      font-weight: 600;
+    }
+    .t-row.me .t-bubble .kw { color: #a8d8ff; }
+
+    /* ── Typing indicator ── */
+    .t-typing {
+      display: flex; gap: 4px; align-items: center;
+      padding: 10px 14px;
+      background: #ffffff;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .t-typing span {
+      width: 6px; height: 6px;
+      background: #aeaeb2;
+      border-radius: 50%;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .t-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .t-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    .t-typing-row {
+      display: flex; gap: 10px; align-items: flex-end;
+      flex-shrink: 0;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .t-typing-row.show { opacity: 1; }
+    .t-typing-row.me { flex-direction: row-reverse; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .t-row, .t-typing-row { transition: none; }
+      .t-typing span { animation: none; }
     }
 
     .media-placeholder {
@@ -317,31 +459,51 @@
       background: var(--bg-section);
       border-radius: 20px;
       padding: 36px 32px;
+      border: 0.5px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
     }
 
-    .problem-card .material-symbols-outlined {
-      font-size: 32px;
-      color: var(--blue);
-      margin-bottom: 16px;
+    .problem-stat {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .problem-stat-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #5ac8fa;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
+    }
+
+    .problem-divider {
+      height: 0.5px;
+      background: rgba(255,255,255,0.12);
+      margin-bottom: 24px;
     }
 
     .problem-card h3 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
-      color: var(--black);
+      color: var(--white);
       margin-bottom: 8px;
       letter-spacing: -0.02em;
     }
 
     .problem-card p {
-      font-size: 15px;
-      line-height: 1.5;
-      color: var(--gray);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #a1a1a6;
     }
 
     /* ── Voice Section (dark) ── */
     .voice-section {
-      background: var(--bg);
+      background: var(--white);
       color: var(--black);
       padding: 100px 24px;
     }
@@ -374,17 +536,48 @@
       display: none;
     }
 
+    /* ── Mac Terminal Voice Cards ── */
     .voice-card {
       flex: 1 1 0;
       min-width: 260px;
-      aspect-ratio: 1 / 1;
-      background: var(--white);
-      border-radius: 20px;
-      padding: 32px 28px;
-      border: 1px solid var(--gray-lighter);
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #d2d2d7;
+      overflow: hidden;
+      box-shadow: none;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      padding: 0;
+    }
+
+    .vc-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 11px 14px;
+      background: #e8e8ed;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+    .vc-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .vc-dot.r { background: #ff5f57; }
+    .vc-dot.y { background: #febc2e; }
+    .vc-dot.g { background: #28c840; }
+    .vc-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #8e8e93;
+      font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+      letter-spacing: 0.01em;
+    }
+
+    .vc-content {
+      padding: 24px 22px 28px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .voice-card-role {
@@ -397,41 +590,63 @@
       letter-spacing: 0.03em;
       margin-bottom: 20px;
     }
-
-    .voice-card-role .material-symbols-outlined {
-      font-size: 18px;
-    }
-
-    .voice-card-role.sales {
-      color: #5ac8fa;
-    }
-
-    .voice-card-role.newbie {
-      color: #30d158;
-    }
-
-    .voice-card-role.leader {
-      color: #ff9f0a;
-    }
+    .voice-card-role.sales  { color: #5ac8fa; }
+    .voice-card-role.newbie { color: #30d158; }
+    .voice-card-role.leader { color: #ff9f0a; }
 
     .voice-card-quote {
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.5;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.6;
       letter-spacing: -0.01em;
-      color: #636366;
+      color: #424245;
       font-style: italic;
-      padding-left: 16px;
+      padding-left: 14px;
       border-left: 3px solid #d2d2d7;
       margin-bottom: 20px;
       flex: 1;
     }
 
     .voice-card-desc {
-      font-size: 14px;
+      font-size: 13px;
       line-height: 1.6;
-      color: var(--black);
-      font-weight: 600;
+      color: #6e6e73;
+    }
+
+    /* ── Card Theme: DarkBlue ── */
+    .voice-card.theme-darkblue {
+      background: #0a1628;
+      border: 1px solid rgba(41,151,255,0.2);
+      box-shadow: none;
+    }
+    .voice-card.theme-darkblue .vc-bar {
+      background: #0d1f3c;
+      border-bottom-color: rgba(41,151,255,0.12);
+    }
+    .voice-card.theme-darkblue .voice-card-quote {
+      color: #ccddf0;
+      border-left-color: rgba(41,151,255,0.45);
+    }
+    .voice-card.theme-darkblue .voice-card-desc {
+      color: #6e90b0;
+    }
+
+    /* ── Card Theme: Dark ── */
+    .voice-card.theme-dark {
+      background: #1c1c1e;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: none;
+    }
+    .voice-card.theme-dark .vc-bar {
+      background: #2d2d2f;
+      border-bottom-color: rgba(255,255,255,0.06);
+    }
+    .voice-card.theme-dark .voice-card-quote {
+      color: #ebebf5;
+      border-left-color: rgba(255,255,255,0.15);
+    }
+    .voice-card.theme-dark .voice-card-desc {
+      color: #8e8e93;
     }
 
     /* ── Features Section ── */
@@ -497,7 +712,7 @@
     }
 
     .feature-text h3 {
-      font-size: 36px;
+      font-size: clamp(28px, 3vw, 42px);
       font-weight: 700;
       letter-spacing: -0.03em;
       line-height: 1.1;
@@ -529,100 +744,148 @@
     }
 
     /* ── Roadmap Section ── */
-    .roadmap-section {
-      padding: 100px 24px;
-      width: 100%;
+    /* ── Roadmap (Timeline Design) ── */
+    .rm-subtitle {
+      text-align: center;
+      color: #86868b;
+      font-size: 17px;
+      max-width: 640px;
+      margin: 16px auto 0;
+      line-height: 1.7;
     }
+    .rm-subtitle strong { color: #1d1d1f; font-weight: 600; }
 
-    .roadmap-inner {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .roadmap-track {
+    .rm-timeline {
+      position: relative;
       display: flex;
-      gap: 20px;
-      margin-top: 56px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 72px;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Horizon line */
+    .rm-horizon {
+      position: absolute;
+      top: 9px; /* center of dot */
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 2px;
+      background: #e5e5ea;
+      border-radius: 2px;
+    }
+    .rm-horizon-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(to right, #0071e3, #34aadc);
+      border-radius: 2px;
+      animation: rmFill 1s 0.4s ease forwards;
+    }
+    @keyframes rmFill {
+      from { width: 0%; }
+      to   { width: 33%; }
+    }
+
+    .rm-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Node dot */
+    .rm-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: box-shadow 0.3s;
+    }
+    .rm-stage.active   .rm-dot { background: #0071e3; box-shadow: 0 0 0 6px rgba(0,113,227,0.15); }
+    .rm-stage.next     .rm-dot { background: #fff; border: 2px solid #aeaeb2; }
+    .rm-stage.future   .rm-dot { background: #fff; border: 2px solid #d1d1d6; }
+
+    /* Time tag above dot */
+    .rm-time {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .rm-stage.active .rm-time { color: #0071e3; }
+    .rm-stage.next   .rm-time { color: #636366; }
+    .rm-stage.future .rm-time { color: #aeaeb2; }
+
+    /* Card below dot */
+    .rm-card {
+      margin-top: 28px;
+      border-radius: 18px;
+      padding: 24px 22px;
+      width: calc(100% - 32px);
+      position: relative;
+    }
+    .rm-stage.active .rm-card {
+      background: #1d1d1f;
+      color: #fff;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.14);
+    }
+    .rm-stage.next   .rm-card { background: #f5f5f7; }
+    .rm-stage.future .rm-card { background: #fafafa; border: 1px solid #e5e5ea; }
+
+    .rm-stage-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .rm-stage.active .rm-stage-label { color: #2997ff; }
+    .rm-stage.next   .rm-stage-label { color: #636366; }
+    .rm-stage.future .rm-stage-label { color: #aeaeb2; }
+
+    .rm-card h3 {
+      font-size: 17px; font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px; line-height: 1.35;
+    }
+    .rm-stage.next   .rm-card h3 { color: #1d1d1f; }
+    .rm-stage.future .rm-card h3 { color: #3a3a3c; }
+
+    .rm-card ul {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .rm-card ul li {
+      font-size: 13.5px; line-height: 1.5;
+      padding-left: 18px; position: relative;
+    }
+    .rm-card ul li::before {
+      content: '›'; position: absolute; left: 0;
+      font-size: 16px; line-height: 1.3;
+    }
+    .rm-stage.active .rm-card ul li       { color: #a1a1a6; }
+    .rm-stage.active .rm-card ul li::before { color: #2997ff; }
+    .rm-stage.next   .rm-card ul li       { color: #636366; }
+    .rm-stage.next   .rm-card ul li::before { color: #aeaeb2; }
+    .rm-stage.future .rm-card ul li       { color: #8e8e93; }
+    .rm-stage.future .rm-card ul li::before { color: #c7c7cc; }
+
+    .rm-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 980px;
+      font-size: 11px; font-weight: 600; margin-top: 14px;
+      background: rgba(41,151,255,0.15); color: #2997ff;
     }
 
     @media (max-width: 768px) {
-      .roadmap-track {
-        flex-direction: column;
-      }
-    }
-
-    .roadmap-card {
-      flex: 1;
-      background: var(--bg-section);
-      border-radius: 20px;
-      padding: 32px 28px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .roadmap-card.active {
-      background: var(--black);
-      color: var(--white);
-    }
-
-    .roadmap-stage {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-      margin-bottom: 12px;
-    }
-
-    .roadmap-card.active .roadmap-stage {
-      color: #2997ff;
-    }
-
-    .roadmap-card:not(.active) .roadmap-stage {
-      color: var(--gray-light);
-    }
-
-    .roadmap-card h3 {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 10px;
-    }
-
-    .roadmap-card p {
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .roadmap-card.active p {
-      color: #a1a1a6;
-    }
-
-    .roadmap-card:not(.active) p {
-      color: var(--gray);
-    }
-
-    .roadmap-date {
-      font-size: 13px;
-      color: var(--gray-light);
-      margin-top: 16px;
-    }
-
-    .roadmap-card.active .roadmap-date {
-      color: #555;
-    }
-
-    .roadmap-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 980px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 12px;
-    }
-
-    .roadmap-card.active .roadmap-badge {
-      background: rgba(41, 151, 255, 0.15);
-      color: #2997ff;
+      .rm-timeline { flex-direction: column; gap: 0; }
+      .rm-horizon  { display: none; }
+      .rm-stage    { flex-direction: row; align-items: flex-start; gap: 16px; width: 100%; margin-bottom: 24px; }
+      .rm-dot      { margin-top: 4px; }
+      .rm-time     { display: none; }
+      .rm-card     { margin-top: 0; width: 100%; }
     }
 
     /* ── CTA Section ── */
@@ -869,6 +1132,14 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fade-in {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
   </style>
 </head>
 
@@ -878,10 +1149,7 @@
   <nav id="navbar">
     <div class="nav-inner">
       <a class="nav-logo" href="#" onclick="scrollToTop()">
-        <div class="nav-logo-icon">
-          <span class="material-symbols-outlined">smart_toy</span>
-        </div>
-        <span class="nav-logo-text">AI Roleplay Agent</span>
+        <span class="nav-logo-text">AICC Roleplaying Agent</span>
       </a>
       <button class="nav-btn" onclick="openLogin()">로그인</button>
     </div>
@@ -889,26 +1157,44 @@
 
   <!-- ══ Hero ══ -->
   <section class="hero">
-    <div class="hero-eyebrow">LG U+ AI사업2팀</div>
-    <h1 class="hero-title">
-      Become the AICC<br>
-      <span class="highlight">Domain Expert</span>
-    </h1>
-    <p class="hero-subtitle">
-      AI 시뮬레이션을 통한 실전 감각의 완벽한 체화!<br>
-      고객 미팅에서 자신감 있게 대응하세요.
-    </p>
-    <div class="hero-cta-group">
-      <button class="btn-primary" onclick="openLogin()">시작하기 →</button>
-      <a class="btn-secondary" href="#features">자세히 알아보기 ↓</a>
-    </div>
-
-    <!-- Hero 이미지/동영상: 아래 주석의 img 또는 video 태그를 사용하세요 -->
-    <div class="hero-media">
-      <video autoplay muted loop playsinline>
+    <!-- 영상 + 텍스트 컨테이너 -->
+    <div style="max-width:860px; margin:0 auto; position:relative; overflow:hidden; border-radius:20px; z-index:1; padding:80px 48px 60px;">
+      <!-- Background video — 위쪽 정렬로 글씨 영역 덮음 -->
+      <video class="hero-bg-video" autoplay muted loop playsinline
+        style="position:absolute; top:-10%; left:0; width:100%; height:120%; object-fit:cover; object-position:center top; opacity:0.3; pointer-events:none;">
         <source src="/static/videos/hero_LGU+광고영상.mp4" type="video/mp4" />
-        <source src="/static/videos/hero_LGU+광고영상.mov" type="video/quicktime" />
       </video>
+
+      <!-- 텍스트 콘텐츠 -->
+      <div style="position:relative; z-index:1;">
+        <div class="hero-eyebrow">LG U+ AI사업2팀</div>
+        <h1 class="hero-title">
+          Become the AICC<br>
+          <span class="highlight">Domain Expert</span>
+        </h1>
+        <p class="hero-subtitle">
+          AI 시뮬레이션을 통한 실전 감각의 완벽한 체화!<br>
+          고객 미팅에서 자신감 있게 대응하세요.
+        </p>
+        <div class="hero-cta-group">
+          <button class="btn-primary" onclick="openLogin()">시작하기 →</button>
+          <a class="btn-secondary" href="#features">자세히 알아보기 ↓</a>
+        </div>
+      </div>
+    </div><!-- 텍스트 컨테이너 닫기 -->
+
+    <!-- 터미널 채팅창 — 별도 분리 -->
+    <div class="hero-media" style="margin-top:40px;">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">AICC Roleplay · xx증권 도입 미팅 시뮬레이션</span>
+        <span class="terminal-badge">LIVE</span>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+        <!-- JS가 대화를 순서대로 삽입 -->
+      </div>
     </div>
   </section>
 
@@ -925,57 +1211,64 @@
       </p>
 
       <div class="voice-grid">
-        <!-- Experts -->
+
+        <!-- Card 1: 도메인 전문가 — Bright -->
         <div class="voice-card">
-          <div class="voice-card-role leader">
-            도메인 전문가
+          <div class="vc-bar">
+            <span class="vc-dot r"></span>
+            <span class="vc-dot y"></span>
+            <span class="vc-dot g"></span>
+            <span class="vc-title"></span>
           </div>
-          <p class="voice-card-quote">
-            "매일 1시간 교육 준비...<br>본업인 사업 지원에 집중하기 어렵습니다."
-          </p>
-          <p class="voice-card-desc">
-            전문가의 시간이 교육에 묶여 병목이 발생합니다. 본업인 고객 미팅과 사업 지원에 재투입할 시간이 절실합니다.
-          </p>
+          <div class="vc-content">
+            <div class="voice-card-role leader">도메인 전문가</div>
+            <p class="voice-card-quote">
+              "매일 1시간 교육 준비...<br>본업인 사업 지원에 집중하기 어렵습니다."
+            </p>
+            <p class="voice-card-desc">
+              전문가의 시간이 교육에 묶여 병목이 발생합니다. 본업인 고객 미팅과 사업 지원에 재투입할 시간이 절실합니다.
+            </p>
+          </div>
         </div>
 
-        <!-- Non-experts 1 -->
-        <div class="voice-card">
-          <div class="voice-card-role newbie">
-            신규전입자
+        <!-- Card 2: 신규전입자 — DarkBlue -->
+        <div class="voice-card theme-darkblue">
+          <div class="vc-bar">
+            <span class="vc-dot r"></span>
+            <span class="vc-dot y"></span>
+            <span class="vc-dot g"></span>
+            <span class="vc-title"></span>
           </div>
-          <p class="voice-card-quote">
-            "선배가 미팅 중일 때는 물어볼 곳이 없어 막막합니다. 현장 용어는 봐도 모르겠고요."
-          </p>
-          <p class="voice-card-desc">
-            ACD, IVR, CTI... 매일 쏟아지는 용어 장벽. 전문가 동행 없이는 고객 앞에서 자신 있게 말하기 어렵습니다.
-          </p>
+          <div class="vc-content">
+            <div class="voice-card-role newbie">신규전입자</div>
+            <p class="voice-card-quote">
+              "선배가 미팅 중일 때는 물어볼 곳이 없어 막막합니다. 현장 용어는 봐도 모르겠고요."
+            </p>
+            <p class="voice-card-desc">
+              ACD, IVR, CTI... 매일 쏟아지는 용어 장벽. 전문가 동행 없이는 고객 앞에서 자신 있게 말하기 어렵습니다.
+            </p>
+          </div>
         </div>
 
-        <!-- Sales A -->
-        <div class="voice-card">
-          <div class="voice-card-role sales">
-            사업담당자
+        <!-- Card 3: 사업담당자(전입자) — Dark -->
+        <div class="voice-card theme-dark">
+          <div class="vc-bar">
+            <span class="vc-dot r"></span>
+            <span class="vc-dot y"></span>
+            <span class="vc-dot g"></span>
+            <span class="vc-title"></span>
           </div>
-          <p class="voice-card-quote">
-            "IPCC 경험은 있는데, AICC는 고객이 뭘 물어볼지 감이 안 와요. 뭐부터 준비해야 할까요?"
-          </p>
-          <p class="voice-card-desc">
-            AI 콜봇, STT 정확도 등 새로운 주제에 대한 대응이 필요합니다. 자사 상품에 대한 명확한 이해가 필요합니다.
-          </p>
+          <div class="vc-content">
+            <div class="voice-card-role sales">사업담당자(전입자)</div>
+            <p class="voice-card-quote">
+              "고객이 일상적으로 쓰는 용어들... 저만 모르는 것 같아요. 자신감이 자꾸 떨어집니다."
+            </p>
+            <p class="voice-card-desc">
+              컨택센터 현장의 수백 가지 약어와 KPI. 이 용어 장벽만 넘어도 고객과의 대화가 훨씬 수월해질 것입니다.
+            </p>
+          </div>
         </div>
 
-        <!-- Sales B -->
-        <div class="voice-card">
-          <div class="voice-card-role sales">
-            사업담당자
-          </div>
-          <p class="voice-card-quote">
-            "고객이 일상적으로 쓰는 용어들... 저만 모르는 것 같아요. 자신감이 자꾸 떨어집니다."
-          </p>
-          <p class="voice-card-desc">
-            컨택센터 현장의 수백 가지 약어와 KPI. 이 용어 장벽만 넘어도 고객과의 대화가 훨씬 수월해질 것입니다.
-          </p>
-        </div>
       </div>
     </div>
   </section>
@@ -986,35 +1279,43 @@
     <div class="section-inner">
       <div class="section-eyebrow" style="text-align: center;">The Challenge</div>
       <h2 class="section-title" style="color: var(--white); text-align: center;">
-        전문가 의존의 병목,<br>
-        성장을 가로막는 <span style="color: #5ac8fa;">도메인 러닝커브</span>.
+        소수에게 집중된 AICC 노하우,<br>
+        전체 성장을 가로막는 <span style="color: #5ac8fa;">도메인 러닝커브</span>.
       </h2>
       <p class="section-desc"
         style="color: #a1a1a6; text-align: center; margin-left: auto; margin-right: auto; max-width: 800px;">
-        10명 중 2명에게만 집중된 도메인 지식은 팀 전체 활동성에 제약이 됩니다.<br>
-        수동 코칭의 한계를 넘어, 1~2년의 숙련 기간을 AI Agent로 단축해야 합니다.
+        전문가 2명에게 전적으로 의존하는 '지식 병목' 현상은 팀 전체 업무 확장에 제약이 됩니다.<br>
+        신규 인력에게 1~2년의 적응기를 강요하는 수동 코칭은 성장을 저해하는 근본적 원인입니다.
       </p>
 
       <div class="problem-grid">
         <div class="problem-card" style="background: #1c1c1e;">
-          <span class="material-symbols-outlined" style="color: #5ac8fa;">timer_off</span>
-          <h3 style="color: var(--white);">전문가의 희소성</h3>
-          <p style="color: #a1a1a6;">전문가 2인에게 집중된 코칭 부하. 연간 3,750시간의 기회비용이 수동 반복 교육에 매몰됩니다.</p>
+          <div class="problem-stat">3,750h</div>
+          <div class="problem-stat-label">연간 교육 기회비용</div>
+          <div class="problem-divider"></div>
+          <h3>전문가의 희소성</h3>
+          <p>전문가 2인에게 집중된 코칭 부하. 수동 반복 교육에 매몰된 시간을 본업인 고객 미팅에 되돌려야 합니다.</p>
         </div>
         <div class="problem-card" style="background: #1c1c1e;">
-          <span class="material-symbols-outlined" style="color: #5ac8fa;">trending_down</span>
-          <h3 style="color: var(--white);">전입사원들의 적응기</h3>
-          <p style="color: #a1a1a6;">혼자서 고객 대응까지 소요되는 시간은 1~2년. 그 사이 고객 접점에서 발생하는 전문성 부재와 신뢰 하락 대책이 시급합니다.</p>
+          <div class="problem-stat">1~2년</div>
+          <div class="problem-stat-label">독립 대응까지 소요 기간</div>
+          <div class="problem-divider"></div>
+          <h3>전입사원들의 적응기</h3>
+          <p>그 사이 고객 접점에서 발생하는 전문성 부재와 신뢰 하락. 지금 당장 단축할 방법이 필요합니다.</p>
         </div>
         <div class="problem-card" style="background: #1c1c1e;">
-          <span class="material-symbols-outlined" style="color: #5ac8fa;">translate</span>
-          <h3 style="color: var(--white);">현장-이론용어의 해독 지연</h3>
-          <p style="color: #a1a1a6;">ACD, IVR 등 복잡한 현장 용어의 장벽. 이론 중심 학습으로는 실제 고객 미팅에서의 즉각적 상황 판단이 어렵습니다.</p>
+          <div class="problem-stat">210개</div>
+          <div class="problem-stat-label">해독해야 할 현장 용어</div>
+          <div class="problem-divider"></div>
+          <h3>현장-이론용어의 해독 지연</h3>
+          <p>ACD, IVR, CTI… 이론 중심 학습으로는 실제 고객 미팅에서의 즉각적 상황 판단이 어렵습니다.</p>
         </div>
         <div class="problem-card" style="background: #1c1c1e;">
-          <span class="material-symbols-outlined" style="color: #5ac8fa;">rebase_edit</span>
-          <h3 style="color: var(--white);">성장의 확장성 병목</h3>
-          <p style="color: #a1a1a6;">전문가가 팀원 8명을 일일이 가이드할 수 없는 물리적 한계. 사업 가속을 위해 무한 확장이 가능한 코칭 시스템이 필수입니다.</p>
+          <div class="problem-stat">2 : 8</div>
+          <div class="problem-stat-label">전문가 대 팀원 비율</div>
+          <div class="problem-divider"></div>
+          <h3>성장의 확장성 병목</h3>
+          <p>전문가 2인이 팀원 8명을 일일이 가이드할 수 없는 물리적 한계. 무한 확장 가능한 코칭 시스템이 필수입니다.</p>
         </div>
       </div>
     </div>
@@ -1025,7 +1326,7 @@
     <div class="features-inner">
       <div class="section-eyebrow" style="text-align: center;">Key Features</div>
       <h2 class="section-title" style="margin-bottom:56px; text-align: center;">
-        세 가지 학습 도구,<br>
+        네 가지 학습 도구,<br>
         하나의 플랫폼.
       </h2>
 
@@ -1040,10 +1341,8 @@
           <p> 지난 3개월간 약 150회의 실제 고객 미팅을 기반으로 한 시나리오 구성.
             초급부터 고급까지 3단계 난이도로 반복 연습하세요.</p>
         </div>
-        <div class="feature-media">
-          <video autoplay muted loop playsinline>
-            <source src="/static/videos/롤플래잉_편집.mov" type="video/mp4" />
-          </video>
+        <div class="feature-media" style="background:#f5f5f7; border-radius:16px; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.10);">
+          <div class="terminal-body" id="featureTerminalBody" style="height:360px;"></div>
         </div>
       </div>
 
@@ -1081,6 +1380,232 @@
         </div>
       </div>
 
+      <!-- Feature 4: Lectures -->
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <div class="feature-badge">
+            <span class="material-symbols-outlined">play_lesson</span>
+            강의 (Lectures)
+          </div>
+          <h3>현장 전문가의<br>핵심 강의 정리</h3>
+          <p>AICC 도입 실무 강연과 현장 인사이트를 AI가 구조화한 요약 노트로 제공합니다. 이동 중에도 빠르게 학습하세요.</p>
+        </div>
+        <div class="feature-media" style="background:#fff; border-radius:16px; min-height:300px; overflow:hidden; position:relative; padding:0; border:1px solid #e8e8ed;">
+          <style>
+            #ipcc-ss { position:relative; width:100%; min-height:300px; }
+            .iss { position:absolute; inset:0; opacity:0; transition:opacity 0.35s ease; pointer-events:none; display:flex; flex-direction:column; }
+            .iss.on { opacity:1; pointer-events:auto; }
+            .iss-hd { padding:10px 16px 9px; display:flex; align-items:center; gap:8px; }
+            .iss-hd__tag { font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; background:rgba(255,255,255,0.22); color:#fff; padding:2px 8px; border-radius:20px; }
+            .iss-hd__num { font-size:10px; font-weight:600; color:rgba(255,255,255,0.7); margin-left:auto; }
+            .iss-title { font-size:15px; font-weight:700; letter-spacing:-0.02em; color:#fff; padding:0 16px 10px; line-height:1.3; }
+            .iss-body { background:#fff; flex:1; padding:13px 16px 36px; overflow:hidden; }
+            .iss-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #f5f5f7; }
+            .iss-row:last-child { border-bottom:none; }
+            .iss-row__label { font-size:11px; font-weight:600; color:#6e6e73; min-width:64px; }
+            .iss-row__val { font-size:12px; color:#1d1d1f; font-weight:500; line-height:1.4; }
+            .iss-row__badge { font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; margin-left:auto; white-space:nowrap; }
+            .iss-flow { display:flex; align-items:center; gap:3px; flex-wrap:wrap; margin:4px 0; }
+            .iss-flow__box { font-size:10px; font-weight:600; background:#f5f5f7; color:#1d1d1f; padding:4px 8px; border-radius:6px; }
+            .iss-flow__arr { font-size:11px; color:#86868b; }
+            .iss-kv { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+            .iss-kv__item { background:#f5f5f7; border-radius:8px; padding:7px 10px; }
+            .iss-kv__k { font-size:10px; color:#86868b; font-weight:600; margin-bottom:2px; }
+            .iss-kv__v { font-size:12px; color:#1d1d1f; font-weight:700; }
+            .iss-table { width:100%; border-collapse:collapse; font-size:11px; }
+            .iss-table th { background:#f5f5f7; color:#6e6e73; font-weight:600; padding:5px 8px; text-align:left; }
+            .iss-table td { padding:5px 8px; border-bottom:1px solid #f5f5f7; color:#1d1d1f; }
+            .iss-table tr:last-child td { border-bottom:none; }
+            .iss-dots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:5px; }
+            .iss-dot { width:5px; height:5px; border-radius:50%; background:#d2d2d7; transition:all 0.3s; }
+            .iss-dot.on { background:#0071e3; transform:scale(1.4); }
+          </style>
+          <div id="ipcc-ss">
+
+            <!-- Slide 1: IPCC 전체 구조 (1차) -->
+            <div class="iss on">
+              <div class="iss-hd" style="background:#0071e3;">
+                <span class="iss-hd__tag">1차 교육</span>
+                <span style="font-size:12px;font-weight:700;color:#fff;">IPCC 전체 구조</span>
+                <span class="iss-hd__num">1 / 5</span>
+              </div>
+              <div class="iss-title" style="background:#0071e3;">IPT와 IPCC, 무엇이 다른가?</div>
+              <div class="iss-body">
+                <div class="iss-flow" style="margin-bottom:10px;">
+                  <div class="iss-flow__box">고객 전화</div><div class="iss-flow__arr">→</div>
+                  <div class="iss-flow__box">PSTN</div><div class="iss-flow__arr">→</div>
+                  <div class="iss-flow__box">E1/PRI</div><div class="iss-flow__arr">→</div>
+                  <div class="iss-flow__box" style="background:#e8f4ff;color:#0071e3;">IP-PBX</div><div class="iss-flow__arr">→</div>
+                  <div class="iss-flow__box" style="background:#e8f4ff;color:#0071e3;">CTI</div><div class="iss-flow__arr">→</div>
+                  <div class="iss-flow__box" style="background:#e8f4ff;color:#0071e3;">IVR</div><div class="iss-flow__arr">→</div>
+                  <div class="iss-flow__box">상담원</div>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">IPT</span>
+                  <span class="iss-row__val">PBX + IVR (단순 안내)</span>
+                  <span class="iss-row__badge" style="background:#f5f5f7;color:#86868b;">기본</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">IPCC</span>
+                  <span class="iss-row__val">PBX + CTI + IVR + 녹취 + 상담AP</span>
+                  <span class="iss-row__badge" style="background:#e8f4ff;color:#0071e3;">완전체</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">핵심 차이</span>
+                  <span class="iss-row__val">고객 정보 연동 + 지능형 라우팅</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: CTI 핵심 기능 (1차) -->
+            <div class="iss">
+              <div class="iss-hd" style="background:#5856d6;">
+                <span class="iss-hd__tag">1차 교육</span>
+                <span style="font-size:12px;font-weight:700;color:#fff;">CTI — 콜센터의 두뇌</span>
+                <span class="iss-hd__num">2 / 5</span>
+              </div>
+              <div class="iss-title" style="background:#5856d6;">"CTI가 없으면 IPCC가 아니다"</div>
+              <div class="iss-body">
+                <div class="iss-row">
+                  <span class="iss-row__label">레지스터</span>
+                  <span class="iss-row__val">PBX 전체 내선 상시 모니터링</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">이벤트 감지</span>
+                  <span class="iss-row__val">콜 인입 / 응답 / 종료 실시간 추적</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">데이터 정제</span>
+                  <span class="iss-row__val">16진수 프로토콜 → 사람이 읽는 데이터</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">라우팅 지시</span>
+                  <span class="iss-row__val">IVR 정보 → 스킬그룹 → 상담석 연결</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">통계 생성</span>
+                  <span class="iss-row__val">호통계 · 상담사 퍼포먼스 · 큐 통계</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3: 콜 흐름 시나리오 (1차) -->
+            <div class="iss">
+              <div class="iss-hd" style="background:#34c759;">
+                <span class="iss-hd__tag">1차 교육</span>
+                <span style="font-size:12px;font-weight:700;color:#fff;">실제 콜 흐름 시나리오</span>
+                <span class="iss-hd__num">3 / 5</span>
+              </div>
+              <div class="iss-title" style="background:#34c759;">고객 전화 → 상담 종료 9단계</div>
+              <div class="iss-body">
+                <div class="iss-kv">
+                  <div class="iss-kv__item"><div class="iss-kv__k">① 발신</div><div class="iss-kv__v">고객 → PSTN</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">② 회선</div><div class="iss-kv__v">E1 → VoIP GW</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">③ PBX</div><div class="iss-kv__v">대표번호 인식</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">④ CTI</div><div class="iss-kv__v">UID 생성 (16자리)</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">⑤ IVR</div><div class="iss-kv__v">기관계 고객 조회</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">⑥ 라우팅</div><div class="iss-kv__v">스킬그룹 → 내선</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">⑦ 상담원</div><div class="iss-kv__v">스크린 팝업</div></div>
+                  <div class="iss-kv__item"><div class="iss-kv__k">⑧ 녹취</div><div class="iss-kv__v">CTI 이벤트 연동</div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 4: PDS 3가지 모드 (2차) -->
+            <div class="iss">
+              <div class="iss-hd" style="background:#ff9500;">
+                <span class="iss-hd__tag">2차 교육</span>
+                <span style="font-size:12px;font-weight:700;color:#fff;">PDS — 아웃바운드 자동 발신</span>
+                <span class="iss-hd__num">4 / 5</span>
+              </div>
+              <div class="iss-title" style="background:#ff9500;">해피콜·서베이·공지 3가지 모드</div>
+              <div class="iss-body">
+                <table class="iss-table">
+                  <thead><tr><th>모드</th><th>방식</th><th>특징</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight:600;color:#1d1d1f;">Preview</td>
+                      <td>상담사가 직접 클릭</td>
+                      <td style="color:#86868b;">민감 고객용</td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600;color:#1d1d1f;">Progressive</td>
+                      <td>가용 자원만큼 발신</td>
+                      <td style="color:#86868b;">안정적</td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600;color:#ff9500;">Predictive</td>
+                      <td>자원 이상 발신(120%)</td>
+                      <td style="color:#86868b;">DB 소진 빠름</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="iss-row" style="margin-top:6px;">
+                  <span class="iss-row__label">국내 1위</span>
+                  <span class="iss-row__val">샌드박스 (독과점)</span>
+                  <span class="iss-row__badge" style="background:#fff4e0;color:#ff9500;">PDS 시장</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 5: 원벤더 트렌드 & 주요 벤더 (2차) -->
+            <div class="iss">
+              <div class="iss-hd" style="background:#1d1d1f;">
+                <span class="iss-hd__tag">2차 교육</span>
+                <span style="font-size:12px;font-weight:700;color:#fff;">원벤더 트렌드 & 벤더 현황</span>
+                <span class="iss-hd__num">5 / 5</span>
+              </div>
+              <div class="iss-title" style="background:#1d1d1f;">중소형은 원벤더, 대형은 멀티벤더</div>
+              <div class="iss-body">
+                <div class="iss-row">
+                  <span class="iss-row__label" style="color:#1a7f47;font-weight:700;">브리지텍</span>
+                  <span class="iss-row__val">농협 수주, 금융권 강세</span>
+                  <span class="iss-row__badge" style="background:#e3f5ec;color:#1a7f47;">막강</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">EICN</span>
+                  <span class="iss-row__val">가성비, 소형 사이트</span>
+                  <span class="iss-row__badge" style="background:#f5f5f7;color:#6e6e73;">가성비</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">어바이어</span>
+                  <span class="iss-row__val">전통 강자, 불확실한 미래</span>
+                  <span class="iss-row__badge" style="background:#fff0f0;color:#e3003a;">주의</span>
+                </div>
+                <div class="iss-row">
+                  <span class="iss-row__label">제네시스</span>
+                  <span class="iss-row__val">클라우드 전환 선도</span>
+                  <span class="iss-row__badge" style="background:#e8f4ff;color:#0071e3;">클라우드</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dots -->
+            <div class="iss-dots">
+              <div class="iss-dot on"></div>
+              <div class="iss-dot"></div>
+              <div class="iss-dot"></div>
+              <div class="iss-dot"></div>
+              <div class="iss-dot"></div>
+            </div>
+          </div>
+          <script>
+            (function() {
+              var slides = document.querySelectorAll('#ipcc-ss .iss');
+              var dots = document.querySelectorAll('#ipcc-ss .iss-dot');
+              var cur = 0;
+              setInterval(function() {
+                slides[cur].classList.remove('on');
+                dots[cur].classList.remove('on');
+                cur = (cur + 1) % slides.length;
+                slides[cur].classList.add('on');
+                dots[cur].classList.add('on');
+              }, 1000);
+            })();
+          </script>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -1091,55 +1616,99 @@
       <div class="section-eyebrow" style="color: #5ac8fa; text-align: center;">AX Vision & Principles</div>
       <h2 class="section-title" style="color: var(--white); text-align: center;">
         AICC Role Play Agent는<br>
-        개인 학습도구 입니다.
+        <span style="color: #5ac8fa;">개인 자가 학습 도구</span>입니다.
       </h2>
-      <p class="section-desc"
-        style="margin-bottom:40px; color: #a1a1a6; text-align: center; margin-left: auto; margin-right: auto; max-width: 800px;">
-        수동적 강의에서 AI 기반 자기주도 학습으로의 혁신.<br>
-        리더의 평가 없이 오직 당신의 성장만을 위해 존재합니다.
-      </p>
-      <div class="problem-grid">
-        <div class="problem-card" style="background: #1c1c1e;">
-          <span class="material-symbols-outlined" style="color: #5ac8fa;">lock</span>
-          <h3 style="color: var(--white);">완전한 프라이버시</h3>
-          <p style="color: #a1a1a6;">사용 이력과 점수는 본인만 열람합니다. 리더에게 데이터를 제공하지 않으며, 영어 연습 앱처럼 혼자 쓰는 도구입니다.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:860px; margin:0 auto 0;">
+
+        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:28px 28px 26px; display:flex; flex-direction:column; gap:12px;">
+          <span class="material-symbols-outlined" style="font-size:28px; color:#5ac8fa;">auto_stories</span>
+          <p style="color:#e0e0e5; font-size:15px; line-height:1.6; letter-spacing:-0.01em;">
+            수동적 강의에서 <strong style="color:#fff;">AI 기반 자기주도 학습</strong>으로의 혁신.
+          </p>
         </div>
-        <div class="problem-card" style="background: #1c1c1e;">
-          <span class="material-symbols-outlined" style="color: #5ac8fa;">psychology</span>
-          <h3 style="color: var(--white);">RAG 기반 자사 기준 답변</h3>
-          <p style="color: #a1a1a6;">ChatGPT와 달리 LG U+의 실제 상품 데이터와 구축 사례를 기반으로 답변하여, 실무 업무에 즉시 활용 가능합니다.</p>
+
+        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:28px 28px 26px; display:flex; flex-direction:column; gap:12px;">
+          <span class="material-symbols-outlined" style="font-size:28px; color:#5ac8fa;">shield</span>
+          <p style="color:#e0e0e5; font-size:15px; line-height:1.6; letter-spacing:-0.01em;">
+            이곳엔 <strong style="color:#fff;">어떠한 시험도, 리더의 평가도 없습니다.</strong>
+          </p>
         </div>
+
+        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:28px 28px 26px; display:flex; flex-direction:column; gap:12px;">
+          <span class="material-symbols-outlined" style="font-size:28px; color:#5ac8fa;">hub</span>
+          <p style="color:#e0e0e5; font-size:15px; line-height:1.6; letter-spacing:-0.01em;">
+            도메인 지식이 낯설 때 언제든 부담 없이 질문할 수 있는 <strong style="color:#5ac8fa;">'우리 팀만의 지식 플랫폼'</strong>.
+          </p>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:28px 28px 26px; display:flex; flex-direction:column; gap:12px;">
+          <span class="material-symbols-outlined" style="font-size:28px; color:#5ac8fa;">trending_up</span>
+          <p style="color:#e0e0e5; font-size:15px; line-height:1.6; letter-spacing:-0.01em;">
+            이 Agent는 오직 <strong style="color:#fff;">눈치 보지 않는 당신의 성장</strong>만을 위해 존재합니다.
+          </p>
+        </div>
+
       </div>
     </div>
   </section>
 
   <!-- ══ Roadmap ══ -->
-  <section class="section fade-in" id="roadmap" style="padding-bottom:100px;">
-    <div class="section-inner">
-      <div class="section-eyebrow" style="text-align: center;">Roadmap</div>
-      <h2 class="section-title" style="text-align: center;">
-        Strategic Growth:<br>
-        A Phased Evolution
+  <section class="section fade-in" id="roadmap" style="padding-bottom:120px;">
+    <div class="section-inner" style="max-width:1100px; margin:0 auto; padding:0 24px;">
+      <div class="section-eyebrow" style="text-align:center;">Roadmap</div>
+      <h2 class="section-title" style="text-align:center;">
+        실전 역량의<br>3단계 진화
       </h2>
+      <p class="rm-subtitle">
+        지난 3개월간 <strong>150회의 실제 고객 미팅</strong>을 토대로 시작했습니다.<br>
+        케이스를 발굴하고, 표준화하고, 팀 전체의 현장 무기로 만들어 갑니다.
+      </p>
 
-      <div class="roadmap-track">
-        <div class="roadmap-card active">
-          <div class="roadmap-stage">Stage 1 — Now</div>
-          <h3>도메인 학습 + 롤플레이</h3>
-          <p>RAG 기반 지식 검색, 퀴즈, 용어 사전, 아키텍처 가이드, AI 고객 롤플레이 시뮬레이션</p>
-          <span class="roadmap-badge">MVP 완료</span>
+      <!-- Timeline -->
+      <div class="rm-timeline">
+
+        <!-- Stage 1 — Active -->
+        <div class="rm-stage active">
+          <div class="rm-card">
+            <div class="rm-stage-label">Stage 1</div>
+            <h3>도메인 학습 +<br>AI 롤플레이</h3>
+            <ul>
+              <li>RAG 기반 지식 검색 · 퀴즈 · 용어 사전</li>
+              <li>150회 실제 미팅 기반 시나리오 구성</li>
+              <li>AI 고객 롤플레이 시뮬레이션</li>
+            </ul>
+            <span class="rm-badge">✦ MVP 완료</span>
+          </div>
         </div>
-        <div class="roadmap-card">
-          <div class="roadmap-stage">Stage 2</div>
-          <h3>고도화 + 사후 복기</h3>
-          <p>시나리오 확장, BP 모범 답변 고도화, 미팅 복기 분석, 개인 성장 추적</p>
+
+        <!-- Stage 2 — Next -->
+        <div class="rm-stage next">
+          <div class="rm-card">
+            <div class="rm-stage-label">Stage 2</div>
+            <h3>케이스 고도화 +<br>월간 업데이트</h3>
+            <ul>
+              <li>월 단위 신규 케이스 발굴 · 축적</li>
+              <li>상황별 · 산업별 데이터 지속 확대</li>
+              <li>BP 모범 답변 고도화 · 미팅 복기 분석</li>
+              <li>개인별 성장 추적</li>
+            </ul>
+          </div>
         </div>
-        <div class="roadmap-card">
-          <div class="roadmap-stage">Stage 3</div>
-          <h3>실전 어드바이저</h3>
-          <p>태블릿/모바일에서 실시간 IPCC/AICC 상품·구축 사례 즉시 조회. 현장 무기로.</p>
+
+        <!-- Stage 3 — Future -->
+        <div class="rm-stage future">
+          <div class="rm-card">
+            <div class="rm-stage-label">Stage 3</div>
+            <h3>실전 역량<br>플랫폼</h3>
+            <ul>
+              <li>케이스 표준화 · 전체 범위 확대</li>
+              <li>다양한 케이스 직접 경험으로 역량 체화</li>
+              <li>태블릿 · 모바일 실시간 현장 어드바이저</li>
+            </ul>
+          </div>
         </div>
-      </div>
+
+      </div><!-- /rm-timeline -->
     </div>
   </section>
 
@@ -1296,6 +1865,248 @@
     }, { threshold: 0.08 });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ── Hero Terminal Animation ──
+    (function () {
+      const SCRIPT = [
+        {
+          side: 'them',
+          name: 'xx증권 고객센터장',
+          avatar: '🏦',
+          html: '<span class="kw">상담어드바이저</span>랑 <span class="kw">콜봇</span>, 둘 다 검토 중인데요. 어떤 걸 먼저 도입하는 게 맞을까요?',
+          delay: 500,
+          typing: 1167,
+        },
+        {
+          side: 'me',
+          name: 'LG U+ AI사업2팀',
+          avatar: '🤝',
+          html: '콜봇은 단순 반복 문의를 자동화하고, 상담어드바이저는 상담원 옆에서 실시간으로 답변을 코칭해줍니다. 지금 가장 큰 pain point가 어느 쪽이에요?',
+          delay: 417,
+          typing: 1500,
+        },
+        {
+          side: 'them',
+          name: 'xx증권 고객센터장',
+          avatar: '🏦',
+          html: '신입 상담원들이 <span class="kw">금융 상품 설명</span>에서 자꾸 막혀요. ARS 넘어온 콜 대응이 너무 오래 걸리고, <span class="kw">AHT</span>가 계속 늘고 있어서요.',
+          delay: 500,
+          typing: 1333,
+        },
+        {
+          side: 'me',
+          name: 'LG U+ AI사업2팀',
+          avatar: '🤝',
+          html: '그럼 <span class="kw">상담어드바이저</span>가 먼저입니다. <span class="kw">STT</span>로 고객 말을 실시간 인식해서 관련 상품정보·FAQ를 상담원 화면에 바로 띄워줘요. 보통 <span class="kw">AHT 30% 단축</span>이 나옵니다.',
+          delay: 333,
+          typing: 1417,
+        },
+        {
+          side: 'them',
+          name: 'xx증권 고객센터장',
+          avatar: '🏦',
+          html: '실제 도입 효과가 어느 정도인지 사례가 있으면 좋겠는데요.',
+          delay: 417,
+          typing: 1000,
+        },
+        {
+          side: 'me',
+          name: 'LG U+ AI사업2팀',
+          avatar: '🤝',
+          html: '유사 규모 증권사 기준 — <span class="kw">AHT 32% 단축</span>, 신입 독립처리 기간 <span class="kw">4주 → 2주</span>, 재문의율 18% 감소. 콜봇 병행 시 전체 콜량 <span class="kw">40% 감소</span>까지 나옵니다. PoC 일정 잡아볼까요? ✓',
+          delay: 333,
+          typing: 1500,
+        },
+      ];
+
+      const body = document.getElementById('terminalBody');
+      if (!body) return;
+
+      let idx = 0;
+
+      function makeRow(item) {
+        const row = document.createElement('div');
+        row.className = `t-row ${item.side === 'me' ? 'me' : 'them'}`;
+        row.innerHTML = `
+          <div class="t-avatar">${item.avatar}</div>
+          <div class="t-bubble-wrap">
+            <span class="t-name">${item.name}</span>
+            <div class="t-bubble">${item.html}</div>
+          </div>`;
+        return row;
+      }
+
+      function makeTypingRow(avatar, side) {
+        const row = document.createElement('div');
+        row.className = `t-typing-row${side === 'me' ? ' me' : ''}`;
+        const avatarStyle = side === 'me'
+          ? 'background:#0071e3;color:#fff'
+          : 'background:#3a3a3c;color:#ebebf5';
+        row.innerHTML = `
+          <div class="t-avatar" style="${avatarStyle}">${avatar}</div>
+          <div class="t-typing"><span></span><span></span><span></span></div>`;
+        return row;
+      }
+
+      function scrollBody() {
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+      }
+
+      function next() {
+        if (idx >= SCRIPT.length) {
+          setTimeout(() => {
+            body.style.transition = 'opacity 0.5s';
+            body.style.opacity = '0';
+            setTimeout(() => {
+              body.innerHTML = '';
+              body.style.opacity = '1';
+              idx = 0;
+              setTimeout(next, 600);
+            }, 500);
+          }, 2000);
+          return;
+        }
+        const item = SCRIPT[idx++];
+
+        setTimeout(() => {
+          const typingRow = makeTypingRow(item.avatar, item.side);
+          body.appendChild(typingRow);
+          scrollBody();
+          requestAnimationFrame(() => typingRow.classList.add('show'));
+
+          setTimeout(() => {
+            typingRow.remove();
+            const row = makeRow(item);
+            body.appendChild(row);
+            scrollBody();
+            requestAnimationFrame(() => row.classList.add('show'));
+            next();
+          }, item.typing);
+        }, item.delay);
+      }
+
+      setTimeout(next, 600);
+    })();
+
+    // ── Feature Terminal Animation (Feature 1 섹션) ──
+    (function () {
+      const SCRIPT = [
+        {
+          side: 'them',
+          name: 'xx증권 고객센터장',
+          avatar: '🏦',
+          html: '<span class="kw">상담어드바이저</span>랑 <span class="kw">콜봇</span>, 둘 다 검토 중인데요. 어떤 걸 먼저 도입하는 게 맞을까요?',
+          delay: 500,
+          typing: 1167,
+        },
+        {
+          side: 'me',
+          name: 'LG U+ AI사업2팀',
+          avatar: '🤝',
+          html: '콜봇은 단순 반복 문의를 자동화하고, 상담어드바이저는 상담원 옆에서 실시간으로 답변을 코칭해줍니다. 지금 가장 큰 pain point가 어느 쪽이에요?',
+          delay: 417,
+          typing: 1500,
+        },
+        {
+          side: 'them',
+          name: 'xx증권 고객센터장',
+          avatar: '🏦',
+          html: '신입 상담원들이 <span class="kw">금융 상품 설명</span>에서 자꾸 막혀요. ARS 넘어온 콜 대응이 너무 오래 걸리고, <span class="kw">AHT</span>가 계속 늘고 있어서요.',
+          delay: 500,
+          typing: 1333,
+        },
+        {
+          side: 'me',
+          name: 'LG U+ AI사업2팀',
+          avatar: '🤝',
+          html: '그럼 <span class="kw">상담어드바이저</span>가 먼저입니다. <span class="kw">STT</span>로 고객 말을 실시간 인식해서 관련 상품정보·FAQ를 상담원 화면에 바로 띄워줘요. 보통 <span class="kw">AHT 30% 단축</span>이 나옵니다.',
+          delay: 333,
+          typing: 1417,
+        },
+        {
+          side: 'them',
+          name: 'xx증권 고객센터장',
+          avatar: '🏦',
+          html: '실제 도입 효과가 어느 정도인지 사례가 있으면 좋겠는데요.',
+          delay: 417,
+          typing: 1000,
+        },
+        {
+          side: 'me',
+          name: 'LG U+ AI사업2팀',
+          avatar: '🤝',
+          html: '유사 규모 증권사 기준 — <span class="kw">AHT 32% 단축</span>, 신입 독립처리 기간 <span class="kw">4주 → 2주</span>, 재문의율 18% 감소. 콜봇 병행 시 전체 콜량 <span class="kw">40% 감소</span>까지 나옵니다. PoC 일정 잡아볼까요? ✓',
+          delay: 333,
+          typing: 1500,
+        },
+      ];
+
+      const body = document.getElementById('featureTerminalBody');
+      if (!body) return;
+
+      let idx = 0;
+
+      function makeRow(item) {
+        const row = document.createElement('div');
+        row.className = `t-row ${item.side === 'me' ? 'me' : 'them'}`;
+        row.innerHTML = `
+          <div class="t-avatar">${item.avatar}</div>
+          <div class="t-bubble-wrap">
+            <span class="t-name">${item.name}</span>
+            <div class="t-bubble">${item.html}</div>
+          </div>`;
+        return row;
+      }
+
+      function makeTypingRow(avatar, side) {
+        const row = document.createElement('div');
+        row.className = `t-typing-row${side === 'me' ? ' me' : ''}`;
+        const avatarStyle = side === 'me'
+          ? 'background:#0071e3;color:#fff'
+          : 'background:#3a3a3c;color:#ebebf5';
+        row.innerHTML = `
+          <div class="t-avatar" style="${avatarStyle}">${avatar}</div>
+          <div class="t-typing"><span></span><span></span><span></span></div>`;
+        return row;
+      }
+
+      function scrollBody() {
+        body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+      }
+
+      function next() {
+        if (idx >= SCRIPT.length) {
+          setTimeout(() => {
+            body.style.transition = 'opacity 0.5s';
+            body.style.opacity = '0';
+            setTimeout(() => {
+              body.innerHTML = '';
+              body.style.opacity = '1';
+              idx = 0;
+              setTimeout(next, 600);
+            }, 500);
+          }, 2000);
+          return;
+        }
+        const item = SCRIPT[idx++];
+        setTimeout(() => {
+          const typingRow = makeTypingRow(item.avatar, item.side);
+          body.appendChild(typingRow);
+          scrollBody();
+          requestAnimationFrame(() => typingRow.classList.add('show'));
+          setTimeout(() => {
+            typingRow.remove();
+            const row = makeRow(item);
+            body.appendChild(row);
+            scrollBody();
+            requestAnimationFrame(() => row.classList.add('show'));
+            next();
+          }, item.typing);
+        }, item.delay);
+      }
+
+      setTimeout(next, 1200);
+    })();
   </script>
 </body>
 

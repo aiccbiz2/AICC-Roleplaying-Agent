@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,110 +7,96 @@
   <link rel="stylesheet" href="/static/shared.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
-    rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#0071e3', 'primary-container': '#0077ed',
-            secondary: '#0071e3', 'secondary-fixed': '#e8f0fe',
-            surface: '#f7fafd', 'surface-container-low': '#f1f4f7',
-            'surface-container-high': '#e5e8eb', 'surface-container-lowest': '#ffffff',
-            'on-surface': '#181c1e', 'on-surface-variant': '#434751',
-            outline: '#737782', 'outline-variant': '#c3c6d2',
-            tertiary: '#002f2c', 'tertiary-fixed': '#72f7ed', error: '#ba1a1a',
-          },
-          fontFamily: { headline: ['Manrope', 'sans-serif'], body: ['Inter', 'sans-serif'] },
-        },
-      },
-    };
-  </script>
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background-color: #fbfbfd;
+      color: #1d1d1f;
+      -webkit-font-smoothing: antialiased;
     }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      font-family: 'Manrope', sans-serif;
-    }
-
     .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
       vertical-align: middle;
     }
 
-    .grade-A {
-      background: #dcfce7;
-      color: #166534;
+    /* ── Apple card ── */
+    .apple-card { background: #fff; border-radius: 20px; }
+
+    /* ── Stat divider ── */
+    .stat-cell { position: relative; }
+    .stat-cell:not(:last-child)::after {
+      content: ''; position: absolute;
+      right: 0; top: 18%; bottom: 18%;
+      width: 1px; background: rgba(0,0,0,0.07);
     }
 
-    .grade-B {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .grade-C {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .grade-D {
-      background: #fecaca;
-      color: #991b1b;
-    }
-
-    .grade-badge {
+    /* ── Apple segment control ── */
+    .seg-ctrl {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.5rem;
-      font-weight: 800;
-      font-size: 0.875rem;
+      background: rgba(0,0,0,0.06);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .seg-btn {
+      padding: 7px 20px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: #3a3a3c;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+      letter-spacing: -0.01em;
+    }
+    .seg-btn.active {
+      background: #fff;
+      color: #1d1d1f;
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
 
-    .chat-bubble-ai {
-      background: #E9E9EB;
-      color: #1a1a1a;
-      border-radius: 1rem 1rem 1rem 0.25rem;
+    /* ── Grade pill ── */
+    .grade-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 10px;
+      font-weight: 700; font-size: 15px; flex-shrink: 0;
     }
+    .grade-A { background: #e8f5ec; color: #1a6b35; }
+    .grade-B { background: #e8f0fd; color: #1a4cad; }
+    .grade-C { background: #fff4e0; color: #b06000; }
+    .grade-D { background: #ffeae8; color: #c0281a; }
+    .grade-none { background: #f0f0f5; color: #8e8e93; }
 
-    .chat-bubble-user {
-      background: #007AFF;
-      color: white;
-      border-radius: 1rem 1rem 0.25rem 1rem;
+    /* ── Session row ── */
+    .session-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #fff;
+      border: 0.5px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+      text-decoration: none; color: inherit;
     }
+    .session-row:hover { background: #f9f9fb; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
 
-    .stat-item {
-      position: relative;
+    /* ── Quiz row ── */
+    .quiz-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      transition: background 0.15s;
     }
+    .quiz-row:hover { background: #f5f5f7; }
 
-    .stat-item:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      height: 40px;
-      width: 1px;
-      background-color: #c3c6d2;
-    }
-
-    /* ── Feedback — Apple Design Language ── */
+    /* ── Feedback — Apple Design Language (modal) ── */
     .fb-hero {
       background: #000; border-radius: 20px;
       padding: 36px 24px 32px; text-align: center;
@@ -158,113 +143,118 @@
 
     .fb-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     @media (max-width: 640px) { .fb-grid-2 { grid-template-columns: 1fr; } }
+
+    /* Chat bubbles */
+    .chat-bubble-ai {
+      background: #e9e9eb; color: #1a1a1a;
+      border-radius: 1rem 1rem 1rem 0.25rem;
+    }
+    .chat-bubble-user {
+      background: #007aff; color: white;
+      border-radius: 1rem 1rem 0.25rem 1rem;
+    }
+
+    /* Fade in */
+    @keyframes appleIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ai-0 { animation: appleIn 0.45s ease both; }
+    .ai-1 { animation: appleIn 0.45s 0.07s ease both; }
+    .ai-2 { animation: appleIn 0.45s 0.14s ease both; }
+    .ai-3 { animation: appleIn 0.45s 0.21s ease both; }
   </style>
 </head>
 
-<body class="min-h-screen bg-surface">
+<body class="min-h-screen">
   <script src="/static/shared.js"></script>
 
-  <main class="app-main p-6 md:p-8">
-    <div class="max-w-[1100px] mx-auto">
+  <main class="app-main" style="padding: 40px 40px 60px;">
+    <div style="max-width: 900px; margin: 0 auto;">
 
-      <!-- Dashboard Header & Stats -->
-      <div class="mb-8">
-        <div class="flex items-center gap-3 mb-4">
-          <h2 class="text-3xl font-extrabold text-on-surface">종합 대시보드 및 이력</h2>
-          <span class="bg-secondary-fixed px-3 py-1 rounded-full text-xs font-bold text-secondary">Stage 1 MVP</span>
-        </div>
+      <!-- ── Hero ── -->
+      <section class="ai-0" style="margin-bottom: 32px;">
+        <h1 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;
+                   font-size:clamp(1.75rem,3.5vw,2.5rem);font-weight:700;letter-spacing:-0.04em;
+                   color:#1d1d1f;line-height:1.1;margin:0 0 8px;">나의 기록</h1>
+        <p style="font-size:15px;color:#6e6e73;margin:0;">롤플레이와 퀴즈 이력을 돌아보세요.</p>
+      </section>
 
-        <!-- Progress Card (from Dashboard) -->
-        <section class="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-outline-variant/20 mb-10">
-          <div class="flex items-center gap-2 mb-6">
-            <span class="material-symbols-outlined text-primary">trending_up</span>
-            <h3 class="text-lg font-bold text-on-surface">주간 학습 현황</h3>
+      <!-- ── Stats ── -->
+      <section class="apple-card ai-1" style="margin-bottom: 20px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);">
+          <div class="stat-cell" style="padding:28px 20px;text-align:center;">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:-0.04em;color:#1d1d1f;margin:0 0 5px;" id="stat-roleplay">0<span style="font-size:1rem;font-weight:500;color:#86868b;">회</span></p>
+            <p style="font-size:13px;color:#86868b;margin:0;">롤플레이</p>
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-0">
-            <div class="stat-item text-center px-4">
-              <p class="text-sm text-on-surface-variant mb-2">롤플레이 완료</p>
-              <p class="text-2xl font-black text-primary" id="stat-roleplay">0<span class="text-base font-bold">회</span>
-              </p>
-            </div>
-            <div class="stat-item text-center px-4">
-              <p class="text-sm text-on-surface-variant mb-2">퀴즈 정답률</p>
-              <p class="text-2xl font-black text-primary" id="stat-quiz">0<span class="text-base font-bold">%</span></p>
-            </div>
-            <div class="stat-item text-center px-4">
-              <p class="text-sm text-on-surface-variant mb-2">학습 용어</p>
-              <p class="text-2xl font-black text-primary" id="stat-terms">0<span class="text-base font-bold">개</span>
-              </p>
-            </div>
-            <div class="stat-item text-center px-4">
-              <p class="text-sm text-on-surface-variant mb-2">연속 학습일</p>
-              <p class="text-2xl font-black text-primary" id="stat-streak">0<span class="text-base font-bold">일</span>
-              </p>
-            </div>
+          <div class="stat-cell" style="padding:28px 20px;text-align:center;">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:-0.04em;color:#1d1d1f;margin:0 0 5px;" id="stat-quiz">0<span style="font-size:1rem;font-weight:500;color:#86868b;">%</span></p>
+            <p style="font-size:13px;color:#86868b;margin:0;">퀴즈 정답률</p>
           </div>
-        </section>
-      </div>
-
-      <!-- Tabs -->
-      <div class="flex gap-2 mb-6">
-        <button onclick="showTab('roleplay')" id="tab-roleplay"
-          class="tab-btn active px-5 py-2 rounded-full text-sm font-semibold transition-all">롤플레이 이력</button>
-        <button onclick="showTab('quiz')" id="tab-quiz"
-          class="tab-btn px-5 py-2 rounded-full text-sm font-semibold transition-all">퀴즈 이력</button>
-      </div>
-
-      <!-- Roleplay Tab -->
-      <div id="panel-roleplay">
-        <!-- Grade Chart -->
-        <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 shadow-sm mb-6">
-          <h3 class="font-bold text-on-surface mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">trending_up</span>
-            등급 추이
-          </h3>
-          <div style="height:200px;"><canvas id="gradeChart"></canvas></div>
-          <p id="grade-empty" class="hidden text-center text-outline text-sm py-8">아직 롤플레이 기록이 없습니다.</p>
-        </div>
-
-        <!-- Session List -->
-        <div id="roleplay-list" class="space-y-3">
-          <p class="text-center text-outline text-sm py-8">로딩 중...</p>
-        </div>
-      </div>
-
-      <!-- Quiz Tab -->
-      <div id="panel-quiz" class="hidden">
-        <!-- Category Summary -->
-        <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 shadow-sm mb-6">
-          <h3 class="font-bold text-on-surface mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">bar_chart</span>
-            카테고리별 정답률
-          </h3>
-          <div style="height:250px;"><canvas id="quizChart"></canvas></div>
-          <p id="quiz-chart-empty" class="hidden text-center text-outline text-sm py-8">아직 퀴즈 기록이 없습니다.</p>
-        </div>
-
-        <!-- Quiz Records -->
-        <div id="quiz-list" class="space-y-2">
-          <p class="text-center text-outline text-sm py-8">로딩 중...</p>
-        </div>
-      </div>
-
-      <!-- Roleplay Detail Modal -->
-      <div id="detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
-        style="background:rgba(0,0,0,0.5);">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant/20">
-            <h3 id="modal-title" class="font-bold text-on-surface">세션 상세</h3>
-            <button onclick="closeModal()"
-              class="w-8 h-8 rounded-full hover:bg-surface-container-high flex items-center justify-center">
-              <span class="material-symbols-outlined">close</span>
-            </button>
+          <div class="stat-cell" style="padding:28px 20px;text-align:center;">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:-0.04em;color:#1d1d1f;margin:0 0 5px;" id="stat-terms">0<span style="font-size:1rem;font-weight:500;color:#86868b;">개</span></p>
+            <p style="font-size:13px;color:#86868b;margin:0;">학습한 용어</p>
           </div>
-          <div id="modal-body" class="flex-1 overflow-y-auto p-6"></div>
+          <div class="stat-cell" style="padding:28px 20px;text-align:center;">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:-0.04em;color:#1d1d1f;margin:0 0 5px;" id="stat-streak">0<span style="font-size:1rem;font-weight:500;color:#86868b;">일</span></p>
+            <p style="font-size:13px;color:#86868b;margin:0;">연속 학습</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Segment control ── -->
+      <div class="ai-2" style="margin-bottom:20px;">
+        <div class="seg-ctrl">
+          <button class="seg-btn active" id="tab-roleplay" onclick="showTab('roleplay')">롤플레이 이력</button>
+          <button class="seg-btn" id="tab-quiz" onclick="showTab('quiz')">퀴즈 이력</button>
+        </div>
+      </div>
+
+      <!-- ── Roleplay Tab ── -->
+      <div id="panel-roleplay" class="ai-3">
+        <!-- Grade chart -->
+        <div class="apple-card" style="padding:24px 28px;margin-bottom:16px;">
+          <p style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#86868b;margin:0 0 16px;">등급 추이</p>
+          <div style="height:180px;"><canvas id="gradeChart"></canvas></div>
+          <p id="grade-empty" class="hidden" style="text-align:center;font-size:14px;color:#86868b;padding:32px 0 0;">아직 롤플레이 기록이 없습니다.</p>
+        </div>
+
+        <!-- Session list -->
+        <div id="roleplay-list" style="display:flex;flex-direction:column;gap:8px;">
+          <p style="text-align:center;font-size:14px;color:#86868b;padding:32px 0;">로딩 중...</p>
+        </div>
+      </div>
+
+      <!-- ── Quiz Tab ── -->
+      <div id="panel-quiz" class="hidden ai-3">
+        <!-- Category chart -->
+        <div class="apple-card" style="padding:24px 28px;margin-bottom:16px;">
+          <p style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#86868b;margin:0 0 16px;">카테고리별 정답률</p>
+          <div style="height:220px;"><canvas id="quizChart"></canvas></div>
+          <p id="quiz-chart-empty" class="hidden" style="text-align:center;font-size:14px;color:#86868b;padding:32px 0 0;">아직 퀴즈 기록이 없습니다.</p>
+        </div>
+        <!-- Quiz records -->
+        <div id="quiz-list">
+          <p style="text-align:center;font-size:14px;color:#86868b;padding:32px 0;">로딩 중...</p>
         </div>
       </div>
 
     </div>
   </main>
+
+  <!-- ── Detail Modal ── -->
+  <div id="detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+    style="background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);">
+    <div style="background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,0.2);width:100%;max-width:700px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid rgba(0,0,0,0.07);">
+        <p id="modal-title" style="font-size:16px;font-weight:600;color:#1d1d1f;margin:0;letter-spacing:-0.02em;"></p>
+        <button onclick="closeModal()" style="width:30px;height:30px;border-radius:50%;border:none;background:#f5f5f7;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <span class="material-symbols-outlined" style="font-size:16px;color:#3a3a3c;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;">close</span>
+        </button>
+      </div>
+      <div id="modal-body" style="flex:1;overflow-y:auto;padding:20px 24px;"></div>
+    </div>
+  </div>
 
   <script>
     let roleplaySessions = [];
@@ -276,13 +266,8 @@
     function showTab(tab) {
       document.getElementById('panel-roleplay').classList.toggle('hidden', tab !== 'roleplay');
       document.getElementById('panel-quiz').classList.toggle('hidden', tab !== 'quiz');
-      document.querySelectorAll('.tab-btn').forEach(b => {
+      document.querySelectorAll('.seg-btn').forEach(b => {
         b.classList.toggle('active', b.id === 'tab-' + tab);
-        if (b.id === 'tab-' + tab) {
-          b.style.background = '#0071e3'; b.style.color = 'white';
-        } else {
-          b.style.background = '#f1f4f7'; b.style.color = '#434751';
-        }
       });
     }
 
@@ -305,14 +290,13 @@
     // ── Render Roleplay ──
     function renderRoleplay() {
       const container = document.getElementById('roleplay-list');
-
       if (!roleplaySessions.length) {
-        container.innerHTML = '<p class="text-center text-outline text-sm py-8">아직 롤플레이 기록이 없습니다. 시뮬레이션을 시작해보세요!</p>';
+        container.innerHTML = '<p style="text-align:center;font-size:14px;color:#86868b;padding:40px 0;">아직 롤플레이 기록이 없습니다. 시뮬레이션을 시작해보세요!</p>';
         document.getElementById('grade-empty').classList.remove('hidden');
         return;
       }
 
-      // Grade chart (등급 있는 세션만)
+      // Grade chart
       const reversed = [...roleplaySessions].filter(s => s.overall_grade).reverse();
       const labels = reversed.map((s, i) => '#' + (i + 1));
       const gradeMap = { A: 4, B: 3, C: 2, D: 1 };
@@ -325,45 +309,46 @@
         data: {
           labels,
           datasets: [{
-            label: '등급',
-            data,
+            label: '등급', data,
             borderColor: '#0071e3',
-            backgroundColor: 'rgba(0,113,227,0.1)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 5,
-            pointBackgroundColor: '#0071e3',
+            backgroundColor: 'rgba(0,113,227,0.07)',
+            fill: true, tension: 0.4,
+            pointRadius: 4, pointBackgroundColor: '#0071e3',
+            borderWidth: 2,
           }],
         },
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
-            y: { min: 0, max: 5, ticks: { stepSize: 1, callback: v => ['', 'D', 'C', 'B', 'A', ''][v] || '' } },
+            y: { min: 0, max: 5, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { stepSize: 1, callback: v => ['', 'D', 'C', 'B', 'A', ''][v] || '', font: { size: 11 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
           },
           plugins: { legend: { display: false } },
         },
       });
 
-      // Session cards
+      // Session rows
       container.innerHTML = roleplaySessions.map(s => {
         const grade = s.overall_grade || null;
-        const isIncomplete = !grade;
-        const gradeBadgeClass = isIncomplete ? 'bg-outline-variant/20 text-outline' : `grade-${grade}`;
-        const gradeText = isIncomplete ? '-' : grade;
-        const statusLabel = isIncomplete
-          ? ' <span class="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded-full">진행 중</span>'
-          : '';
-        const date = s.ended_at ? new Date(s.ended_at).toLocaleDateString('ko-KR') : '-';
+        const gradeClass = grade ? `grade-${grade}` : 'grade-none';
+        const gradeText = grade || '—';
+        const inProgress = !grade;
+        const date = s.ended_at ? new Date(s.ended_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) : '-';
         const dur = s.duration_seconds ? Math.round(s.duration_seconds / 60) + '분' : '-';
+        const progressBadge = inProgress
+          ? '<span style="font-size:10px;font-weight:600;color:#b45309;background:#fef3c7;padding:2px 8px;border-radius:980px;margin-left:6px;">진행 중</span>'
+          : '';
         return `
-          <div onclick="openDetail(${s.id})" class="bg-surface-container-lowest rounded-xl p-4 border ${isIncomplete ? 'border-amber-200/50' : 'border-outline-variant/20'} hover:border-primary/30 hover:shadow-sm cursor-pointer transition-all flex items-center gap-4">
-            <div class="grade-badge ${gradeBadgeClass}">${gradeText}</div>
-            <div class="flex-1 min-w-0">
-              <p class="font-semibold text-sm text-on-surface truncate">${escapeHTML(s.scenario_title)}${statusLabel}</p>
-              <p class="text-xs text-on-surface-variant">${escapeHTML(s.persona_level)} | ${s.turn_count || 0}턴 | ${dur}</p>
+          <div onclick="openDetail(${s.id})" class="session-row">
+            <div class="grade-pill ${gradeClass}">${gradeText}</div>
+            <div style="flex:1;min-width:0;">
+              <p style="font-size:14px;font-weight:500;color:#1d1d1f;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${escapeHTML(s.scenario_title)}${progressBadge}
+              </p>
+              <p style="font-size:12px;color:#86868b;margin:0;">${escapeHTML(s.persona_level)} &middot; ${s.turn_count || 0}턴 &middot; ${dur}</p>
             </div>
-            <div class="text-xs text-outline">${date}</div>
-            <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+            <span style="font-size:12px;color:#aeaeb2;white-space:nowrap;">${date}</span>
+            <span class="material-symbols-outlined" style="font-size:16px;color:#c7c7cc;">chevron_right</span>
           </div>`;
       }).join('');
     }
@@ -371,9 +356,8 @@
     // ── Render Quiz ──
     function renderQuiz() {
       const container = document.getElementById('quiz-list');
-
       if (!quizRecords.length) {
-        container.innerHTML = '<p class="text-center text-outline text-sm py-8">아직 퀴즈 기록이 없습니다. 퀴즈를 풀어보세요!</p>';
+        container.innerHTML = '<p style="text-align:center;font-size:14px;color:#86868b;padding:40px 0;">아직 퀴즈 기록이 없습니다. 퀴즈를 풀어보세요!</p>';
         document.getElementById('quiz-chart-empty').classList.remove('hidden');
         return;
       }
@@ -385,69 +369,62 @@
         catStats[r.category].total++;
         if (r.is_correct) catStats[r.category].correct++;
       });
-
       const cats = Object.keys(catStats);
       const accs = cats.map(c => Math.round(100 * catStats[c].correct / catStats[c].total));
 
       if (quizChartInstance) quizChartInstance.destroy();
-      const ctx = document.getElementById('quizChart').getContext('2d');
-      quizChartInstance = new Chart(ctx, {
+      const ctx2 = document.getElementById('quizChart').getContext('2d');
+      quizChartInstance = new Chart(ctx2, {
         type: 'bar',
         data: {
-          labels: cats.map(c => c.length > 12 ? c.substring(0, 12) + '...' : c),
-          datasets: [{
-            label: '정답률 (%)',
-            data: accs,
-            backgroundColor: 'rgba(0,113,227,0.7)',
-            borderRadius: 6,
-          }],
+          labels: cats.map(c => c.length > 10 ? c.substring(0, 10) + '…' : c),
+          datasets: [{ label: '정답률 (%)', data: accs, backgroundColor: 'rgba(0,113,227,0.75)', borderRadius: 6, borderSkipped: false }],
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } },
+          scales: {
+            y: { min: 0, max: 100, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: v => v + '%', font: { size: 11 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          },
           plugins: { legend: { display: false } },
         },
       });
 
-      // Summary cards
+      // Summary strip
       const totalCorrect = quizRecords.filter(r => r.is_correct).length;
       const totalPct = Math.round(100 * totalCorrect / quizRecords.length);
 
       container.innerHTML = `
-        <div class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/20 mb-4">
-          <div class="flex items-center gap-4">
-            <div class="text-center">
-              <p class="text-2xl font-extrabold text-primary">${totalPct}%</p>
-              <p class="text-xs text-on-surface-variant">전체 정답률</p>
-            </div>
-            <div class="h-10 w-px bg-outline-variant/30"></div>
-            <div class="text-center">
-              <p class="text-2xl font-extrabold text-primary">${quizRecords.length}</p>
-              <p class="text-xs text-on-surface-variant">총 문제 수</p>
-            </div>
-            <div class="h-10 w-px bg-outline-variant/30"></div>
-            <div class="text-center">
-              <p class="text-2xl font-extrabold text-primary">${totalCorrect}</p>
-              <p class="text-xs text-on-surface-variant">정답</p>
-            </div>
+        <div class="apple-card" style="display:flex;gap:0;margin-bottom:16px;overflow:hidden;">
+          <div style="flex:1;padding:20px;text-align:center;border-right:1px solid rgba(0,0,0,0.07);">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0 0 2px;">${totalPct}<span style="font-size:1rem;font-weight:600;color:#86868b;">%</span></p>
+            <p style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0;">전체 정답률</p>
+          </div>
+          <div style="flex:1;padding:20px;text-align:center;border-right:1px solid rgba(0,0,0,0.07);">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0 0 2px;">${quizRecords.length}</p>
+            <p style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0;">총 문제</p>
+          </div>
+          <div style="flex:1;padding:20px;text-align:center;">
+            <p style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0 0 2px;">${totalCorrect}</p>
+            <p style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:#86868b;margin:0;">정답</p>
           </div>
         </div>
-        <h4 class="font-semibold text-sm text-on-surface mb-2">최근 기록</h4>
-        ${quizRecords.slice(0, 50).map(r => {
-        const icon = r.is_correct ? 'check_circle' : 'cancel';
-        const color = r.is_correct ? 'text-green-600' : 'text-red-500';
-        const date = r.answered_at ? new Date(r.answered_at).toLocaleDateString('ko-KR') : '';
-        return `
-            <div class="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-surface-container-low transition-colors">
-              <span class="material-symbols-outlined ${color}" style="font-size:18px;">${icon}</span>
-              <div class="flex-1 min-w-0">
-                <p class="text-xs text-on-surface truncate">${escapeHTML(r.question)}</p>
-                <p class="text-[10px] text-outline">${escapeHTML(r.category)} | ${escapeHTML(r.difficulty)} | 내 답: ${escapeHTML(r.user_answer)}</p>
-              </div>
-              <span class="text-[10px] text-outline">${date}</span>
-            </div>`;
-      }).join('')}
-      `;
+        <div class="apple-card" style="padding:8px 12px;">
+          <p style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#86868b;padding:10px 4px 8px;margin:0;">최근 기록</p>
+          ${quizRecords.slice(0, 50).map(r => {
+            const ok = r.is_correct;
+            const date = r.answered_at ? new Date(r.answered_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) : '';
+            return `
+              <div class="quiz-row">
+                <span class="material-symbols-outlined" style="font-size:17px;color:${ok ? '#30d158' : '#ff3b30'};flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;">${ok ? 'check_circle' : 'cancel'}</span>
+                <div style="flex:1;min-width:0;">
+                  <p style="font-size:13px;color:#1d1d1f;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(r.question)}</p>
+                  <p style="font-size:11px;color:#aeaeb2;margin:0;">${escapeHTML(r.category)} &middot; ${escapeHTML(r.difficulty)} &middot; 내 답: ${escapeHTML(r.user_answer)}</p>
+                </div>
+                <span style="font-size:11px;color:#c7c7cc;white-space:nowrap;">${date}</span>
+              </div>`;
+          }).join('')}
+        </div>`;
     }
 
     // ── Detail Modal ──
@@ -455,23 +432,23 @@
       const modal = document.getElementById('detail-modal');
       const body = document.getElementById('modal-body');
       modal.classList.remove('hidden');
-      body.innerHTML = '<p class="text-center text-outline py-8">로딩 중...</p>';
+      body.innerHTML = '<p style="text-align:center;color:#86868b;padding:40px 0;font-size:14px;">로딩 중...</p>';
 
       try {
         const res = await authFetch('/api/history/roleplay/' + sessionId);
         const d = await res.json();
-
         document.getElementById('modal-title').textContent = d.scenario_title;
+
         const dur = d.duration_seconds ? Math.round(d.duration_seconds / 60) + '분' : '-';
         const gradeLabels = { A: '우수 - 훌륭한 대응이었습니다!', B: '양호 - 좋은 수준이에요.', C: '보통 - 개선할 부분이 있어요.', D: '미흡 - 더 연습이 필요해요.' };
 
         const convHtml = (d.conversation || []).map(msg => {
           const isAI = msg.role === 'assistant';
           return `
-            <div class="flex ${isAI ? 'justify-start' : 'justify-end'}">
-              <div class="${isAI ? 'chat-bubble-ai' : 'chat-bubble-user'} px-4 py-3 max-w-[80%]">
-                <p style="font-size:10px;font-weight:600;margin-bottom:4px;${isAI ? 'color:#86868b;' : 'color:rgba(255,255,255,0.7);'}">${isAI ? 'AI 고객' : '나 (사업담당)'}</p>
-                <p style="font-size:13px;line-height:1.6;">${escapeHTML(msg.content)}</p>
+            <div style="display:flex;justify-content:${isAI ? 'flex-start' : 'flex-end'};">
+              <div class="${isAI ? 'chat-bubble-ai' : 'chat-bubble-user'}" style="padding:10px 14px;max-width:80%;">
+                <p style="font-size:10px;font-weight:600;margin:0 0 4px;${isAI ? 'color:#86868b;' : 'color:rgba(255,255,255,0.7);'}">${isAI ? 'AI 고객' : '나 (사업담당)'}</p>
+                <p style="font-size:13px;line-height:1.6;margin:0;">${escapeHTML(msg.content)}</p>
               </div>
             </div>`;
         }).join('');
@@ -482,11 +459,9 @@
           const termCheck = fb.terminology_check || {};
           const ringColors = { A: '#30d158', B: '#0071e3', C: '#ff9f0a', D: '#ff3b30' };
           const ringPercent = { A: 0.95, B: 0.75, C: 0.50, D: 0.25 };
-          const circumference = 2 * Math.PI * 58; // 364.42
+          const circumference = 2 * Math.PI * 58;
           const pct = ringPercent[grade] || 0.25;
           const ringColor = ringColors[grade] || '#86868b';
-
-          // Term stats
           const correctTerms = termCheck.correctly_used || [];
           const missedTerms = termCheck.missed_or_wrong || [];
           const totalTerms = correctTerms.length + missedTerms.length;
@@ -519,10 +494,7 @@
             ${totalTerms > 0 ? `
             <div class="fb-card">
               <h3 class="fb-card__title">도메인 용어 분석</h3>
-              <div class="fb-term-stats">
-                <span>정확 <strong>${correctTerms.length}</strong></span>
-                <span>미사용 <strong>${missedTerms.length}</strong></span>
-              </div>
+              <div class="fb-term-stats"><span>정확 <strong>${correctTerms.length}</strong></span><span>미사용 <strong>${missedTerms.length}</strong></span></div>
               <div class="fb-term-bar"><div class="fb-term-bar__fill" id="modal-term-bar" style="width:0%"></div></div>
               <div class="fb-tags">
                 ${correctTerms.map(t => '<span class="fb-tag">' + escapeHTML(t) + '</span>').join('')}
@@ -561,33 +533,26 @@
 
             <div class="fb-card" style="padding:0;overflow:hidden;margin-top:4px;">
               <button onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('.chevron-icon').style.transform=this.nextElementSibling.classList.contains('hidden')?'':'rotate(180deg)'"
-                style="width:100%;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:transparent;border:none;">
+                style="width:100%;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:transparent;border:none;font-family:inherit;">
                 <span class="fb-card__title" style="margin-bottom:0;">전체 대화 기록</span>
                 <span class="material-symbols-outlined chevron-icon" style="font-size:20px;color:#86868b;transition:transform 0.2s;">expand_more</span>
               </button>
               <div class="hidden" style="padding:0 24px 20px;border-top:1px solid rgba(0,0,0,0.04);">
-                <div class="space-y-3" style="padding-top:14px;">
-                  ${convHtml}
-                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;padding-top:14px;">${convHtml}</div>
               </div>
-            </div>
-          `;
+            </div>`;
 
-          // Animate ring
           requestAnimationFrame(() => {
             const ringEl = document.getElementById('modal-ring-fill');
             if (ringEl) ringEl.style.strokeDashoffset = circumference * (1 - pct);
           });
-          // Animate term bar
           requestAnimationFrame(() => {
             const barEl = document.getElementById('modal-term-bar');
             if (barEl) barEl.style.width = termPct + '%';
           });
         } else {
           body.innerHTML = `
-            <div class="space-y-3 mb-6">
-              ${convHtml}
-            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">${convHtml}</div>
             <div style="text-align:center;padding:24px 0;border-top:1px solid rgba(0,0,0,0.06);">
               <p style="font-size:14px;color:#86868b;margin-bottom:16px;">이 세션에 대한 피드백이 아직 없습니다.</p>
               <button id="btn-request-feedback"
@@ -595,95 +560,67 @@
                 data-scenario-title="${escapeHTML(d.scenario_title)}"
                 data-persona-level="${escapeHTML(d.persona_level)}"
                 onclick="requestFeedbackFromBtn(this)"
-                style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#1d1d1f;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">
-                <span class="material-symbols-outlined" style="font-size:18px;">analytics</span>
+                style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#1d1d1f;color:#fff;border:none;border-radius:980px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
+                <span class="material-symbols-outlined" style="font-size:17px;">analytics</span>
                 피드백 받기
               </button>
-            </div>
-          `;
+            </div>`;
         }
       } catch (e) {
-        body.innerHTML = '<p class="text-center text-error text-sm py-8">데이터를 불러올 수 없습니다.</p>';
+        body.innerHTML = '<p style="text-align:center;color:#ff3b30;font-size:14px;padding:40px 0;">데이터를 불러올 수 없습니다.</p>';
       }
     }
 
     function requestFeedbackFromBtn(btn) {
-      const sessionId = parseInt(btn.dataset.sessionId);
-      const scenarioTitle = btn.dataset.scenarioTitle;
-      const personaLevel = btn.dataset.personaLevel;
-      requestFeedback(sessionId, scenarioTitle, personaLevel);
+      requestFeedback(parseInt(btn.dataset.sessionId), btn.dataset.scenarioTitle, btn.dataset.personaLevel);
     }
 
     async function requestFeedback(sessionId, scenarioTitle, personaLevel) {
       const btn = document.getElementById('btn-request-feedback');
       if (!btn) return;
-
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span><span>피드백 생성 중... (약 1~2분)</span>';
-
+      btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></span><span>피드백 생성 중...</span>';
       try {
-        // 1. 세션 대화 조회
         const detailRes = await authFetch('/api/history/roleplay/' + sessionId);
         const detail = await detailRes.json();
-
-        // 2. LLM 피드백 요청
         const fbRes = await authFetch('/api/roleplay/feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            history: detail.conversation,
-            scenario_title: scenarioTitle,
-            persona_level: personaLevel,
-          }),
+          body: JSON.stringify({ history: detail.conversation, scenario_title: scenarioTitle, persona_level: personaLevel }),
         });
         const feedback = await fbRes.json();
-
-        // 3. PATCH로 세션 업데이트
         await authFetch('/api/history/roleplay/' + sessionId, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            feedback: feedback,
-            overall_grade: feedback.overall_score || null,
-          }),
+          body: JSON.stringify({ feedback, overall_grade: feedback.overall_score || null }),
         });
-
-        // 4. 목록 및 모달 새로고침
         await loadData();
         openDetail(sessionId);
       } catch (err) {
-        console.error('Feedback request failed:', err);
         btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">error</span> 피드백 생성 실패 — 다시 시도';
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:17px;">error</span> 피드백 생성 실패 — 다시 시도';
       }
     }
 
-    function closeModal() {
-      document.getElementById('detail-modal').classList.add('hidden');
-    }
-    document.getElementById('detail-modal').addEventListener('click', function (e) {
-      if (e.target === this) closeModal();
-    });
+    function closeModal() { document.getElementById('detail-modal').classList.add('hidden'); }
+    document.getElementById('detail-modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 
-    // ── Load Stats (from Dashboard) ──
     async function loadStats() {
       try {
         const res = await authFetch('/api/my-stats');
         if (res.ok) {
           const d = await res.json();
-          document.getElementById('stat-roleplay').innerHTML = `${d.roleplay_count}<span class="text-base font-bold">회</span>`;
-          document.getElementById('stat-quiz').innerHTML = `${d.quiz_accuracy}<span class="text-base font-bold">%</span>`;
-          document.getElementById('stat-terms').innerHTML = `${d.terms_learned}<span class="text-base font-bold">개</span>`;
-          document.getElementById('stat-streak').innerHTML = `${d.streak_days}<span class="text-base font-bold">일</span>`;
+          document.getElementById('stat-roleplay').innerHTML = `${d.roleplay_count}<span style="font-size:0.95rem;font-weight:600;color:#86868b;">회</span>`;
+          document.getElementById('stat-quiz').innerHTML     = `${d.quiz_accuracy}<span style="font-size:0.95rem;font-weight:600;color:#86868b;">%</span>`;
+          document.getElementById('stat-terms').innerHTML    = `${d.terms_learned}<span style="font-size:0.95rem;font-weight:600;color:#86868b;">개</span>`;
+          document.getElementById('stat-streak').innerHTML   = `${d.streak_days}<span style="font-size:0.95rem;font-weight:600;color:#86868b;">일</span>`;
         }
-      } catch (e) { /* ignore */ }
+      } catch (e) {}
     }
 
-    // ── Init ──
     showTab('roleplay');
     loadData();
     loadStats();
   </script>
 </body>
-
 </html>

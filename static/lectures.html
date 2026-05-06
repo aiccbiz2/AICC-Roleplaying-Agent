@@ -173,14 +173,14 @@
       gap: 4px;
       font-size: 14px;
       font-weight: 500;
-      color: #0071e3;
+      color: #1d1d1f;
       cursor: pointer;
       margin-bottom: 24px;
       transition: color 0.2s;
     }
 
     .detail-back:hover {
-      color: #0077ed;
+      color: #434751;
     }
 
     .detail-back .material-symbols-outlined {
@@ -380,7 +380,7 @@
       <!-- ══ List View ══ -->
       <div class="list-view" id="listView">
         <div class="mb-8">
-          <h1 class="font-headline text-3xl font-extrabold text-primary mb-2">Lecture Materials</h1>
+          <h1 style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-0.03em;color:#1d1d1f;margin:0 0 4px;">Lecture Materials</h1>
           <p class="text-secondary text-base">IPCC/AICC 실무 교육자료를 확인하세요.</p>
         </div>
 
@@ -573,9 +573,12 @@
   .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
 
   /* Pipeline */
-  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
-  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
-  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: none; }
+  .ex-apple .ex-step { background: rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 24px; }
+  .ex-apple .ex-section--white .ex-step { background: #f5f5f7; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: #86868b; text-transform: uppercase; margin: 0 0 14px; padding: 4px 12px; background: rgba(255,255,255,0.1); border-radius: 980px; }
+  .ex-apple .ex-section--white .ex-step__num { background: rgba(0,0,0,0.06); color: #6e6e73; }
 
   /* Q&A */
   .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
@@ -1927,9 +1930,12 @@
   .ex-apple .ex-section--dark table.ex-table .ex-tag--primary { background: #f5f5f7; color: #1d1d1f; }
 
   /* Pipeline */
-  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
-  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
-  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: none; }
+  .ex-apple .ex-step { background: rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 24px; }
+  .ex-apple .ex-section--white .ex-step { background: #f5f5f7; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: #86868b; text-transform: uppercase; margin: 0 0 14px; padding: 4px 12px; background: rgba(255,255,255,0.1); border-radius: 980px; }
+  .ex-apple .ex-section--white .ex-step__num { background: rgba(0,0,0,0.06); color: #6e6e73; }
 
   /* Timeline (history) */
   .ex-apple .ex-timeline { position: relative; padding-left: 32px; margin: 40px 0; max-width: 760px; }
@@ -2335,9 +2341,12 @@
   .ex-apple table.ex-table .ex-tag--primary { background: #1d1d1f; color: #fff; }
 
   /* Pipeline */
-  .ex-apple .ex-pipeline { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px; align-items: stretch; margin: 32px 0; }
-  .ex-apple .ex-pipeline__arrow { display: flex; align-items: center; justify-content: center; color: #86868b; font-size: 24px; font-weight: 300; }
-  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #6e6e73; text-transform: uppercase; margin: 0 0 12px; }
+  .ex-apple .ex-pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; margin: 32px 0; }
+  .ex-apple .ex-pipeline__arrow { display: none; }
+  .ex-apple .ex-step { background: rgba(255,255,255,0.06); border-radius: 16px; padding: 28px 24px; }
+  .ex-apple .ex-section--white .ex-step { background: #f5f5f7; }
+  .ex-apple .ex-step__num { display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: #86868b; text-transform: uppercase; margin: 0 0 14px; padding: 4px 12px; background: rgba(255,255,255,0.1); border-radius: 980px; }
+  .ex-apple .ex-section--white .ex-step__num { background: rgba(0,0,0,0.06); color: #6e6e73; }
 
   /* Q&A */
   .ex-apple .ex-qa { border-bottom: 1px solid #d2d2d7; padding: 28px 0; max-width: 760px; }
