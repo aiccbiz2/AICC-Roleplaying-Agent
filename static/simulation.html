@@ -2095,9 +2095,15 @@
       showPhase('feedback');
       document.getElementById('feedback-loading').classList.remove('hidden');
       document.getElementById('feedback-content').classList.add('hidden');
+      // 피드백 phase로 전환 직후 페이지 최상단으로 이동 — 로딩 스피너가 보이도록
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
       const scen = scenarios[selectedScenario];
       const pers = personas[selectedPersona];
+
+      // 180초 타임아웃 — LLM 응답이 늦어도 무한 대기 방지
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 180000);
 
       try {
         const res = await authFetch('/api/roleplay/feedback', {
@@ -2111,7 +2117,9 @@
             mode: currentMode,
             answer_history: currentMode === 'multiple_choice' ? answerHistory : null,
           }),
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
         feedback = await res.json();
         renderFeedback(scen, pers);
 
@@ -2160,13 +2168,19 @@
         clearLocalStorageBackup();
         savedSessionId = null;
       } catch (err) {
+        clearTimeout(timeoutId);
         console.error('Feedback failed:', err);
+        const isTimeout = err.name === 'AbortError';
+        const msg = isTimeout
+          ? '피드백 생성이 시간 초과되었습니다 (180초). 잠시 후 다시 시도해주세요.'
+          : '피드백 생성에 실패했습니다. 네트워크 또는 서버 상태를 확인해주세요.';
         document.getElementById('feedback-loading').innerHTML = `
           <div class="text-center">
             <span class="material-symbols-outlined text-error mb-2" style="font-size:40px;">error</span>
-            <p class="text-error text-sm font-semibold">피드백 생성에 실패했습니다.</p>
-            <button onclick="endRoleplay()" style="color:#1d1d1f;font-size:14px;font-weight:600;background:none;border:none;cursor:pointer;text-decoration:underline;">다시 시도</button>
+            <p class="text-error text-sm font-semibold">${msg}</p>
+            <button onclick="endRoleplay()" style="color:#1d1d1f;font-size:14px;font-weight:600;background:none;border:none;cursor:pointer;text-decoration:underline;margin-top:8px;">다시 시도</button>
           </div>`;
+        alert(msg);
       }
     }
 
